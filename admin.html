@@ -1,0 +1,9198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>KMFBinary Admin</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+   <style>
+
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #08111f;
+    --bg-soft: #0d1726;
+    --panel: #111d2d;
+    --panel-2: #162337;
+    --border: #24344a;
+    --text: #f1f5f9;
+    --muted: #8fa3b8;
+    --blue: #3b82f6;
+    --blue-soft: #172f55;
+    --green: #22c55e;
+    --green-soft: #103b25;
+    --red: #ef4444;
+    --red-soft: #46151a;
+    --orange: #f59e0b;
+    --orange-soft: #432d0c;
+    --purple: #8b5cf6;
+    --purple-soft: #2a1c52;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+/* ==========================================
+   TOP HEADER
+========================================== */
+
+.admin-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: 72px;
+    background: rgba(8, 17, 31, 0.96);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 800;
+    color: white;
+}
+
+.brand-title {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.brand-subtitle {
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.admin-status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #a7f3d0;
+    background: var(--green-soft);
+    border: 1px solid #166534;
+    padding: 8px 11px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+}
+
+.logout {
+    float: none;
+    background: var(--red-soft);
+    color: #fecaca;
+    border: 1px solid #7f1d1d;
+    padding: 9px 14px;
+}
+
+.logout:hover {
+    background: #63151a;
+}
+
+/* ==========================================
+   LAYOUT
+========================================== */
+
+.admin-layout {
+    display: flex;
+    min-height: calc(100vh - 72px);
+}
+
+/* ==========================================
+   SIDEBAR
+========================================== */
+
+.sidebar {
+    width: 235px;
+    flex-shrink: 0;
+    background: #0b1524;
+    border-right: 1px solid var(--border);
+    padding: 22px 13px;
+    position: sticky;
+    top: 72px;
+    height: calc(100vh - 72px);
+    overflow-y: auto;
+}
+
+.sidebar-section {
+    margin-bottom: 24px;
+}
+
+.sidebar-title {
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0 11px;
+    margin-bottom: 7px;
+}
+
+.sidebar-link {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 11px;
+    margin-bottom: 3px;
+    border-radius: 8px;
+    color: #aebdce;
+    text-decoration: none;
+    font-size: 13px;
+    transition: 0.15s ease;
+}
+
+.sidebar-link:hover {
+    background: #142238;
+    color: white;
+}
+
+.sidebar-link.active {
+    background: var(--blue-soft);
+    color: #dbeafe;
+    border: 1px solid #1e40af;
+}
+
+.sidebar-icon {
+    width: 20px;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* ==========================================
+   MAIN
+========================================== */
+
+.main-content {
+    flex: 1;
+    min-width: 0;
+    padding: 28px;
+}
+
+.container {
+    max-width: 1500px;
+    margin: 0 auto;
+}
+
+/* ==========================================
+   PAGE INTRO
+========================================== */
+
+.page-intro {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.page-intro h1 {
+    margin: 0;
+    font-size: 27px;
+}
+
+.page-intro p {
+    margin: 7px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.page-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* ==========================================
+   ALERTS
+========================================== */
+
+.error,
+.success {
+    padding: 13px 15px;
+    border-radius: 9px;
+    margin-bottom: 18px;
+    font-size: 13px;
+}
+
+.error {
+    background: var(--red-soft);
+    color: #fecaca;
+    border: 1px solid #7f1d1d;
+    display: none;
+}
+
+.success {
+    background: var(--green-soft);
+    color: #bbf7d0;
+    border: 1px solid #166534;
+    display: none;
+}
+
+/* ==========================================
+   SECTION
+========================================== */
+
+.section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 21px;
+    margin-bottom: 22px;
+    overflow-x: auto;
+}
+
+.section h2 {
+    margin: 0 0 7px;
+    font-size: 18px;
+}
+
+.section h3 {
+    color: #dbeafe;
+}
+
+.section-note {
+    color: var(--muted);
+    font-size: 12px;
+    margin: 0 0 17px;
+}
+
+/* ==========================================
+   STAT CARDS
+========================================== */
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 13px;
+    margin-bottom: 20px;
+}
+
+.card {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 17px;
+    min-width: 0;
+}
+
+.card:hover {
+    border-color: #36506f;
+}
+
+.card-title {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.card-value {
+    font-size: 25px;
+    font-weight: 800;
+    margin-top: 9px;
+    color: white;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-subtitle {
+    color: #64748b;
+    font-size: 11px;
+    margin-top: 7px;
+}
+
+.card-green {
+    border-color: #166534;
+}
+
+.card-red {
+    border-color: #7f1d1d;
+}
+
+.card-orange {
+    border-color: #854d0e;
+}
+
+.card-blue {
+    border-color: #1e40af;
+}
+
+/* ==========================================
+   PRIORITY CARDS
+========================================== */
+
+.priority-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 13px;
+}
+
+.priority-card {
+    padding: 17px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.priority-card .priority-label {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.priority-card .priority-number {
+    font-size: 24px;
+    font-weight: 800;
+    margin-top: 5px;
+}
+
+.priority-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+/* ==========================================
+   ADMIN PROFILE
+========================================== */
+
+.admin-profile {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 13px;
+    margin-top: 15px;
+}
+
+.profile-box {
+    background: #0d1726;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+}
+
+.profile-label {
+    color: var(--muted);
+    font-size: 11px;
+    margin-bottom: 7px;
+}
+
+.profile-value {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 6px;
+    background: #1d4ed8;
+    color: #dbeafe;
+    text-transform: uppercase;
+    font-size: 10px;
+}
+
+/* ==========================================
+   PERMISSIONS
+========================================== */
+
+.permission-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 7px;
+}
+
+.permission {
+    padding: 9px 11px;
+    border-radius: 7px;
+    background: #0d1726;
+    border: 1px solid var(--border);
+    font-size: 11px;
+}
+
+.permission.allowed {
+    color: #bbf7d0;
+}
+
+.permission.denied {
+    color: #fca5a5;
+}
+
+/* ==========================================
+   NOTICE
+========================================== */
+
+.notice {
+    background: #101f3d;
+    border: 1px solid #1e40af;
+    color: #bfdbfe;
+    padding: 14px 16px;
+    border-radius: 10px;
+    margin-bottom: 22px;
+    line-height: 1.55;
+    font-size: 12px;
+}
+
+/* ==========================================
+   QUICK ACTIONS
+========================================== */
+
+.quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.quick-action {
+    background: #172337;
+    color: #dbeafe;
+    border: 1px solid #2c405a;
+}
+
+.quick-action:hover {
+    background: #1d2e46;
+}
+
+/* ==========================================
+   TABLES
+========================================== */
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+}
+
+th,
+td {
+    text-align: left;
+    padding: 11px 10px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+
+th {
+    color: #71869c;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+}
+
+td {
+    font-size: 12px;
+    color: #d8e1eb;
+}
+
+tbody tr:hover {
+    background: #142033;
+}
+
+/* ==========================================
+   BUTTONS
+========================================== */
+
+button {
+    border: none;
+    border-radius: 7px;
+    padding: 8px 11px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+.toggle {
+    background: var(--blue);
+    color: white;
+}
+
+.toggle:hover:not(:disabled) {
+    background: #2563eb;
+}
+
+.active {
+    background: var(--green-soft);
+    color: #bbf7d0;
+}
+
+.inactive {
+    background: var(--red-soft);
+    color: #fecaca;
+}
+
+/* ==========================================
+   WALLET
+========================================== */
+
+.wallet-owner-badge {
+    display: inline-block;
+    background: var(--orange-soft);
+    color: #fde68a;
+    padding: 5px 9px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 800;
+    margin-bottom: 12px;
+}
+
+.wallet-security,
+.role-info {
+    background: #0d1726;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 13px;
+    margin-bottom: 17px;
+    color: #b9c7d6;
+    line-height: 1.5;
+    font-size: 12px;
+}
+
+.wallet-security strong,
+.role-info strong {
+    color: white;
+}
+
+.wallet-balance {
+    font-weight: 700;
+}
+
+.wallet-live {
+    color: #86efac;
+}
+
+.wallet-demo {
+    color: #93c5fd;
+}
+
+.wallet-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.wallet-action {
+    color: white;
+}
+
+.wallet-credit {
+    background: #15803d;
+}
+
+.wallet-debit {
+    background: #b91c1c;
+}
+
+.wallet-set {
+    background: #7c3aed;
+}
+
+.wallet-view {
+    background: #2563eb;
+}
+
+/* ==========================================
+   ROLE MANAGEMENT
+========================================== */
+
+.role-select {
+    background: #0a1422;
+    color: var(--text);
+    border: 1px solid #40536b;
+    border-radius: 7px;
+    padding: 7px 9px;
+    min-width: 135px;
+}
+
+.role-button {
+    background: var(--blue);
+    color: white;
+}
+
+.protected {
+    color: #fca5a5;
+    font-size: 11px;
+}
+
+.role-user {
+    color: #cbd5e1;
+}
+
+.role-admin {
+    color: #93c5fd;
+    font-weight: bold;
+}
+
+.role-super {
+    color: #c4b5fd;
+    font-weight: bold;
+}
+
+.role-owner {
+    color: #fbbf24;
+    font-weight: bold;
+}
+
+/* ==========================================
+   WITHDRAWAL BUTTONS
+========================================== */
+
+.withdrawal-approve-btn,
+.withdrawal-reject-btn {
+    border-radius: 6px;
+    padding: 6px 9px;
+    margin: 2px;
+    font-size: 11px;
+}
+
+.withdrawal-approve-btn {
+    background: #16a34a;
+    color: white;
+}
+
+.withdrawal-reject-btn {
+    background: #dc2626;
+    color: white;
+}
+
+/* ==========================================
+   CUSTOMER CARE
+========================================== */
+
+.support-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.support-header h2 {
+    margin: 0;
+}
+
+.support-refresh {
+    background: var(--blue);
+    color: white;
+}
+
+.support-layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 13px;
+    min-height: 520px;
+}
+
+.support-conversations,
+.support-chat {
+    background: #0d1726;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    overflow: hidden;
+}
+
+.support-list-header {
+    padding: 13px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.support-list {
+    max-height: 455px;
+    overflow-y: auto;
+}
+
+.support-conversation {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    color: var(--text);
+    border-radius: 0;
+    padding: 13px;
+    border-bottom: 1px solid var(--border);
+}
+
+.support-conversation:hover {
+    background: #142033;
+}
+
+.support-conversation.selected {
+    background: var(--blue-soft);
+}
+
+.support-customer {
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+.support-preview {
+    color: var(--muted);
+    font-size: 11px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.support-time {
+    color: #64748b;
+    font-size: 10px;
+    margin-top: 6px;
+}
+
+.support-unread {
+    display: inline-block;
+    background: #dc2626;
+    color: white;
+    border-radius: 20px;
+    padding: 2px 6px;
+    font-size: 9px;
+    margin-left: 5px;
+}
+
+.support-chat {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.support-chat-header {
+    padding: 13px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.support-chat-customer {
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.support-chat-status {
+    color: #86efac;
+    font-size: 10px;
+    margin-top: 3px;
+}
+
+.support-chat-status.closed {
+    color: #fca5a5;
+}
+
+.support-chat-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.support-close {
+    background: #7f1d1d;
+    color: white;
+}
+
+.support-reopen {
+    background: #15803d;
+    color: white;
+}
+
+.support-read {
+    background: #475569;
+    color: white;
+}
+
+.support-messages {
+    flex: 1;
+    padding: 14px;
+    overflow-y: auto;
+    min-height: 350px;
+    max-height: 410px;
+}
+
+.support-empty {
+    height: 100%;
+    min-height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.support-message {
+    display: flex;
+    margin-bottom: 11px;
+}
+
+.support-message.customer {
+    justify-content: flex-start;
+}
+
+.support-message.support {
+    justify-content: flex-end;
+}
+
+.support-bubble {
+    max-width: 75%;
+    padding: 9px 12px;
+    border-radius: 11px;
+    line-height: 1.45;
+    font-size: 12px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.support-message.customer .support-bubble {
+    background: #1a2739;
+    border: 1px solid #2c4058;
+}
+
+.support-message.support .support-bubble {
+    background: #14532d;
+    color: #dcfce7;
+}
+
+.support-message-time {
+    display: block;
+    margin-top: 5px;
+    font-size: 9px;
+    color: #94a3b8;
+}
+
+.support-compose {
+    border-top: 1px solid var(--border);
+    padding: 10px;
+    display: flex;
+    gap: 7px;
+}
+
+.support-compose textarea {
+    flex: 1;
+    min-height: 52px;
+    resize: vertical;
+    background: #08111f;
+    color: var(--text);
+    border: 1px solid #3a4d65;
+    border-radius: 8px;
+    padding: 9px;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+}
+
+.support-send {
+    align-self: flex-end;
+    background: var(--blue);
+    color: white;
+}
+
+.support-filter {
+    background: #0a1422;
+    color: var(--text);
+    border: 1px solid #40536b;
+    border-radius: 7px;
+    padding: 8px 10px;
+    font-size: 11px;
+}
+
+/* ==========================================
+   LOADING
+========================================== */
+
+.loading {
+    color: var(--muted);
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 1150px) {
+
+    .cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .priority-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .permission-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+@media (max-width: 900px) {
+
+    .sidebar {
+        display: none;
+    }
+
+    .main-content {
+        padding: 18px;
+    }
+
+    .admin-profile {
+        grid-template-columns: 1fr;
+    }
+
+    .support-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .support-conversations {
+        min-height: 240px;
+    }
+
+    .support-list {
+        max-height: 240px;
+    }
+
+}
+
+@media (max-width: 650px) {
+
+    .admin-header {
+        height: auto;
+        min-height: 68px;
+        padding: 12px 15px;
+    }
+
+    .brand-subtitle {
+        display: none;
+    }
+
+    .admin-status {
+        display: none;
+    }
+
+    .main-content {
+        padding: 12px;
+    }
+
+    .page-intro {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .page-intro h1 {
+        font-size: 23px;
+    }
+
+    .cards,
+    .priority-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .permission-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section {
+        padding: 15px;
+        border-radius: 11px;
+    }
+
+    .support-chat-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .support-bubble {
+        max-width: 90%;
+    }
+
+    .wallet-actions {
+        flex-direction: column;
+    }
+
+    .wallet-action {
+        width: 100%;
+    }
+
+}
+/* =========================================================
+   PLATFORM TRANSFER INTERFACE
+   ========================================================= */
+
+.platform-transfer-panel {
+    margin: 25px 0;
+    padding: 22px;
+    background: #0d1714;
+    border: 1px solid #263d35;
+    border-radius: 14px;
+}
+
+.transfer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 22px;
+}
+
+.transfer-header h3 {
+    margin: 0 0 6px;
+    color: #ffffff;
+    font-size: 20px;
+}
+
+.transfer-header p {
+    margin: 0;
+    color: #91a39c;
+    font-size: 13px;
+}
+
+.platform-balance-card {
+    min-width: 230px;
+    padding: 15px 18px;
+    background: #111f1b;
+    border: 1px solid #315247;
+    border-radius: 10px;
+    text-align: right;
+}
+
+.platform-balance-card span {
+    display: block;
+    color: #91a39c;
+    font-size: 11px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.platform-balance-card strong {
+    display: block;
+    color: #42d392;
+    font-size: 22px;
+    margin-bottom: 8px;
+}
+
+.small-refresh-btn {
+    border: 1px solid #315247;
+    background: #162720;
+    color: #b9d2c8;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.small-refresh-btn:hover {
+    background: #203a30;
+}
+
+.transfer-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.transfer-card {
+    background: #111c19;
+    border: 1px solid #263d35;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.transfer-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 16px;
+    margin-bottom: 17px;
+    border-bottom: 1px solid #23352f;
+}
+
+.transfer-icon {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #17372b;
+    color: #42d392;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.transfer-card-header h4 {
+    margin: 0 0 4px;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.transfer-card-header span {
+    color: #84978f;
+    font-size: 12px;
+}
+
+.transfer-form label {
+    display: block;
+    margin: 0 0 7px;
+    color: #b7c9c1;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.transfer-form input,
+.transfer-form select,
+.transfer-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    padding: 11px 12px;
+    border: 1px solid #30463e;
+    border-radius: 7px;
+    background: #0b1412;
+    color: #ffffff;
+    outline: none;
+    font-size: 13px;
+}
+
+.transfer-form input:focus,
+.transfer-form select:focus,
+.transfer-form textarea:focus {
+    border-color: #42d392;
+}
+
+.transfer-form textarea {
+    resize: vertical;
+    min-height: 78px;
+}
+
+.transfer-form select option {
+    background: #111c19;
+    color: #ffffff;
+}
+
+.transfer-btn {
+    width: 100%;
+    border: none;
+    padding: 12px 15px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 13px;
+    transition: .2s ease;
+}
+
+.transfer-btn-primary {
+    background: #315f4c;
+    color: #ffffff;
+}
+
+.transfer-btn-primary:hover {
+    background: #3d735c;
+}
+
+.transfer-btn-success {
+    background: #23845b;
+    color: #ffffff;
+}
+
+.transfer-btn-success:hover {
+    background: #2d9d6e;
+}
+
+.transfer-btn:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+}
+
+.platform-transfer-message {
+    margin-top: 18px;
+    padding: 12px 15px;
+    border-radius: 7px;
+    font-size: 13px;
+}
+
+.platform-transfer-message.success {
+    background: #123a29;
+    border: 1px solid #287b58;
+    color: #70e2aa;
+}
+
+.platform-transfer-message.error {
+    background: #3a1717;
+    border: 1px solid #803535;
+    color: #ff9292;
+}
+
+@media (max-width: 850px) {
+
+    .transfer-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .platform-balance-card {
+        text-align: left;
+        min-width: 0;
+    }
+
+    .transfer-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+</head>
+
+
+<body>
+
+<header class="admin-header">
+
+    <div class="brand">
+
+        <div class="brand-logo">
+            K
+        </div>
+
+        <div>
+
+            <div class="brand-title">
+                KMFBinary Admin
+            </div>
+
+            <div class="brand-subtitle">
+                Administration &amp; Financial Control
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="header-right">
+
+        <div class="admin-status">
+
+            <span class="status-dot"></span>
+
+            Administrator
+
+        </div>
+
+
+        <button
+            class="logout"
+            onclick="logout()"
+        >
+            Logout
+        </button>
+
+    </div>
+
+</header>
+
+
+<div class="admin-layout">
+
+
+    <!-- ==========================================
+         SIDEBAR
+    =========================================== -->
+
+    <aside class="sidebar">
+
+
+        <div class="sidebar-section">
+
+            <div class="sidebar-title">
+                Main
+            </div>
+
+            <a
+                href="#dashboard"
+                class="sidebar-link active"
+            >
+                <span class="sidebar-icon">⌂</span>
+                Dashboard
+            </a>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <div class="sidebar-title">
+                Finance
+            </div>
+
+            <a
+                href="#financialOverview"
+                class="sidebar-link"
+            >
+                <span class="sidebar-icon">💰</span>
+                Financial Overview
+            </a>
+
+            <a
+                href="#pendingDeposits"
+                class="sidebar-link"
+            >
+                <span class="sidebar-icon">↓</span>
+                Deposits
+            </a>
+
+            <a
+                href="#withdrawals"
+                class="sidebar-link"
+            >
+                <span class="sidebar-icon">↑</span>
+                Withdrawals
+            </a>
+
+            <a
+                href="#transactions"
+                class="sidebar-link"
+            >
+                <span class="sidebar-icon">↔</span>
+                Transactions
+            </a>
+
+          <a
+    href="#ownerWalletSection"
+    class="sidebar-link"
+    onclick="showAdminSection('ownerWalletSection'); return false;"
+>
+    <span class="sidebar-icon">▣</span>
+    Wallets
+</a>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <div class="sidebar-title">
+                Customers
+            </div>
+
+            <a
+                href="#users"
+                class="sidebar-link"
+            >
+                <span class="sidebar-icon">♙</span>
+                Users
+            </a>
+
+            <a
+                href="#customerCareSection"
+                class="sidebar-link"
+            >
+                <span class="sidebar-icon">✉</span>
+                Customer Care
+            </a>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <div class="sidebar-title">
+                Trading
+            </div>
+
+            <a
+                href="#trades"
+                class="sidebar-link"
+            >
+                <span class="sidebar-icon">▥</span>
+                Trades
+            </a>
+
+            <a
+                href="#markets"
+                class="sidebar-link"
+            >
+                <span class="sidebar-icon">◈</span>
+                Markets
+            </a>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <div class="sidebar-title">
+                Administration
+            </div>
+
+            <a
+                href="#roleManagement"
+                class="sidebar-link"
+            >
+                <span class="sidebar-icon">♙</span>
+                Roles
+            </a>
+
+            <a
+                href="#adminAccess"
+                class="sidebar-link"
+            >
+                <span class="sidebar-icon">⚙</span>
+                Admin Access
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ==========================================
+         MAIN CONTENT
+    =========================================== -->
+
+    <main class="main-content">
+
+        <div class="container">
+
+
+            <!-- ======================================
+                 ALERTS
+            ======================================= -->
+
+            <div
+                id="errorBox"
+                class="error"
+            ></div>
+
+
+            <div
+                id="successBox"
+                class="success"
+            ></div>
+
+
+            <!-- ======================================
+                 PAGE INTRO
+            ======================================= -->
+
+            <div class="page-intro">
+
+                <div>
+
+                    <h1>
+                        Dashboard
+                    </h1>
+
+                    <p id="adminInfo">
+                        Checking administrator access...
+                    </p>
+
+                </div>
+
+
+                <div class="page-actions">
+
+                    <button
+                        class="quick-action"
+                        onclick="location.reload()"
+                    >
+                        Refresh Dashboard
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ======================================
+                 PRIORITY / NEEDS ATTENTION
+            ======================================= -->
+
+            <div class="section">
+
+                <h2>
+                    Needs Attention
+                </h2>
+
+                <p class="section-note">
+                    Items that may require administrator action.
+                </p>
+
+
+                <div class="priority-grid">
+
+
+                    <div class="priority-card">
+
+                        <div>
+
+                            <div class="priority-label">
+                                Pending Withdrawals
+                            </div>
+
+                            <div
+                                class="priority-number"
+                                id="withdrawalsCount"
+                            >
+                                -
+                            </div>
+
+                        </div>
+
+                        <div
+                            class="priority-icon"
+                            style="
+                                background:#432d0c;
+                                color:#fbbf24;
+                            "
+                        >
+                            ↑
+                        </div>
+
+                    </div>
+
+
+                    <div class="priority-card">
+
+                        <div>
+
+                            <div class="priority-label">
+                                Pending Deposits
+                            </div>
+
+                            <div
+                                class="priority-number"
+                                id="depositsCount"
+                            >
+                                -
+                            </div>
+
+                        </div>
+
+                        <div
+                            class="priority-icon"
+                            style="
+                                background:#172f55;
+                                color:#60a5fa;
+                            "
+                        >
+                            ↓
+                        </div>
+
+                    </div>
+
+
+                    <div class="priority-card">
+
+                        <div>
+
+                            <div class="priority-label">
+                                Registered Users
+                            </div>
+
+                            <div
+                                class="priority-number"
+                                id="usersCount"
+                            >
+                                -
+                            </div>
+
+                        </div>
+
+                        <div
+                            class="priority-icon"
+                            style="
+                                background:#2a1c52;
+                                color:#c4b5fd;
+                            "
+                        >
+                            ♙
+                        </div>
+
+                    </div>
+
+
+                    <div class="priority-card">
+
+                        <div>
+
+                            <div class="priority-label">
+                                Total Trades
+                            </div>
+
+                            <div
+                                class="priority-number"
+                                id="tradesCount"
+                            >
+                                -
+                            </div>
+
+                        </div>
+
+                        <div
+                            class="priority-icon"
+                            style="
+                                background:#103b25;
+                                color:#86efac;
+                            "
+                        >
+                            ▥
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ======================================
+                 QUICK ACTIONS
+            ======================================= -->
+
+            <div class="section">
+
+                <h2>
+                    Quick Access
+                </h2>
+
+                <p class="section-note">
+                    Jump directly to the areas you use most.
+                </p>
+
+
+                <div class="quick-actions">
+
+                    <a
+                        href="#financialOverview"
+                        class="sidebar-link quick-action"
+                        style="width:auto;"
+                    >
+                        💰 Financial Overview
+                    </a>
+
+                    <a
+                        href="#withdrawals"
+                        class="sidebar-link quick-action"
+                        style="width:auto;"
+                    >
+                        ↑ Review Withdrawals
+                    </a>
+
+                    <a
+                        href="#pendingDeposits"
+                        class="sidebar-link quick-action"
+                        style="width:auto;"
+                    >
+                        ↓ Review Deposits
+                    </a>
+
+                    <a
+                        href="#customerCareSection"
+                        class="sidebar-link quick-action"
+                        style="width:auto;"
+                    >
+                        ✉ Customer Care
+                    </a>
+
+                    <a
+                        href="#users"
+                        class="sidebar-link quick-action"
+                        style="width:auto;"
+                    >
+                        ♙ Users
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- ======================================
+                 ADMIN ACCESS
+            ======================================= -->
+
+            <div
+                class="section"
+                id="adminAccess"
+            >
+
+                <h2>
+                    Administrator Access
+                </h2>
+
+                <p class="section-note">
+                    Current administrator identity, role and permissions.
+                </p>
+
+
+                <div class="admin-profile">
+
+                    <div class="profile-box">
+
+                        <div class="profile-label">
+                            Administrator
+                        </div>
+
+                        <div
+                            class="profile-value"
+                            id="adminEmail"
+                        >
+                            Loading...
+                        </div>
+
+                    </div>
+
+
+                    <div class="profile-box">
+
+                        <div class="profile-label">
+                            Role
+                        </div>
+
+                        <div
+                            class="profile-value"
+                            id="adminRole"
+                        >
+                            Loading...
+                        </div>
+
+                    </div>
+
+
+                    <div class="profile-box">
+
+                        <div class="profile-label">
+                            Access Level
+                        </div>
+
+                        <div
+                            class="profile-value"
+                            id="accessLevel"
+                        >
+                            Loading...
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <h3>
+                    Permissions
+                </h3>
+
+
+                <div
+                    id="permissionGrid"
+                    class="permission-grid"
+                >
+
+                    <div class="loading">
+                        Loading permissions...
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ======================================
+                 SECURITY
+            ======================================= -->
+
+            <div class="notice">
+
+                <strong>
+                    Admin security:
+                </strong>
+
+                This panel is for monitoring and controlled
+                management. User balances, verified payment
+                results, settled trades and administrator roles
+                are protected by backend permissions.
+
+            </div>
+
+
+            <!-- ======================================
+                 FINANCIAL OVERVIEW
+            ======================================= -->
+
+            <div
+                class="section"
+                id="financialOverview"
+            >
+
+                <h2>
+                    Financial Overview
+                </h2>
+
+                <p class="section-note">
+                    Monitor customer liabilities, deposits,
+                    withdrawals, trading flows and recent
+                    financial activity.
+                </p>
+
+
+                <!-- CUSTOMER FUNDS -->
+
+                <h3>
+                    Customer Funds
+                </h3>
+
+                <div class="cards">
+
+                    <div class="card card-blue">
+
+                        <div class="card-title">
+                            Customer Funds
+                        </div>
+
+                        <div
+                            class="card-value"
+                            id="customerFundsUsd"
+                        >
+                            $0.00
+                        </div>
+
+                        <div class="card-subtitle">
+                            Live customer wallet balances
+                        </div>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <div class="card-title">
+                            Customer Funds KSh
+                        </div>
+
+                        <div
+                            class="card-value"
+                            id="customerFundsKes"
+                        >
+                            KSh 0.00
+                        </div>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <div class="card-title">
+                            Funded Users
+                        </div>
+
+                        <div
+                            class="card-value"
+                            id="fundedUsers"
+                        >
+                            0
+                        </div>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <div class="card-title">
+                            Total Wallets
+                        </div>
+
+                        <div
+                            class="card-value"
+                            id="totalWallets"
+                        >
+                            0
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DEPOSITS -->
+
+                <h3>
+                    Deposits
+                </h3>
+
+                <div class="cards">
+
+                    <div class="card card-green">
+
+                        <div class="card-title">
+                            Completed
+                        </div>
+
+                        <div
+                            class="card-value"
+                            id="completedDeposits"
+                        >
+                            $0.00
+                        </div>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <div class="card-title">
+                            Completed KSh
+                        </div>
+
+                        <div
+                            class="card-value"
+                            id="completedDepositsKes"
+                        >
+                            KSh 0.00
+                        </div>
+
+                    </div>
+
+
+                    <div class="card card-orange">
+
+                        <div class="card-title">
+                            Pending
+                        </div>
+
+                        <div
+                            class="card-value"
+                            id="pendingDepositsAmount"
+                        >
+                            $0.00
+                        </div>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <div class="card-title">
+                            Pending KSh
+                        </div>
+
+                        <div
+                            class="card-value"
+                            id="pendingDepositsKes"
+                        >
+                            KSh 0.00
+                        </div>
+
+                    </div>
+
+
+                    <div class="card card-red">
+
+                        <div class="card-title">
+                            Failed
+                        </div>
+
+                        <div
+                            class="card-value"
+                            id="failedDepositsAmount"
+                        >
+                            $0.00
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- WITHDRAWALS -->
+
+                <h3>
+                    Withdrawals
+                </h3>
+
+                <div class="cards">
+
+                    <div class="card card-green">
+
+                        <div class="card-title">
+                            Completed
+                        </div>
+
+                        <div
+                            class="card-value"
+                            id="completedWithdrawals"
+                        >
+                            $0.00
+                        </div>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <div class="card-title">
+                            Completed KSh
+                        </div>
+
+                        <div
+                            class="card-value"
+                            id="completedWithdrawalsKes"
+                        >
+                            KSh 0.00
+                        </div>
+
+                    </div>
+
+
+                    <div class="card card-orange">
+
+                        <div class="card-title">
+                            Pending
+                        </div>
+
+                        <div
+                            class="card-value"
+                            id="pendingWithdrawalsAmount"
+                        >
+                            $0.00
+                        </div>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <div class="card-title">
+                            Pending KSh
+                        </div>
+
+                        <div
+                            class="card-value"
+                            id="pendingWithdrawalsKes"
+                        >
+                            KSh 0.00
+                        </div>
+
+                    </div>
+
+
+                    <div class="card card-red">
+
+                        <div class="card-title">
+                            Rejected
+                        </div>
+
+                        <div
+                            class="card-value"
+                            id="rejectedWithdrawalsAmount"
+                        >
+                            $0.00
+                        </div>
+
+                    </div>
+
+
+                    <div class="card card-red">
+
+                        <div class="card-title">
+                            Failed
+                        </div>
+
+                        <div
+                            class="card-value"
+                            id="failedWithdrawalsAmount"
+                        >
+                            $0.00
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- TRADING -->
+
+                <h3>
+                    Trading
+                </h3>
+
+                <div class="cards">
+
+                    <div class="card">
+
+                        <div class="card-title">
+                            Trade Stakes
+                        </div>
+
+                        <div
+                            class="card-value"
+                            id="tradeStakes"
+                        >
+                            $0.00
+                        </div>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <div class="card-title">
+                            Trade Payouts
+                        </div>
+
+                        <div
+                            class="card-value"
+                            id="tradePayouts"
+                        >
+                            $0.00
+                        </div>
+
+                    </div>
+
+
+                    <div class="card card-blue">
+
+                        <div class="card-title">
+                            Net Trading Flow
+                        </div>
+
+                        <div
+                            class="card-value"
+                            id="netTradingFlow"
+                        >
+                            $0.00
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- OTHER -->
+
+                <h3>
+                    Other Financial Activity
+                </h3>
+
+                <div class="cards">
+
+                    <div class="card">
+
+                        <div class="card-title">
+                            Refunds
+                        </div>
+
+                        <div
+                            class="card-value"
+                            id="refundsAmount"
+                        >
+                            $0.00
+                        </div>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <div class="card-title">
+                            Bonuses
+                        </div>
+
+                        <div
+                            class="card-value"
+                            id="bonusesAmount"
+                        >
+                            $0.00
+                        </div>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <div class="card-title">
+                            Net Deposits - Withdrawals
+                        </div>
+
+                        <div
+                            class="card-value"
+                            id="netDepositWithdrawal"
+                        >
+                            $0.00
+                        </div>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <div class="card-title">
+                            Net Deposits - Withdrawals KSh
+                        </div>
+
+                        <div
+                            class="card-value"
+                            id="netDepositWithdrawalKes"
+                        >
+                            KSh 0.00
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- BUSINESS CASH -->
+
+                <h3>
+                    Business Cash
+                </h3>
+
+                <div class="card">
+
+                    <div class="card-title">
+                        Actual Business Cash
+                    </div>
+
+                    <div
+                        id="businessCashStatus"
+                        style="
+                            margin-top:9px;
+                            color:#94a3b8;
+                            font-size:12px;
+                            line-height:1.6;
+                        "
+                    >
+                        Actual business cash must be checked externally.
+                    </div>
+
+                </div>
+
+
+                <!-- CUSTOMER BALANCES -->
+
+                <h3>
+                    Customer Wallet Balances
+                </h3>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>User</th>
+                                <th>User ID</th>
+                                <th>Live USD</th>
+                                <th>KSh Equivalent</th>
+                                <th>Currency</th>
+                                <th>Updated</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="financialUserBalancesTable">
+
+                            <tr>
+                                <td colspan="6">
+                                    Loading...
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <!-- RECENT FINANCIAL TRANSACTIONS -->
+
+                <h3>
+                    Recent Financial Transactions
+                </h3>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>User</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Payment</th>
+                                <th>Reference</th>
+                                <th>Date</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="financialRecentTransactionsTable">
+
+                            <tr>
+                                <td colspan="7">
+                                    Loading...
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- ======================================
+                 CUSTOMER CARE
+            ======================================= -->
+
+            <div
+                class="section"
+                id="customerCareSection"
+            >
+
+                <div class="support-header">
+
+                    <div>
+
+                        <h2>
+                            Customer Care
+                        </h2>
+
+                        <p class="section-note">
+                            View and reply to customer support conversations.
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        style="
+                            display:flex;
+                            gap:7px;
+                            align-items:center;
+                            flex-wrap:wrap;
+                        "
+                    >
+
+                        <select
+                            id="supportFilter"
+                            class="support-filter"
+                            onchange="loadSupportConversations()"
+                        >
+
+                            <option value="open">
+                                Open Conversations
+                            </option>
+
+                            <option value="closed">
+                                Closed Conversations
+                            </option>
+
+                            <option value="all">
+                                All Conversations
+                            </option>
+
+                        </select>
+
+
+                        <button
+                            type="button"
+                            class="support-refresh"
+                            onclick="refreshCustomerCare()"
+                        >
+                            Refresh
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="support-layout">
+
+
+                    <div class="support-conversations">
+
+                        <div class="support-list-header">
+
+                            Conversations
+
+                            <span id="supportConversationCount">
+                                (0)
+                            </span>
+
+                        </div>
+
+
+                        <div
+                            id="supportConversationList"
+                            class="support-list"
+                        >
+
+                            <div
+                                class="support-empty"
+                                style="min-height:220px;"
+                            >
+                                Loading conversations...
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="support-chat">
+
+                        <div
+                            id="supportChatHeader"
+                            class="support-chat-header"
+                        >
+
+                            <div>
+
+                                <div
+                                    id="supportChatCustomer"
+                                    class="support-chat-customer"
+                                >
+                                    Select a conversation
+                                </div>
+
+                                <div
+                                    id="supportChatStatus"
+                                    class="support-chat-status"
+                                >
+                                    No conversation selected
+                                </div>
+
+                            </div>
+
+
+                            <div
+                                id="supportChatActions"
+                                class="support-chat-actions"
+                                style="display:none;"
+                            >
+
+                                <button
+                                    type="button"
+                                    class="support-read"
+                                    onclick="markSupportConversationRead()"
+                                >
+                                    Mark Read
+                                </button>
+
+                                <button
+                                    type="button"
+                                    id="supportCloseButton"
+                                    class="support-close"
+                                    onclick="closeSupportConversation()"
+                                >
+                                    Close
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            id="supportMessages"
+                            class="support-messages"
+                        >
+
+                            <div class="support-empty">
+
+                                Select a customer conversation
+                                to view messages.
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            id="supportCompose"
+                            class="support-compose"
+                            style="display:none;"
+                        >
+
+                            <textarea
+                                id="supportMessageInput"
+                                placeholder="Type your reply..."
+                            ></textarea>
+
+
+                            <button
+                                type="button"
+                                id="supportSendButton"
+                                class="support-send"
+                                onclick="sendSupportMessage()"
+                            >
+                                Send
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ======================================
+                 USERS
+            ======================================= -->
+
+            <div
+                class="section"
+                id="users"
+            >
+
+                <h2>
+                    Users
+                </h2>
+
+                <p class="section-note">
+                    Registered customers and their current account balances.
+                </p>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Username</th>
+                                <th>Name</th>
+                                <th>Country</th>
+                                <th>Role</th>
+                                <th>Balance</th>
+                                <th>Demo Balance</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="usersTable">
+
+                            <tr>
+
+                                <td
+                                    colspan="6"
+                                    class="loading"
+                                >
+                                    Loading users...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- ======================================
+                 MARKETS
+            ======================================= -->
+
+            <div
+                class="section"
+                id="markets"
+            >
+
+                <h2>
+                    Markets
+                </h2>
+
+                <p class="section-note">
+                    Activate or deactivate available trading markets.
+                </p>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Name</th>
+                                <th>Contract</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="marketsTable">
+
+                            <tr>
+
+                                <td
+                                    colspan="5"
+                                    class="loading"
+                                >
+                                    Loading markets...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+<!-- REFERRAL COMMISSION SETTINGS -->
+<div class="section" id="referralSettingsSection">
+
+    <h2>Referral Commission Settings</h2>
+    <div class="settings-card">
+        <p>
+            Configure the commission earned when a referred user
+            makes a qualifying successful deposit.
+        </p>
+
+        <div class="form-group">
+            <label for="referralCommissionPercent">
+                Commission Rate
+            </label>
+
+            <select id="referralCommissionPercent">
+                <option value="5">5%</option>
+                <option value="10">10%</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Minimum Qualifying Deposit</label>
+            <input
+                type="text"
+                value="$8.00 USD"
+                readonly
+            >
+        </div>
+
+        <p>
+            Commission status: Earned — not automatically paid.
+        </p>
+
+        <button
+            type="button"
+            id="saveReferralSettingsButton"
+            onclick="saveReferralSettings()"
+        >
+            Save Referral Settings
+        </button>
+
+
+        <p id="referralSettingsMessage" role="status"></p>
+
+    </div> <!-- End settings-card -->
+</div> <!-- End referralSettingsSection -->
+
+
+<!-- ======================================
+     TRADES
+======================================= -->
+
+<div class="section" id="trades">
+
+    <h2>Recent Trades</h2>
+
+    <p class="section-note">
+        Monitor recent customer trading activity.
+    </p>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Trade ID</th>
+                    <th>User</th>
+                    <th>Symbol</th>
+                    <th>Contract</th>
+                    <th>Action</th>
+                    <th>Stake</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody id="tradesTable">
+                <tr>
+                    <td colspan="7" class="loading">
+                        Loading trades...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+
+<!-- ======================================
+     OWNER WALLET
+======================================= -->
+
+<div
+    class="section"
+    id="ownerWalletSection"
+    style="display:none;"
+>
+
+    <h2>
+        Owner Wallet Management
+    </h2>
+
+    <span class="wallet-owner-badge">
+        OWNER ONLY
+    </span>
+
+    <p class="section-note">
+        Manual live wallet controls. These affect real customer balances.
+    </p>
+
+    <div class="wallet-security">
+
+        <strong>
+            Important:
+        </strong>
+
+        Wallet actions affect the user's
+        <strong>LIVE / REAL balance only</strong>.
+
+        Demo balances are not changed.
+
+        <br><br>
+
+        Always enter a clear reason for every
+        manual wallet adjustment.
+
+    </div>
+
+
+    <!-- ======================================
+         PLATFORM TRANSFER INTERFACE
+    ======================================= -->
+
+    <div
+        class="platform-transfer-panel"
+        style="
+            margin:20px 0;
+            padding:20px;
+            border:1px solid rgba(34,197,94,.25);
+            border-radius:14px;
+            background:rgba(15,23,42,.55);
+        "
+    >
+
+        <div
+            style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                gap:15px;
+                flex-wrap:wrap;
+                margin-bottom:18px;
+            "
+        >
+
+            <div>
+
+                <h3 style="margin:0 0 5px;">
+                    Platform Transfers
+                </h3>
+
+                <p
+                    style="
+                        margin:0;
+                        color:#94a3b8;
+                        font-size:13px;
+                    "
+                >
+                    Owner-only movement of real funds.
+                    Demo balances are never changed.
+                </p>
+
+            </div>
+
+
+            <div
+                style="
+                    padding:10px 14px;
+                    border-radius:10px;
+                    background:rgba(34,197,94,.10);
+                    border:1px solid rgba(34,197,94,.25);
+                    min-width:190px;
+                "
+            >
+
+                <div
+                    style="
+                        font-size:11px;
+                        color:#94a3b8;
+                        text-transform:uppercase;
+                    "
+                >
+                    Platform Balance
+                </div>
+
+                <strong
+                    id="platformBalanceDisplay"
+                    style="
+                        display:block;
+                        margin-top:4px;
+                        font-size:18px;
+                    "
+                >
+                    Loading...
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="platformTransferMessage"
+            class="platform-transfer-message"
+            style="
+                display:none;
+                margin-bottom:15px;
+                padding:11px 13px;
+                border-radius:9px;
+            "
+        ></div>
+
+
+        <div
+            style="
+                display:grid;
+                grid-template-columns:
+                    repeat(
+                        auto-fit,
+                        minmax(280px,1fr)
+                    );
+                gap:16px;
+            "
+        >
+
+          
+<!-- ======================================
+     OWNER → KMFBINARY
+====================================== -->
+
+<div
+    style="
+        padding:16px;
+        border:1px solid rgba(148,163,184,.15);
+        border-radius:12px;
+    "
+>
+    <h4 style="margin:0 0 6px;">
+        User → KMFBinary
+    </h4>
+
+    <p style="margin:0 0 14px;color:#94a3b8;font-size:13px;">
+        Transfer from a customer's LIVE / REAL wallet
+        to the KMFBinary platform wallet.
+    </p>
+
+    <select
+        id="userToKmfUser"
+        onchange="loadSelectedUserBalance()"
+        style="width:100%;box-sizing:border-box;margin-bottom:10px;"
+    >
+        <option value="">Loading customers...</option>
+    </select>
+
+    <div
+        id="userToKmfBalance"
+        style="margin-bottom:10px;color:#22c55e;font-size:13px;"
+    >
+        Select a user to view their LIVE balance.
+    </div>
+
+    <input
+        id="ownerToKmfAmount"
+        oninput="updateTransferEstimate()"
+        type="number"
+        min="0.01"
+        step="0.01"
+        placeholder="Amount in USD"
+        style="width:100%;box-sizing:border-box;margin-bottom:10px;"
+    >
+
+    <textarea
+        id="ownerToKmfReason"
+        rows="3"
+        maxlength="500"
+        placeholder="Reason for this transfer"
+        style="width:100%;box-sizing:border-box;margin-bottom:10px;resize:vertical;"
+    ></textarea>
+
+    <button
+        type="button"
+        onclick="transferOwnerToKmf()"
+        style="width:100%;"
+    >
+        Transfer from User
+    </button>
+</div>
+
+
+<!-- ======================================
+     KMF → USER
+====================================== -->
+
+<div
+    style="
+        padding:16px;
+        border:1px solid rgba(148,163,184,.15);
+        border-radius:12px;
+    "
+>
+    <h4 style="margin:0 0 6px;">
+        KMFBinary → User Wallet
+    </h4>
+
+    <p style="margin:0 0 14px;color:#94a3b8;font-size:13px;">
+        Transfer from the platform wallet
+        to a customer's LIVE / REAL wallet.
+    </p>
+
+    <select
+        id="kmfTransferUser"
+        style="width:100%;box-sizing:border-box;margin-bottom:10px;"
+    >
+        <option value="">Loading customers...</option>
+    </select>
+
+    <input
+        id="kmfToUserAmount"
+        type="number"
+        min="0.01"
+        step="0.01"
+        placeholder="Amount in USD"
+        style="width:100%;box-sizing:border-box;margin-bottom:10px;"
+    >
+
+    <textarea
+        id="kmfToUserReason"
+        rows="3"
+        maxlength="500"
+        placeholder="Reason for this transfer"
+        style="width:100%;box-sizing:border-box;margin-bottom:10px;resize:vertical;"
+    ></textarea>
+
+    <button
+        type="button"
+        onclick="transferKmfToUser()"
+        style="width:100%;"
+    >
+        Transfer to User
+    </button>
+</div>
+  
+        </div>
+
+
+        <div
+            style="
+                margin-top:14px;
+                padding:11px 13px;
+                border-radius:9px;
+                background:rgba(245,158,11,.08);
+                border:
+                    1px solid
+                    rgba(245,158,11,.20);
+                color:#fbbf24;
+                font-size:12px;
+                line-height:1.5;
+            "
+        >
+            Owner authorization is required.
+            Platform transfers do not modify demo balances.
+        </div>
+
+    </div>
+
+
+    <!-- ======================================
+         EXISTING OWNER WALLET TABLE
+    ======================================= -->
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>User ID</th>
+                    <th>Wallet ID</th>
+                    <th>Live Balance</th>
+                    <th>Demo Balance</th>
+                    <th>Currency</th>
+                    <th>Updated</th>
+                    <th>Actions</th>
+                </tr>
+
+            </thead>
+
+
+            <tbody id="walletManagementTable">
+
+                <tr>
+
+                    <td
+                        colspan="7"
+                        class="loading"
+                    >
+                        Loading wallet records...
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+            <!-- ======================================
+                 ROLE MANAGEMENT
+            ======================================= -->
+
+            <div
+                class="section"
+                id="roleManagement"
+            >
+
+                <h2>
+                    Role Management
+                </h2>
+
+                <p class="section-note">
+                    Manage administrator roles according to the KMFBinary hierarchy.
+                </p>
+
+
+                <div class="role-info">
+
+                    <strong>
+                        Role hierarchy:
+                    </strong>
+
+                    Owner → Super Admin → Admin → User
+
+                    <br><br>
+
+                    <strong>
+                        Rules:
+                    </strong>
+
+                    Admins cannot change roles.
+                    Super Admins can manage Admins.
+                    Owners can manage Admins and Super Admins.
+                    Owner accounts cannot be modified.
+                    No administrator can change their own role.
+
+                </div>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Username</th>
+                                <th>Name</th>
+                                <th>Country</th>
+                                <th>Current Role</th>
+                                <th>Change Role</th>
+                                <th>Action</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="roleManagementTable">
+
+                            <tr>
+
+                                <td
+                                    colspan="6"
+                                    class="loading"
+                                >
+                                    Loading role management...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- ======================================
+                 PENDING DEPOSITS
+            ======================================= -->
+
+            <div
+                class="section"
+                id="pendingDeposits"
+            >
+
+                <h2>
+                    Pending Deposits
+                </h2>
+
+                <p class="section-note">
+                    Deposit requests awaiting completion or review.
+                </p>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Reference</th>
+                                <th>Amount</th>
+                                <th>Payment</th>
+                                <th>Checkout ID</th>
+                                <th>Result</th>
+                                <th>Date</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="depositsTable">
+
+                            <tr>
+
+                                <td
+                                    colspan="6"
+                                    class="loading"
+                                >
+                                    Loading deposits...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- ======================================
+                 WITHDRAWALS
+            ======================================= -->
+
+            <div
+                class="section"
+                id="withdrawals"
+            >
+
+                <h2>
+                    Withdrawals
+                </h2>
+
+                <p class="section-note">
+                    Review and process customer withdrawal requests.
+                </p>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Reference</th>
+                                <th>Amount</th>
+                                <th>Phone</th>
+                                <th>Status</th>
+                                <th>M-Pesa Receipt</th>
+                                <th>Result</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="withdrawalsTable">
+
+                            <tr>
+
+                                <td
+                                    colspan="8"
+                                    class="loading"
+                                >
+                                    Loading withdrawals...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- ======================================
+                 TRANSACTIONS
+            ======================================= -->
+
+            <div
+                class="section"
+                id="transactions"
+            >
+
+                <h2>
+                    Recent Transactions
+                </h2>
+
+                <p class="section-note">
+                    Recent wallet and financial transactions.
+                </p>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Payment</th>
+                                <th>Reference</th>
+                                <th>Date</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="transactionsTable">
+
+                            <tr>
+
+                                <td
+                                    colspan="6"
+                                    class="loading"
+                                >
+                                    Loading transactions...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+"use strict";
+
+
+/* ==========================================
+   SUPABASE
+========================================== */
+
+const SUPABASE_URL =
+    "https://nugufikdivanyzmghofq.supabase.co";
+
+
+const SUPABASE_KEY =
+    "sb_publishable_NfsjmPephsaJrRB6vLXglw_G6yTdPTl";
+
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+const API_URL =
+    "http://localhost:3000";
+
+
+let adminPermissions = {};
+
+let adminRole = "admin";
+
+let currentAdminId = null;
+
+
+/* ==========================================
+   CUSTOMER CARE STATE
+========================================== */
+
+let supportConversations = [];
+
+let selectedSupportConversationId = null;
+
+let supportPollingTimer = null;
+
+
+/* ==========================================
+   ERROR DISPLAY
+========================================== */
+
+function showError(message) {
+
+    const box =
+        document.getElementById(
+            "errorBox"
+        );
+
+    box.textContent =
+        message ||
+        "An error occurred.";
+
+    box.style.display =
+        "block";
+
+
+    setTimeout(() => {
+
+        box.style.display =
+            "none";
+
+    }, 6000);
+}
+
+
+function showSuccess(message) {
+
+    const box =
+        document.getElementById(
+            "successBox"
+        );
+
+    box.textContent =
+        message ||
+        "Operation successful.";
+
+    box.style.display =
+        "block";
+
+
+    setTimeout(() => {
+
+        box.style.display =
+            "none";
+
+    }, 4000);
+}
+
+
+/* ==========================================
+   GET AUTH TOKEN
+========================================== */
+
+async function getToken() {
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient.auth.getSession();
+
+
+    if (
+        error ||
+        !data.session
+    ) {
+
+        throw new Error(
+            "Please login first."
+        );
+
+    }
+
+
+    return data.session.access_token;
+}
+
+
+/* ==========================================
+   API REQUEST
+========================================== */
+
+async function apiRequest(
+    endpoint,
+    options = {}
+) {
+
+    const token =
+        await getToken();
+
+
+    const response =
+        await fetch(
+            API_URL + endpoint,
+            {
+                ...options,
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json",
+
+                    "Authorization":
+                        "Bearer " + token,
+
+                    ...(options.headers || {})
+
+                }
+
+            }
+        );
+
+
+    let data = {};
+
+
+    try {
+
+        data =
+            await response.json();
+
+    }
+
+    catch {
+
+        data = {};
+
+    }
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            data.message ||
+            data.error ||
+            "Request failed"
+        );
+
+    }
+
+
+    return data;
+}
+
+
+/* ==========================================
+   REFERRAL COMMISSION SETTINGS
+========================================== */
+
+async function loadReferralSettings() {
+    const select = document.getElementById(
+        "referralCommissionPercent"
+    );
+
+    const message = document.getElementById(
+        "referralSettingsMessage"
+    );
+
+    if (!select || !message) return;
+
+    try {
+        message.textContent = "Loading settings...";
+
+        const data = await apiRequest(
+            "/api/admin/referral-settings"
+        );
+
+        const settings = data.settings || {};
+
+        const rate = Number(settings.commission_percent);
+
+        if (![5, 10].includes(rate)) {
+            throw new Error(
+                "The server returned an invalid commission rate."
+            );
+        }
+
+        select.value = String(rate);
+
+        message.textContent =
+            "Current rate: " + rate +
+            "%. Minimum qualifying deposit: $8 USD.";
+
+    } catch (error) {
+        console.error(
+            "Load referral settings error:",
+            error
+        );
+
+        message.textContent =
+            error.message ||
+            "Unable to load referral settings.";
+    }
+}
+
+
+async function saveReferralSettings() {
+    const select = document.getElementById(
+        "referralCommissionPercent"
+    );
+
+    const button = document.getElementById(
+        "saveReferralSettingsButton"
+    );
+
+    const message = document.getElementById(
+        "referralSettingsMessage"
+    );
+
+    if (!select || !button || !message) return;
+
+    const rate = Number(select.value);
+
+    if (![5, 10].includes(rate)) {
+        message.textContent =
+            "Select either 5% or 10%.";
+        return;
+    }
+
+    const confirmed = window.confirm(
+        "Save the referral commission rate as " +
+        rate +
+        "%?\n\n" +
+        "The minimum qualifying deposit will remain $8 USD."
+    );
+
+    if (!confirmed) return;
+
+    button.disabled = true;
+    message.textContent = "Saving settings...";
+
+    try {
+        const data = await apiRequest(
+            "/api/admin/referral-settings",
+            {
+                method: "PATCH",
+                body: JSON.stringify({
+                    commission_percent: rate
+                })
+            }
+        );
+
+        const savedRate = Number(
+            data.settings?.commission_percent
+        );
+
+        if (![5, 10].includes(savedRate)) {
+            throw new Error(
+                "The server did not confirm the saved rate."
+            );
+        }
+
+        select.value = String(savedRate);
+
+        message.textContent =
+            "Saved successfully. New qualifying deposits " +
+            "will use the " + savedRate +
+            "% rate.";
+
+    } catch (error) {
+        console.error(
+            "Save referral settings error:",
+            error
+        );
+
+        message.textContent =
+            error.message ||
+            "Unable to save referral settings.";
+
+    } finally {
+        button.disabled = false;
+    }
+}
+/* ==========================================
+   CHECK ADMIN
+========================================== */
+
+async function checkAdmin() {
+
+    const result =
+        await apiRequest(
+            "/api/admin/me"
+        );
+
+
+    const admin =
+        result.admin || {};
+
+
+    const profile =
+        admin.profile || {};
+
+
+    adminPermissions =
+        admin.permissions || {};
+
+
+    adminRole =
+        String(
+            admin.role ||
+            profile.role ||
+            "admin"
+        ).toLowerCase();
+
+
+    currentAdminId =
+        admin.id || null;
+
+
+    document.getElementById(
+        "adminInfo"
+    ).textContent =
+        "Administrator: " +
+        (
+            admin.email ||
+            profile.username ||
+            "Administrator"
+        );
+
+
+    document.getElementById(
+        "adminEmail"
+    ).textContent =
+        admin.email ||
+        profile.username ||
+        "Administrator";
+
+
+    document.getElementById(
+        "adminRole"
+    ).innerHTML =
+        `
+        <span class="role-badge">
+            ${escapeHtml(adminRole)}
+        </span>
+        `;
+
+
+    document.getElementById(
+        "accessLevel"
+    ).textContent =
+        getAccessLevel(adminRole);
+
+
+    renderPermissions();
+
+    applyPermissions();
+
+}
+
+
+/* ==========================================
+   ACCESS LEVEL
+========================================== */
+
+function getAccessLevel(role) {
+
+    if (role === "owner") {
+
+        return "Owner";
+
+    }
+
+
+    if (role === "super_admin") {
+
+        return "Super Administrator";
+
+    }
+
+
+    if (role === "admin") {
+
+        return "Administrator";
+
+    }
+
+
+    return "Standard User";
+}
+
+
+/* ==========================================
+   PERMISSIONS
+========================================== */
+
+function renderPermissions() {
+
+    const grid =
+        document.getElementById(
+            "permissionGrid"
+        );
+
+
+    const labels = {
+
+        viewDashboard:
+            "View Dashboard",
+
+        viewUsers:
+            "View Users",
+
+        viewWallets:
+            "View Wallets",
+
+        viewTrades:
+            "View Trades",
+
+        viewTransactions:
+            "View Transactions",
+
+        viewFinance:
+            "View Finance",
+
+        viewDeposits:
+            "View Deposits",
+
+        viewWithdrawals:
+            "View Withdrawals",
+
+        viewMarkets:
+            "View Markets",
+
+        manageMarkets:
+            "Manage Markets",
+
+        manageWalletBalances:
+            "Modify Wallet Balances",
+
+        approveDeposits:
+            "Approve Deposits",
+
+        forceWithdrawals:
+            "Force Withdrawals",
+
+        modifySettledTrades:
+            "Modify Settled Trades",
+
+        changeAdminRoles:
+            "Change Admin Roles",
+
+        manageSuperAdmins:
+            "Manage Super Admins",
+
+        manageOwner:
+            "Manage Owner"
+
+    };
+
+
+    grid.innerHTML =
+        Object.keys(labels)
+            .map(key => {
+
+                const allowed =
+                    adminPermissions[key] === true;
+
+
+                return `
+
+                    <div
+                        class="permission ${
+                            allowed
+                                ? "allowed"
+                                : "denied"
+                        }"
+                    >
+
+                        ${
+                            allowed
+                                ? "✓"
+                                : "✕"
+                        }
+
+                        ${escapeHtml(
+                            labels[key]
+                        )}
+
+                    </div>
+
+                `;
+
+            })
+            .join("");
+
+}
+
+
+/* ==========================================
+   APPLY PERMISSIONS
+========================================== */
+
+function applyPermissions() {
+
+    const marketPermission =
+        adminPermissions.manageMarkets === true;
+
+
+    document
+        .querySelectorAll(
+            ".market-action"
+        )
+        .forEach(button => {
+
+            button.disabled =
+                !marketPermission;
+
+        });
+
+
+    const walletSection =
+        document.getElementById(
+            "ownerWalletSection"
+        );
+
+
+    if (walletSection) {
+
+        walletSection.style.display =
+            (
+                adminRole === "owner" &&
+                adminPermissions.manageWalletBalances === true
+            )
+                ? "block"
+                : "none";
+
+    }
+
+}
+
+
+/* ==========================================
+   DASHBOARD
+========================================== */
+
+async function loadDashboard() {
+
+    const data =
+        await apiRequest(
+            "/api/admin/dashboard"
+        );
+
+
+    const stats =
+        data.stats || {};
+
+
+    const dashboardCounters = [
+        ["usersCount", stats.users || 0],
+        ["walletsCount", stats.wallets || 0],
+        ["tradesCount", stats.trades || 0],
+        ["depositsCount", stats.pendingDeposits || 0],
+        ["withdrawalsCount", stats.pendingWithdrawals || 0]
+    ];
+
+    dashboardCounters.forEach(([id, value]) => {
+        const element = document.getElementById(id);
+
+        if (element) {
+            element.textContent = value;
+        } else {
+            console.warn(
+                `Dashboard element #${id} was not found.`
+            );
+        }
+    });
+
+
+    renderMarkets(
+        data.markets || []
+    );
+
+}
+
+
+/* ==========================================
+   MARKETS
+========================================== */
+
+function renderMarkets(markets) {
+
+    const table =
+        document.getElementById(
+            "marketsTable"
+        );
+
+
+    if (!markets.length) {
+
+        table.innerHTML =
+            `
+            <tr>
+                <td colspan="5">
+                    No markets found.
+                </td>
+            </tr>
+            `;
+
+        return;
+    }
+
+
+    const canManage =
+        adminPermissions.manageMarkets === true;
+
+
+    table.innerHTML =
+        markets.map(
+            market => `
+
+                <tr>
+
+                    <td>
+                        ${escapeHtml(
+                            market.symbol
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            market.market_name
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            market.contract_type
+                        )}
+                    </td>
+
+                    <td>
+
+                        <span
+                            class="${
+                                market.is_active
+                                    ? "active"
+                                    : "inactive"
+                            }"
+                            style="
+                                padding:6px 9px;
+                                border-radius:6px;
+                            "
+                        >
+
+                            ${
+                                market.is_active
+                                    ? "ACTIVE"
+                                    : "INACTIVE"
+                            }
+
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        <button
+                            class="toggle market-action"
+                            ${
+                                canManage
+                                    ? ""
+                                    : "disabled"
+                            }
+                            onclick="toggleMarket(
+                                '${escapeJs(
+                                    market.id
+                                )}',
+                                ${!market.is_active}
+                            )"
+                        >
+
+                            ${
+                                canManage
+                                    ? (
+                                        market.is_active
+                                            ? "Deactivate"
+                                            : "Activate"
+                                    )
+                                    : "Restricted"
+                            }
+
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            `
+        ).join("");
+
+}
+
+
+/* ==========================================
+   TOGGLE MARKET
+========================================== */
+
+async function toggleMarket(
+    marketId,
+    newStatus
+) {
+
+    if (
+        adminPermissions.manageMarkets !== true
+    ) {
+
+        showError(
+            "You do not have permission to manage markets."
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        await apiRequest(
+            "/api/admin/markets/" +
+            encodeURIComponent(
+                marketId
+            ),
+            {
+                method: "PATCH",
+
+                body: JSON.stringify({
+                    is_active:
+                        newStatus
+                })
+
+            }
+        );
+
+
+        showSuccess(
+            "Market status updated."
+        );
+
+
+        await loadDashboard();
+
+    }
+
+    catch (error) {
+
+        showError(
+            error.message
+        );
+
+    }
+
+}
+
+
+/* ==========================================
+   USERS
+========================================== */
+
+async function loadUsers() {
+
+    const data =
+        await apiRequest(
+            "/api/admin/users?limit=100"
+        );
+
+
+    const users =
+        data.users || [];
+
+
+    renderUsersTable(users);
+
+    renderRoleManagement(users);
+
+}
+
+
+/* ==========================================
+   USERS TABLE
+========================================== */
+
+function renderUsersTable(users) {
+
+    const table =
+        document.getElementById(
+            "usersTable"
+        );
+
+
+    if (!users.length) {
+
+        table.innerHTML =
+            `
+            <tr>
+                <td colspan="6">
+                    No users found.
+                </td>
+            </tr>
+            `;
+
+        return;
+    }
+
+
+    table.innerHTML =
+        users.map(
+            user => {
+
+                const wallet =
+                    user.wallet || {};
+
+
+                return `
+
+                    <tr>
+
+                        <td>
+                            ${escapeHtml(
+                                user.username || "-"
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                user.full_name || "-"
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                user.country || "-"
+                            )}
+                        </td>
+
+                        <td>
+                            ${renderRoleBadge(
+                                user.role || "user"
+                            )}
+                        </td>
+
+                        <td>
+                            $${Number(
+                                wallet.balance || 0
+                            ).toFixed(2)}
+                        </td>
+
+                        <td>
+                            $${Number(
+                                wallet.demo_balance || 0
+                            ).toFixed(2)}
+                        </td>
+
+                    </tr>
+
+                `;
+
+            }
+        ).join("");
+
+}
+
+
+/* ==========================================
+   OWNER WALLET MANAGEMENT
+========================================== */
+
+async function loadOwnerWallets() {
+
+    const section =
+        document.getElementById(
+            "ownerWalletSection"
+        );
+
+
+    const table =
+        document.getElementById(
+            "walletManagementTable"
+        );
+
+
+    if (!section || !table) {
+
+        return;
+
+    }
+
+
+    if (
+        adminRole !== "owner" ||
+        adminPermissions.manageWalletBalances !== true
+    ) {
+
+        section.style.display =
+            "none";
+
+        return;
+
+    }
+
+
+    section.style.display =
+        "block";
+
+
+    table.innerHTML = `
+
+        <tr>
+
+            <td
+                colspan="7"
+                class="loading"
+            >
+                Loading actual wallet records...
+            </td>
+
+        </tr>
+
+    `;
+
+
+    try {
+
+        const data =
+            await apiRequest(
+                "/api/admin/wallets"
+            );
+
+
+        const wallets =
+            Array.isArray(
+                data.wallets
+            )
+                ? data.wallets
+                : [];
+
+
+        if (!wallets.length) {
+
+            table.innerHTML = `
+
+                <tr>
+
+                    <td colspan="7">
+                        No wallet records found.
+                    </td>
+
+                </tr>
+
+            `;
+
+            return;
+
+        }
+
+
+        table.innerHTML =
+            wallets.map(
+                wallet => {
+
+                    const liveBalance =
+                        Number(
+                            wallet.balance || 0
+                        );
+
+
+                    const demoBalance =
+                        Number(
+                            wallet.demo_balance || 0
+                        );
+
+
+                    const userId =
+                        String(
+                            wallet.user_id || ""
+                        );
+
+
+                    return `
+
+                        <tr>
+
+                            <td>
+                                ${escapeHtml(
+                                    userId || "-"
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    wallet.id || "-"
+                                )}
+                            </td>
+
+                            <td>
+
+                                <span
+                                    class="wallet-balance wallet-live"
+                                >
+                                    $${liveBalance.toFixed(6)}
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                <span
+                                    class="wallet-balance wallet-demo"
+                                >
+                                    $${demoBalance.toFixed(6)}
+                                </span>
+
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    wallet.currency || "USD"
+                                )}
+                            </td>
+
+                            <td>
+
+                                ${
+                                    wallet.updated_at
+                                        ? new Date(
+                                            wallet.updated_at
+                                        ).toLocaleString()
+                                        : "-"
+                                }
+
+                            </td>
+
+                            <td>
+
+                                <div class="wallet-actions">
+
+                                    <button
+                                        class="wallet-action wallet-credit"
+                                        onclick="walletAction(
+                                            '${escapeJs(userId)}',
+                                            'credit'
+                                        )"
+                                    >
+                                        Credit
+                                    </button>
+
+                                    <button
+                                        class="wallet-action wallet-debit"
+                                        onclick="walletAction(
+                                            '${escapeJs(userId)}',
+                                            'debit'
+                                        )"
+                                    >
+                                        Debit
+                                    </button>
+
+                                    <button
+                                        class="wallet-action wallet-set"
+                                        onclick="walletAction(
+                                            '${escapeJs(userId)}',
+                                            'set'
+                                        )"
+                                    >
+                                        Set
+                                    </button>
+
+                                    <button
+                                        class="wallet-action wallet-view"
+                                        onclick="viewOwnerWallet(
+                                            '${escapeJs(userId)}'
+                                        )"
+                                    >
+                                        View
+                                    </button>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                }
+            ).join("");
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Owner wallet loading error:",
+            error
+        );
+
+
+        table.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="7"
+                    style="color:#fca5a5;"
+                >
+                    ${escapeHtml(
+                        error.message ||
+                        "Unable to load wallet records."
+                    )}
+                </td>
+
+            </tr>
+
+        `;
+
+
+        showError(
+            error.message ||
+            "Unable to load wallet records."
+        );
+
+    }
+
+}
+/* =========================================================
+   PLATFORM TRANSFER MANAGEMENT
+   ========================================================= */
+
+function showPlatformTransferMessage(
+    message,
+    type = "success"
+) {
+    const box = document.getElementById(
+        "platformTransferMessage"
+    );
+
+    if (!box) return;
+
+    box.textContent = message;
+    box.className =
+        "platform-transfer-message " + type;
+
+    box.style.display = "block";
+
+    setTimeout(() => {
+        box.style.display = "none";
+    }, 7000);
+}
+
+
+/* ---------------------------------------------------------
+   LOAD PLATFORM STATUS
+   --------------------------------------------------------- */
+
+async function loadKmfPlatformStatus() {
+    const balanceElement =
+        document.getElementById(
+            "platformBalanceDisplay"
+        );
+
+    if (!balanceElement) return;
+
+    try {
+
+        /*
+         * The transfer routes return the updated
+         * platform balance after a successful transfer.
+         *
+         * Until the backend status endpoint is used,
+         * keep the existing displayed value intact.
+         */
+
+        if (
+            balanceElement.textContent ===
+            "Loading..."
+        ) {
+            balanceElement.textContent =
+                "Platform wallet";
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Platform status error:",
+            error
+        );
+
+        balanceElement.textContent =
+            "Unavailable";
+    }
+}
+
+
+/* ---------------------------------------------------------
+   LOAD USERS INTO TRANSFER SELECT
+   --------------------------------------------------------- */
+
+/* ---------------------------------------------------------
+   LOAD USERS INTO BOTH TRANSFER SELECTS
+--------------------------------------------------------- */
+
+async function loadKmfTransferUsers() {
+
+    const selects = [
+        document.getElementById("kmfTransferUser"),
+        document.getElementById("userToKmfUser")
+    ].filter(Boolean);
+
+    if (!selects.length) return;
+
+    try {
+
+        const response = await apiRequest(
+            "/api/admin/users"
+        );
+
+        const users = Array.isArray(response)
+            ? response
+            : (
+                response.users ||
+                response.data ||
+                []
+            );
+
+        selects.forEach(select => {
+
+            select.innerHTML =
+                '<option value="">Select customer</option>';
+
+            users.forEach(user => {
+
+                const userId =
+                    user.id ||
+                    user.user_id ||
+                    "";
+
+                if (!userId) return;
+
+                const option =
+                    document.createElement("option");
+
+                option.value = userId;
+
+                const email =
+                    user.email || "No email";
+
+                const name =
+                    user.full_name ||
+                    user.name ||
+                    user.username ||
+                    "";
+
+                option.textContent = name
+                    ? `${name} — ${email}`
+                    : email;
+
+                select.appendChild(option);
+
+            });
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Unable to load transfer users:",
+            error
+        );
+
+        selects.forEach(select => {
+
+            select.innerHTML =
+                '<option value="">Unable to load customers</option>';
+
+        });
+
+    }
+}
+
+/* ---------------------------------------------------------
+   SELECTED USER LIVE BALANCE
+--------------------------------------------------------- */
+
+let selectedUserLiveBalance = null;
+let selectedUserCurrency = "USD";
+
+async function loadSelectedUserBalance() {
+
+    const userSelect =
+        document.getElementById("userToKmfUser");
+
+    const balanceDisplay =
+        document.getElementById("userToKmfBalance");
+
+    selectedUserLiveBalance = null;
+
+    if (!userSelect || !balanceDisplay) return;
+
+    const userId = userSelect.value;
+
+    if (!userId) {
+        balanceDisplay.textContent =
+            "Select a user to view their LIVE balance.";
+        updateTransferEstimate();
+        return;
+    }
+
+    balanceDisplay.textContent =
+        "Loading LIVE balance...";
+
+    try {
+
+        const response = await apiRequest(
+            `/api/admin/owner/user-wallet/${encodeURIComponent(userId)}`
+        );
+
+        const wallet = response.wallet;
+
+        if (
+            !response.success ||
+            !wallet ||
+            !Number.isFinite(Number(wallet.balance))
+        ) {
+            throw new Error("Unable to retrieve the LIVE balance.");
+        }
+
+        selectedUserLiveBalance = Number(wallet.balance);
+        selectedUserCurrency = wallet.currency || "USD";
+
+        balanceDisplay.textContent =
+            `LIVE Balance: ${selectedUserCurrency} ` +
+            selectedUserLiveBalance.toLocaleString(
+                "en-US",
+                {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }
+            );
+
+        updateTransferEstimate();
+
+    } catch (error) {
+
+        selectedUserLiveBalance = null;
+
+        balanceDisplay.textContent =
+            error.message || "Unable to load LIVE balance.";
+
+        updateTransferEstimate();
+
+        console.error(
+            "Unable to load selected user's LIVE balance:",
+            error
+        );
+    }
+}
+
+
+/* ---------------------------------------------------------
+   ESTIMATED BALANCE AFTER TRANSFER
+--------------------------------------------------------- */
+
+function updateTransferEstimate() {
+
+    const amountInput =
+        document.getElementById("ownerToKmfAmount");
+
+    if (!amountInput) return;
+
+    let estimate =
+        document.getElementById("userToKmfRemaining");
+
+    if (!estimate) {
+
+        estimate = document.createElement("div");
+        estimate.id = "userToKmfRemaining";
+
+        estimate.style.marginBottom = "10px";
+        estimate.style.fontSize = "13px";
+        estimate.style.color = "#94a3b8";
+
+        amountInput.insertAdjacentElement(
+            "afterend",
+            estimate
+        );
+    }
+
+    if (selectedUserLiveBalance === null) {
+        estimate.textContent =
+            "Estimated remaining balance: unavailable";
+        return;
+    }
+
+    const amount = Number(amountInput.value);
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+        estimate.textContent =
+            `Estimated balance after transfer: ` +
+            `${selectedUserCurrency} ` +
+            selectedUserLiveBalance.toFixed(2);
+        return;
+    }
+
+    const remaining = selectedUserLiveBalance - amount;
+
+    estimate.textContent =
+        `Estimated balance after transfer: ` +
+        `${selectedUserCurrency} ` +
+        remaining.toLocaleString(
+            "en-US",
+            {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }
+        );
+
+    estimate.style.color =
+        remaining < 0 ? "#ef4444" : "#22c55e";
+}
+
+/* ---------------------------------------------------------
+   OWNER → KMF
+   --------------------------------------------------------- */
+
+/* ---------------------------------------------------------
+   USER → KMF PLATFORM WALLET
+--------------------------------------------------------- */
+
+async function transferOwnerToKmf() {
+
+    const userSelect =
+        document.getElementById("userToKmfUser");
+
+    const amountInput =
+        document.getElementById("ownerToKmfAmount");
+
+    const reasonInput =
+        document.getElementById("ownerToKmfReason");
+
+    if (!userSelect || !amountInput || !reasonInput) {
+        showPlatformTransferMessage(
+            "Transfer form elements could not be found.",
+            "error"
+        );
+        return;
+    }
+
+    const userId = userSelect.value;
+    const amount = Number(amountInput.value);
+    const reason = reasonInput.value.trim();
+
+    if (!userId) {
+        showPlatformTransferMessage(
+            "Select a customer first.",
+            "error"
+        );
+        return;
+    }
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+        showPlatformTransferMessage(
+            "Enter a valid transfer amount.",
+            "error"
+        );
+        return;
+    }
+
+    if (!reason) {
+        showPlatformTransferMessage(
+            "A transfer reason is required.",
+            "error"
+        );
+        return;
+    }
+
+if (
+    selectedUserLiveBalance === null ||
+    amount > selectedUserLiveBalance
+) {
+    showPlatformTransferMessage(
+        selectedUserLiveBalance === null
+            ? "Unable to verify the customer's LIVE balance. Please reload it."
+            : "Insufficient LIVE balance. The customer cannot transfer more than their available balance.",
+        "error"
+    );
+    return;
+}
+
+    const selectedText =
+        userSelect.options[
+            userSelect.selectedIndex
+        ].text;
+
+    const confirmed = confirm(
+        `Confirm transferring $${amount.toFixed(2)} ` +
+        `from this customer's LIVE / REAL wallet ` +
+        `to the KMFBinary platform wallet?\n\n` +
+        `Customer: ${selectedText}\n` +
+        `Reason: ${reason}`
+    );
+
+    if (!confirmed) return;
+
+    const button = document.querySelector(
+        'button[onclick="transferOwnerToKmf()"]'
+    );
+
+    try {
+
+        if (button) {
+            button.disabled = true;
+            button.textContent = "Processing...";
+        }
+
+        const response = await apiRequest(
+            "/api/admin/owner/transfer/user-to-kmf",
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    userId,
+                    amount,
+                    reason
+                })
+            }
+        );
+
+        const newBalance =
+            response.platform_balance ??
+            response.platformBalance ??
+            response.balance;
+
+        const balanceDisplay =
+            document.getElementById(
+                "platformBalanceDisplay"
+            );
+
+        if (
+            balanceDisplay &&
+            newBalance !== undefined
+        ) {
+            balanceDisplay.textContent =
+                Number(newBalance).toFixed(2);
+        }
+
+        showPlatformTransferMessage(
+            response.message ||
+            "Transfer completed successfully.",
+            "success"
+        );
+
+        amountInput.value = "";
+        reasonInput.value = "";
+        userSelect.value = "";
+
+        await refreshTransferData();
+
+    } catch (error) {
+
+        console.error(
+            "User → KMFBinary transfer failed:",
+            error
+        );
+
+        showPlatformTransferMessage(
+            error.message || "Transfer failed.",
+            "error"
+        );
+
+    } finally {
+
+        if (button) {
+            button.disabled = false;
+            button.textContent = "Transfer from User";
+        }
+
+    }
+}
+
+
+
+/* ---------------------------------------------------------
+   KMF → USER
+   --------------------------------------------------------- */
+
+async function transferKmfToUser() {
+
+    const userSelect =
+        document.getElementById(
+            "kmfTransferUser"
+        );
+
+    const amountInput =
+        document.getElementById(
+            "kmfToUserAmount"
+        );
+
+    const reasonInput =
+        document.getElementById(
+            "kmfToUserReason"
+        );
+
+    const userId =
+        userSelect.value;
+
+    const amount =
+        Number(amountInput.value);
+
+    const reason =
+        reasonInput.value.trim();
+
+    if (!userId) {
+
+        showPlatformTransferMessage(
+            "Select a customer first.",
+            "error"
+        );
+
+        return;
+    }
+
+    if (
+        !Number.isFinite(amount) ||
+        amount <= 0
+    ) {
+
+        showPlatformTransferMessage(
+            "Enter a valid transfer amount.",
+            "error"
+        );
+
+        return;
+    }
+
+    if (!reason) {
+
+        showPlatformTransferMessage(
+            "A transfer reason is required.",
+            "error"
+        );
+
+        return;
+    }
+
+    const selectedText =
+        userSelect.options[
+            userSelect.selectedIndex
+        ].text;
+
+    const confirmed =
+        confirm(
+            `Confirm sending ${amount.toFixed(2)} to:\n\n${selectedText}\n\nThis will affect the customer's LIVE / REAL wallet only.\n\nReason: ${reason}`
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+
+        const button =
+            document.querySelector(
+                ".transfer-btn-success"
+            );
+
+        if (button) {
+            button.disabled = true;
+            button.textContent =
+                "Processing...";
+        }
+
+        const response =
+            await apiRequest(
+                "/api/admin/owner/transfer/kmf-to-user",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body: JSON.stringify({
+                        userId,
+                        amount,
+                        reason
+                    })
+                }
+            );
+
+        const newBalance =
+            response.platform_balance ??
+            response.platformBalance ??
+            response.balance;
+
+        if (newBalance !== undefined) {
+
+            document.getElementById(
+                "platformBalanceDisplay"
+            ).textContent =
+                Number(newBalance).toFixed(2);
+        }
+
+        showPlatformTransferMessage(
+            response.message ||
+            "Funds successfully transferred to the customer's LIVE wallet.",
+            "success"
+        );
+
+        amountInput.value = "";
+        reasonInput.value = "";
+
+        await refreshTransferData();
+
+    } catch (error) {
+
+        console.error(
+            "KMFBinary → User transfer failed:",
+            error
+        );
+
+        showPlatformTransferMessage(
+            error.message ||
+            "Transfer failed.",
+            "error"
+        );
+
+    } finally {
+
+        const button =
+            document.querySelector(
+                ".transfer-btn-success"
+            );
+
+        if (button) {
+            button.disabled = false;
+            button.textContent =
+                "Send to User Wallet";
+        }
+    }
+}
+
+
+/* ---------------------------------------------------------
+   REFRESH RELATED ADMIN DATA
+   --------------------------------------------------------- */
+
+async function refreshTransferData() {
+
+    try {
+
+        await Promise.all([
+            loadOwnerWallets(),
+            loadTransactions()
+        ]);
+
+        await loadKmfTransferUsers();
+
+    } catch (error) {
+
+        console.error(
+            "Transfer refresh error:",
+            error
+        );
+    }
+}
+
+/* ==========================================
+   OWNER WALLET ACTION
+========================================== */
+
+async function walletAction(
+    userId,
+    action
+) {
+
+    if (
+        adminRole !== "owner" ||
+        adminPermissions.manageWalletBalances !== true
+    ) {
+
+        showError(
+            "Owner access is required."
+        );
+
+        return;
+
+    }
+
+
+    if (!userId) {
+
+        showError(
+            "Invalid user ID."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        ![
+            "credit",
+            "debit",
+            "set"
+        ].includes(action)
+    ) {
+
+        showError(
+            "Invalid wallet action."
+        );
+
+        return;
+
+    }
+
+
+    let promptTitle = "";
+
+
+    if (action === "credit") {
+
+        promptTitle =
+            "Enter amount to CREDIT in USD:";
+
+    }
+
+    else if (action === "debit") {
+
+        promptTitle =
+            "Enter amount to DEBIT in USD:";
+
+    }
+
+    else {
+
+        promptTitle =
+            "Enter the NEW LIVE BALANCE in USD:";
+
+    }
+
+
+    const amountInput =
+        window.prompt(
+            promptTitle
+        );
+
+
+    if (
+        amountInput === null
+    ) {
+
+        return;
+
+    }
+
+
+    const amount =
+        Number(
+            String(amountInput)
+                .replace(/,/g, "")
+                .trim()
+        );
+
+
+    if (
+        !Number.isFinite(amount) ||
+        amount <= 0
+    ) {
+
+        showError(
+            "Enter a valid amount greater than zero."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        amount > 1000000
+    ) {
+
+        showError(
+            "Maximum wallet adjustment is $1,000,000."
+        );
+
+        return;
+
+    }
+
+
+    const reason =
+        window.prompt(
+            "Enter the reason for this wallet adjustment:"
+        );
+
+
+    if (
+        reason === null
+    ) {
+
+        return;
+
+    }
+
+
+    const cleanReason =
+        String(reason).trim();
+
+
+    if (!cleanReason) {
+
+        showError(
+            "A reason is required."
+        );
+
+        return;
+
+    }
+
+
+    let actionName = "";
+
+
+    if (action === "credit") {
+
+        actionName = "credit";
+
+    }
+
+    else if (action === "debit") {
+
+        actionName = "debit";
+
+    }
+
+    else {
+
+        actionName = "set";
+
+    }
+
+
+    const confirmation =
+        window.confirm(
+            "Confirm wallet action?\n\n" +
+            "Action: " +
+            actionName.toUpperCase() +
+            "\n" +
+            "Amount: $" +
+            amount.toFixed(6) +
+            "\n" +
+            "Reason: " +
+            cleanReason +
+            "\n\n" +
+            "This changes the LIVE balance only."
+        );
+
+
+    if (!confirmation) {
+
+        return;
+
+    }
+
+
+    try {
+
+        let endpoint = "";
+
+
+        if (action === "credit") {
+
+            endpoint =
+                "/api/admin/owner/wallet/" +
+                encodeURIComponent(userId) +
+                "/credit";
+
+        }
+
+        else if (action === "debit") {
+
+            endpoint =
+                "/api/admin/owner/wallet/" +
+                encodeURIComponent(userId) +
+                "/debit";
+
+        }
+
+        else {
+
+            endpoint =
+                "/api/admin/owner/wallet/" +
+                encodeURIComponent(userId) +
+                "/set-balance";
+
+        }
+
+
+        const body = {};
+
+
+        if (action === "set") {
+
+            body.newBalance =
+                Number(
+                    amount.toFixed(6)
+                );
+
+        }
+
+        else {
+
+            body.amount =
+                Number(
+                    amount.toFixed(6)
+                );
+
+        }
+
+
+        body.reason =
+            cleanReason;
+
+
+        showSuccess(
+            "Sending wallet adjustment..."
+        );
+
+
+        const result =
+            await apiRequest(
+                endpoint,
+                {
+                    method: "POST",
+
+                    body:
+                        JSON.stringify(
+                            body
+                        )
+
+                }
+            );
+
+
+        showSuccess(
+            result.message ||
+            "Wallet updated successfully."
+        );
+
+
+        await Promise.all([
+
+            loadOwnerWallets(),
+
+            loadUsers(),
+
+            loadDashboard(),
+
+            loadTransactions()
+
+        ]);
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Wallet action error:",
+            error
+        );
+
+
+        showError(
+            error.message ||
+            "Wallet adjustment failed."
+        );
+
+    }
+
+}
+
+
+/* ==========================================
+   VIEW OWNER WALLET
+========================================== */
+
+async function viewOwnerWallet(
+    userId
+) {
+
+    if (
+        adminRole !== "owner" ||
+        adminPermissions.manageWalletBalances !== true
+    ) {
+
+        showError(
+            "Owner access is required."
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        const data =
+            await apiRequest(
+                "/api/admin/owner/wallet/" +
+                encodeURIComponent(
+                    userId
+                )
+            );
+
+
+        const wallet =
+            data.wallet || {};
+
+
+        const liveBalance =
+            Number(
+                wallet.balance || 0
+            );
+
+
+        const demoBalance =
+            Number(
+                wallet.demo_balance || 0
+            );
+
+
+        window.alert(
+
+            "Wallet Details\n\n" +
+
+            "User ID: " +
+            (
+                wallet.user_id ||
+                "-"
+            ) +
+
+            "\n\nWallet ID: " +
+            (
+                wallet.id ||
+                "-"
+            ) +
+
+            "\n\nLive Balance: $" +
+            liveBalance.toFixed(6) +
+
+            "\nDemo Balance: $" +
+            demoBalance.toFixed(6) +
+
+            "\nCurrency: " +
+            (
+                wallet.currency ||
+                "USD"
+            ) +
+
+            "\n\nUpdated: " +
+            (
+                wallet.updated_at
+                    ? new Date(
+                        wallet.updated_at
+                    ).toLocaleString()
+                    : "-"
+            )
+
+        );
+
+    }
+
+    catch (error) {
+
+        showError(
+            error.message
+        );
+
+    }
+
+}
+
+
+/* ==========================================
+   ROLE MANAGEMENT TABLE
+========================================== */
+
+function renderRoleManagement(users) {
+
+    const table =
+        document.getElementById(
+            "roleManagementTable"
+        );
+
+
+    const canManageRoles =
+        adminPermissions.changeAdminRoles === true;
+
+
+    if (!users.length) {
+
+        table.innerHTML =
+            `
+            <tr>
+                <td colspan="6">
+                    No users found.
+                </td>
+            </tr>
+            `;
+
+        return;
+
+    }
+
+
+    table.innerHTML =
+        users.map(user => {
+
+            const role =
+                String(
+                    user.role ||
+                    "user"
+                ).toLowerCase();
+
+
+            const isSelf =
+                String(user.id) ===
+                String(currentAdminId);
+
+
+            const isOwner =
+                role === "owner";
+
+
+            const isSuperAdmin =
+                role === "super_admin";
+
+
+            let canEdit = false;
+
+            let reason = "";
+
+
+            if (isSelf) {
+
+                canEdit = false;
+
+                reason =
+                    "You cannot change your own role";
+
+            }
+
+            else if (isOwner) {
+
+                canEdit = false;
+
+                reason =
+                    "Owner account is protected";
+
+            }
+
+            else if (
+                adminRole === "admin"
+            ) {
+
+                canEdit = false;
+
+                reason =
+                    "Admin cannot manage roles";
+
+            }
+
+            else if (
+                adminRole === "super_admin" &&
+                isSuperAdmin
+            ) {
+
+                canEdit = false;
+
+                reason =
+                    "Super Admin account is protected";
+
+            }
+
+            else if (
+                adminRole === "super_admin"
+            ) {
+
+                canEdit =
+                    canManageRoles;
+
+            }
+
+            else if (
+                adminRole === "owner"
+            ) {
+
+                canEdit = true;
+
+            }
+
+
+            if (!canEdit) {
+
+                return `
+
+                    <tr>
+
+                        <td>
+                            ${escapeHtml(
+                                user.username || "-"
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                user.full_name || "-"
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                user.country || "-"
+                            )}
+                        </td>
+
+                        <td>
+                            ${renderRoleBadge(role)}
+                        </td>
+
+                        <td
+                            class="protected"
+                        >
+                            ${
+                                reason ||
+                                "Protected"
+                            }
+                        </td>
+
+                        <td>
+
+                            <button
+                                disabled
+                            >
+                                Protected
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+            }
+
+
+            return `
+
+                <tr>
+
+                    <td>
+                        ${escapeHtml(
+                            user.username || "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            user.full_name || "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            user.country || "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${renderRoleBadge(role)}
+                    </td>
+
+                    <td>
+
+                        <select
+                            class="role-select"
+                            id="role-select-${escapeHtml(
+                                user.id
+                            )}"
+                        >
+
+                            ${getRoleOptions(
+                                role
+                            )}
+
+                        </select>
+
+                    </td>
+
+                    <td>
+
+                        <button
+                            class="role-button"
+                            onclick="changeUserRole(
+                                '${escapeJs(
+                                    user.id
+                                )}'
+                            )"
+                        >
+                            Change Role
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }).join("");
+
+}
+
+
+/* ==========================================
+   ROLE OPTIONS
+========================================== */
+
+function getRoleOptions(currentRole) {
+
+    if (
+        adminRole === "super_admin"
+    ) {
+
+        return `
+
+            <option
+                value="user"
+                ${
+                    currentRole === "user"
+                        ? "selected"
+                        : ""
+                }
+            >
+                User
+            </option>
+
+            <option
+                value="admin"
+                ${
+                    currentRole === "admin"
+                        ? "selected"
+                        : ""
+                }
+            >
+                Admin
+            </option>
+
+        `;
+
+    }
+
+
+    if (
+        adminRole === "owner"
+    ) {
+
+        return `
+
+            <option
+                value="user"
+                ${
+                    currentRole === "user"
+                        ? "selected"
+                        : ""
+                }
+            >
+                User
+            </option>
+
+            <option
+                value="admin"
+                ${
+                    currentRole === "admin"
+                        ? "selected"
+                        : ""
+                }
+            >
+                Admin
+            </option>
+
+            <option
+                value="super_admin"
+                ${
+                    currentRole === "super_admin"
+                        ? "selected"
+                        : ""
+                }
+            >
+                Super Admin
+            </option>
+
+        `;
+
+    }
+
+
+    return `
+
+        <option value="user">
+            User
+        </option>
+
+    `;
+
+}
+
+
+/* ==========================================
+   CHANGE USER ROLE
+========================================== */
+
+async function changeUserRole(
+    userId
+) {
+
+    if (
+        adminPermissions.changeAdminRoles !== true
+    ) {
+
+        showError(
+            "You do not have permission to change administrator roles."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        String(userId) ===
+        String(currentAdminId)
+    ) {
+
+        showError(
+            "You cannot change your own role."
+        );
+
+        return;
+
+    }
+
+
+    const select =
+        document.getElementById(
+            "role-select-" +
+            userId
+        );
+
+
+    if (!select) {
+
+        showError(
+            "Role selector not found."
+        );
+
+        return;
+
+    }
+
+
+    const newRole =
+        String(
+            select.value || ""
+        ).toLowerCase();
+
+
+    if (
+        ![
+            "user",
+            "admin",
+            "super_admin"
+        ].includes(newRole)
+    ) {
+
+        showError(
+            "Invalid role selected."
+        );
+
+        return;
+
+    }
+
+
+    const confirmed =
+        window.confirm(
+            "Change this user's role to " +
+            newRole +
+            "?"
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const result =
+            await apiRequest(
+                "/api/admin/users/" +
+                encodeURIComponent(
+                    userId
+                ) +
+                "/role",
+                {
+                    method: "PATCH",
+
+                    body:
+                        JSON.stringify({
+                            role:
+                                newRole
+                        })
+
+                }
+            );
+
+
+        showSuccess(
+            result.message ||
+            "User role updated successfully."
+        );
+
+
+        await loadUsers();
+
+    }
+
+    catch (error) {
+
+        showError(
+            error.message
+        );
+
+    }
+
+}
+
+
+/* ==========================================
+   ROLE BADGE
+========================================== */
+
+function renderRoleBadge(role) {
+
+    const normalized =
+        String(
+            role || "user"
+        ).toLowerCase();
+
+
+    let className =
+        "role-user";
+
+
+    if (
+        normalized === "admin"
+    ) {
+
+        className =
+            "role-admin";
+
+    }
+
+    else if (
+        normalized === "super_admin"
+    ) {
+
+        className =
+            "role-super";
+
+    }
+
+    else if (
+        normalized === "owner"
+    ) {
+
+        className =
+            "role-owner";
+
+    }
+
+
+    return `
+
+        <span class="${className}">
+            ${escapeHtml(
+                normalized
+            )}
+        </span>
+
+    `;
+
+}
+
+
+/* ==========================================
+   TRADES
+========================================== */
+
+async function loadTrades() {
+
+    const data =
+        await apiRequest(
+            "/api/admin/trades?limit=100"
+        );
+
+
+    const trades =
+        data.trades || [];
+
+
+    const table =
+        document.getElementById(
+            "tradesTable"
+        );
+
+
+    if (!trades.length) {
+
+        table.innerHTML =
+            `
+            <tr>
+                <td colspan="7">
+                    No trades found.
+                </td>
+            </tr>
+            `;
+
+        return;
+
+    }
+
+
+    table.innerHTML =
+        trades.map(
+            trade => `
+
+                <tr>
+
+                    <td>
+                        ${escapeHtml(
+                            String(
+                                trade.id
+                            ).slice(0, 8)
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            String(
+                                trade.user_id
+                            ).slice(0, 8)
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            trade.symbol || "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            trade.contract_type || "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            trade.action || "-"
+                        )}
+                    </td>
+
+                    <td>
+                        $${Number(
+                            trade.stake || 0
+                        ).toFixed(2)}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            trade.status || "-"
+                        )}
+                    </td>
+
+                </tr>
+
+            `
+        ).join("");
+
+}
+
+/* ==========================================
+   FINANCIAL OVERVIEW
+========================================== */
+
+async function loadFinance() {
+
+    try {
+
+        const data =
+            await apiRequest(
+                "/api/admin/finance"
+            );
+
+
+        const finance =
+            data.finance || {};
+
+
+        const customerFunds =
+            finance.customerFunds || {};
+
+
+        const deposits =
+            finance.deposits || {};
+
+
+        const withdrawals =
+            finance.withdrawals || {};
+
+
+        const trading =
+            finance.trading || {};
+
+
+        const other =
+            finance.other || {};
+
+
+        const platformFlow =
+            finance.platformFlow || {};
+
+
+        // ======================================
+        // EXISTING FINANCIAL SUMMARY CARDS
+        // ======================================
+
+        const completedDeposits =
+            document.getElementById(
+                "completedDeposits"
+            );
+
+        if (completedDeposits) {
+
+            completedDeposits.textContent =
+                "$" +
+                Number(
+                    deposits.completedUsd || 0
+                ).toFixed(2);
+
+        }
+
+
+        const completedWithdrawals =
+            document.getElementById(
+                "completedWithdrawals"
+            );
+
+        if (completedWithdrawals) {
+
+            completedWithdrawals.textContent =
+                "$" +
+                Number(
+                    withdrawals.completedUsd || 0
+                ).toFixed(2);
+
+        }
+
+
+        const tradeStakes =
+            document.getElementById(
+                "tradeStakes"
+            );
+
+        if (tradeStakes) {
+
+            tradeStakes.textContent =
+                "$" +
+                Number(
+                    trading.stakesUsd || 0
+                ).toFixed(2);
+
+        }
+
+
+        const tradePayouts =
+            document.getElementById(
+                "tradePayouts"
+            );
+
+        if (tradePayouts) {
+
+            tradePayouts.textContent =
+                "$" +
+                Number(
+                    trading.payoutsUsd || 0
+                ).toFixed(2);
+
+        }
+
+
+        // ======================================
+        // NEW FINANCIAL OVERVIEW ELEMENTS
+        // ======================================
+
+        const setValue =
+            (
+                id,
+                value
+            ) => {
+
+                const element =
+                    document.getElementById(
+                        id
+                    );
+
+                if (element) {
+
+                    element.textContent =
+                        value;
+
+                }
+
+            };
+
+
+        const usd =
+            value =>
+                "$" +
+                Number(
+                    value || 0
+                ).toFixed(2);
+
+
+        const kes =
+            value =>
+                "KSh " +
+                Number(
+                    value || 0
+                ).toLocaleString(
+                    "en-KE",
+                    {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }
+                );
+
+
+        // ======================================
+        // CUSTOMER FUNDS
+        // ======================================
+
+        setValue(
+            "customerFundsUsd",
+            usd(
+                customerFunds.liabilityUsd
+            )
+        );
+
+
+        setValue(
+            "customerFundsKes",
+            kes(
+                customerFunds.liabilityKes
+            )
+        );
+
+
+        setValue(
+            "fundedUsers",
+            Number(
+                customerFunds.fundedUsers || 0
+            )
+        );
+
+
+        setValue(
+            "totalWallets",
+            Number(
+                customerFunds.totalWallets || 0
+            )
+        );
+
+
+        // ======================================
+        // DEPOSITS
+        // ======================================
+
+        setValue(
+            "pendingDepositsAmount",
+            usd(
+                deposits.pendingUsd
+            )
+        );
+
+
+        setValue(
+            "pendingDepositsKes",
+            kes(
+                deposits.pendingKes
+            )
+        );
+
+
+        setValue(
+            "failedDepositsAmount",
+            usd(
+                deposits.failedUsd
+            )
+        );
+
+
+        setValue(
+            "completedDepositsKes",
+            kes(
+                deposits.completedKes
+            )
+        );
+
+
+        // ======================================
+        // WITHDRAWALS
+        // ======================================
+
+        setValue(
+            "pendingWithdrawalsAmount",
+            usd(
+                withdrawals.pendingUsd
+            )
+        );
+
+
+        setValue(
+            "pendingWithdrawalsKes",
+            kes(
+                withdrawals.pendingKes
+            )
+        );
+
+
+        setValue(
+            "rejectedWithdrawalsAmount",
+            usd(
+                withdrawals.rejectedUsd
+            )
+        );
+
+
+        setValue(
+            "failedWithdrawalsAmount",
+            usd(
+                withdrawals.failedUsd
+            )
+        );
+
+
+        setValue(
+            "completedWithdrawalsKes",
+            kes(
+                withdrawals.completedKes
+            )
+        );
+
+
+        // ======================================
+        // TRADING
+        // ======================================
+
+        setValue(
+            "netTradingFlow",
+            usd(
+                trading.netTradingFlowUsd
+            )
+        );
+
+
+        // ======================================
+        // OTHER
+        // ======================================
+
+        setValue(
+            "refundsAmount",
+            usd(
+                other.refundsUsd
+            )
+        );
+
+
+        setValue(
+            "bonusesAmount",
+            usd(
+                other.bonusesUsd
+            )
+        );
+
+
+        // ======================================
+        // PLATFORM FLOW
+        // ======================================
+
+        setValue(
+            "netDepositWithdrawal",
+            usd(
+                platformFlow
+                    .depositsMinusWithdrawalsUsd
+            )
+        );
+
+
+        setValue(
+            "netDepositWithdrawalKes",
+            kes(
+                platformFlow
+                    .depositsMinusWithdrawalsKes
+            )
+        );
+
+
+        // ======================================
+        // BUSINESS CASH
+        // ======================================
+
+        const businessCash =
+            finance.businessCash || {};
+
+
+        const businessCashElement =
+            document.getElementById(
+                "businessCashStatus"
+            );
+
+
+        if (businessCashElement) {
+
+            businessCashElement.textContent =
+                businessCash.message ||
+                "External business cash balance.";
+
+        }
+
+
+        // ======================================
+        // USER BALANCES TABLE
+        // ======================================
+
+        const userBalancesTable =
+            document.getElementById(
+                "financialUserBalancesTable"
+            );
+
+
+        if (userBalancesTable) {
+
+            const users =
+                Array.isArray(
+                    finance.userBalances
+                )
+                    ? finance.userBalances
+                    : [];
+
+
+            if (!users.length) {
+
+                userBalancesTable.innerHTML =
+                    `
+                    <tr>
+                        <td colspan="6">
+                            No live wallet balances found.
+                        </td>
+                    </tr>
+                    `;
+
+            }
+
+            else {
+
+                userBalancesTable.innerHTML =
+                    users
+                        .map(
+                            user => {
+
+                                return `
+                                <tr>
+
+                                    <td>
+                                        ${escapeHtml(
+                                            user.username ||
+                                            user.full_name ||
+                                            user.user_id ||
+                                            "Unknown"
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        ${escapeHtml(
+                                            user.user_id ||
+                                            ""
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        $${Number(
+                                            user.live_balance || 0
+                                        ).toFixed(2)}
+                                    </td>
+
+                                    <td>
+                                        KSh ${Number(
+                                            user.live_balance_kes || 0
+                                        ).toLocaleString(
+                                            "en-KE",
+                                            {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        ${escapeHtml(
+                                            user.currency ||
+                                            "USD"
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        ${user.updated_at
+                                            ? new Date(
+                                                user.updated_at
+                                              ).toLocaleString()
+                                            : "-"
+                                        }
+                                    </td>
+
+                                </tr>
+                                `;
+
+                            }
+                        )
+                        .join("");
+
+            }
+
+        }
+
+
+        // ======================================
+        // RECENT FINANCIAL TRANSACTIONS
+        // ======================================
+
+        const recentTransactionsTable =
+            document.getElementById(
+                "financialRecentTransactionsTable"
+            );
+
+
+        if (recentTransactionsTable) {
+
+            const transactions =
+                Array.isArray(
+                    finance.recentTransactions
+                )
+                    ? finance.recentTransactions
+                    : [];
+
+
+            if (!transactions.length) {
+
+                recentTransactionsTable.innerHTML =
+                    `
+                    <tr>
+                        <td colspan="7">
+                            No financial transactions found.
+                        </td>
+                    </tr>
+                    `;
+
+            }
+
+            else {
+
+                recentTransactionsTable.innerHTML =
+                    transactions
+                        .map(
+                            tx => {
+
+                                const type =
+                                    tx.transaction_type ||
+                                    tx.type ||
+                                    "-";
+
+
+                                return `
+                                <tr>
+
+                                    <td>
+                                        ${escapeHtml(
+                                            tx.username ||
+                                            tx.full_name ||
+                                            tx.user_id ||
+                                            "Unknown"
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        ${escapeHtml(
+                                            type
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        $${Number(
+                                            tx.amount || 0
+                                        ).toFixed(2)}
+                                    </td>
+
+                                    <td>
+                                        ${escapeHtml(
+                                            tx.status ||
+                                            "-"
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        ${escapeHtml(
+                                            tx.payment_method ||
+                                            "-"
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        ${escapeHtml(
+                                            tx.reference ||
+                                            "-"
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        ${tx.created_at
+                                            ? new Date(
+                                                tx.created_at
+                                              ).toLocaleString()
+                                            : "-"
+                                        }
+                                    </td>
+
+                                </tr>
+                                `;
+
+                            }
+                        )
+                        .join("");
+
+            }
+
+        }
+
+
+        console.log(
+            "Financial Overview loaded successfully:",
+            finance
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Financial Overview error:",
+            error
+        );
+
+        showError(
+            error.message ||
+            "Unable to load financial overview."
+        );
+
+    }
+
+}
+
+
+/* ==========================================
+   DEPOSITS
+========================================== */
+
+async function loadDeposits() {
+
+    const data =
+        await apiRequest(
+            "/api/admin/deposits?status=pending"
+        );
+
+
+    const deposits =
+        data.deposits || [];
+
+
+    const table =
+        document.getElementById(
+            "depositsTable"
+        );
+
+
+    if (!deposits.length) {
+
+        table.innerHTML =
+            `
+            <tr>
+                <td colspan="6">
+                    No pending deposits.
+                </td>
+            </tr>
+            `;
+
+        return;
+
+    }
+
+
+    table.innerHTML =
+        deposits.map(
+            deposit => `
+
+                <tr>
+
+                    <td>
+                        ${escapeHtml(
+                            deposit.reference || "-"
+                        )}
+                    </td>
+
+                    <td>
+                        $${Number(
+                            deposit.amount || 0
+                        ).toFixed(2)}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            deposit.payment_method || "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            deposit.checkout_request_id ||
+                            "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            deposit.result_description ||
+                            "-"
+                        )}
+                    </td>
+
+                    <td>
+
+                        ${
+                            deposit.created_at
+                                ? new Date(
+                                    deposit.created_at
+                                ).toLocaleString()
+                                : "-"
+                        }
+
+                    </td>
+
+                </tr>
+
+            `
+        ).join("");
+
+}
+
+
+/* ==========================================
+   WITHDRAWALS
+========================================== */
+async function approveWithdrawal(withdrawalId) {
+    if (!withdrawalId) {
+        alert("Withdrawal ID is missing.");
+        return;
+    }
+
+    const confirmed = confirm(
+        "Are you sure you want to approve this withdrawal?"
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+        const data = await apiRequest(
+            `/api/admin/withdrawals/${withdrawalId}/approve`,
+            {
+                method: "POST"
+            }
+        );
+
+        alert(
+            data.message ||
+            "Withdrawal approved successfully."
+        );
+
+        await loadWithdrawals();
+    }
+    catch (error) {
+        console.error(
+            "Approve withdrawal error:",
+            error
+        );
+
+        alert(
+            error.message ||
+            "Unable to approve withdrawal."
+        );
+    }
+}
+
+
+async function rejectWithdrawal(withdrawalId) {
+    if (!withdrawalId) {
+        alert("Withdrawal ID is missing.");
+        return;
+    }
+
+    const reason = prompt(
+        "Enter the reason for rejecting this withdrawal:"
+    );
+
+    if (reason === null) {
+        return;
+    }
+
+    const trimmedReason =
+        String(reason).trim();
+
+    if (!trimmedReason) {
+        alert(
+            "A rejection reason is required."
+        );
+        return;
+    }
+
+    if (trimmedReason.length > 500) {
+        alert(
+            "Rejection reason must be 500 characters or less."
+        );
+        return;
+    }
+
+    const confirmed = confirm(
+        `Reject this withdrawal?\n\nReason: ${trimmedReason}`
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+        const data = await apiRequest(
+            `/api/admin/withdrawals/${withdrawalId}/reject`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+                body: JSON.stringify({
+                    reason:
+                        trimmedReason
+                })
+            }
+        );
+
+        alert(
+            data.message ||
+            "Withdrawal rejected successfully."
+        );
+
+        await loadWithdrawals();
+    }
+    catch (error) {
+        console.error(
+            "Reject withdrawal error:",
+            error
+        );
+
+        alert(
+            error.message ||
+            "Unable to reject withdrawal."
+        );
+    }
+}
+async function loadWithdrawals() {
+
+    const data =
+        await apiRequest(
+            "/api/admin/withdrawals"
+        );
+
+
+    const withdrawals =
+        data.withdrawals || [];
+
+
+    const table =
+        document.getElementById(
+            "withdrawalsTable"
+        );
+
+
+    if (!withdrawals.length) {
+
+        table.innerHTML =
+            `
+            <tr>
+                <td colspan="8">
+                    No withdrawals found.
+                </td>
+            </tr>
+            `;
+
+        return;
+
+    }
+
+
+  table.innerHTML = withdrawals.map(
+    withdrawal => {
+   const withdrawalId =
+    withdrawal.withdrawal_id ||
+    withdrawal.reference_id ||
+    withdrawal.id;
+
+        const status =
+            String(
+                withdrawal.status || ""
+            ).toLowerCase();
+
+        const isPending =
+            status === "pending";
+
+        return `
+            <tr>
+                <td>
+                    ${escapeHtml(
+                        withdrawal.reference || "-"
+                    )}
+                </td>
+
+                <td>
+                    $${Number(
+                        withdrawal.amount || 0
+                    ).toFixed(2)}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        withdrawal.phone_number ||
+                        withdrawal.phone ||
+                        "-"
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        withdrawal.status || "-"
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        withdrawal.mpesa_receipt ||
+                        "-"
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        withdrawal.result_description ||
+                        "-"
+                    )}
+                </td>
+
+                <td>
+                    ${
+                        withdrawal.created_at
+                            ? new Date(
+                                withdrawal.created_at
+                            ).toLocaleString()
+                            : "-"
+                    }
+                </td>
+
+                <td>
+                    ${
+                        isPending
+                            ? `
+                                <button
+                                    type="button"
+                                    class="withdrawal-approve-btn"
+                                    onclick="approveWithdrawal('${withdrawalId}')"
+                                >
+                                    Approve
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="withdrawal-reject-btn"
+                                    onclick="rejectWithdrawal('${withdrawalId}')"
+                                >
+                                    Reject
+                                </button>
+                            `
+                            : `
+                                <span>
+                                    -
+                                </span>
+                            `
+                    }
+                </td>
+            </tr>
+        `;
+    }
+).join(""); 
+
+}
+
+
+/* ==========================================
+   TRANSACTIONS
+========================================== */
+
+async function loadTransactions() {
+
+    const data =
+        await apiRequest(
+            "/api/admin/transactions?limit=100"
+        );
+
+
+    const transactions =
+        data.transactions || [];
+
+
+    const table =
+        document.getElementById(
+            "transactionsTable"
+        );
+
+
+    if (!transactions.length) {
+
+        table.innerHTML =
+            `
+            <tr>
+                <td colspan="6">
+                    No transactions found.
+                </td>
+            </tr>
+            `;
+
+        return;
+
+    }
+
+
+    table.innerHTML =
+        transactions.map(
+            tx => `
+
+                <tr>
+
+                    <td>
+                        ${escapeHtml(
+                            tx.transaction_type || "-"
+                        )}
+                    </td>
+
+                    <td>
+                        $${Number(
+                            tx.amount || 0
+                        ).toFixed(2)}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            tx.status || "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            tx.payment_method || "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            tx.reference || "-"
+                        )}
+                    </td>
+
+                    <td>
+
+                        ${
+                            tx.created_at
+                                ? new Date(
+                                    tx.created_at
+                                ).toLocaleString()
+                                : "-"
+                        }
+
+                    </td>
+
+                </tr>
+
+            `
+        ).join("");
+
+}
+
+
+/* ==========================================
+   CUSTOMER CARE
+   ========================================== */
+
+
+/*
+    Load customer conversations.
+*/
+/* ==========================================
+   CUSTOMER CARE POLLING STATE
+========================================== */
+
+let supportPollingInProgress = false;
+
+let lastSupportConversationSignature = "";
+
+let lastSupportMessagesSignature = "";
+
+let lastSupportMessagesConversationId = null;
+
+
+/*
+    Load Customer Care conversations.
+    Background polling only updates the UI
+    when something actually changed.
+*/
+
+async function loadSupportConversations(
+    options = {}
+) {
+
+    const list =
+        document.getElementById(
+            "supportConversationList"
+        );
+
+    const silent =
+        options.silent === true;
+
+    const force =
+        options.force === true;
+
+
+    /*
+        Only show the loading screen during
+        an initial/manual non-silent load.
+    */
+
+    if (!silent) {
+
+        list.innerHTML = `
+
+            <div
+                class="support-empty"
+                style="min-height:220px;"
+            >
+                Loading conversations...
+            </div>
+
+        `;
+
+    }
+
+
+    try {
+
+        const filter =
+            document.getElementById(
+                "supportFilter"
+            ).value;
+
+
+        const data =
+            await apiRequest(
+                "/api/admin/support/conversations?status=" +
+                encodeURIComponent(filter)
+            );
+
+
+        const newConversations =
+            Array.isArray(
+                data.conversations
+            )
+                ? data.conversations
+                : [];
+
+
+        /*
+            Create a stable signature so we can
+            detect whether anything actually changed.
+        */
+
+        const newSignature =
+            JSON.stringify(
+                newConversations.map(
+                    conversation => {
+
+                        const lastMessage =
+                            conversation.lastMessage ||
+                            {};
+
+                        return {
+                            id:
+                                conversation.id,
+
+                            status:
+                                conversation.status,
+
+                            updated_at:
+                                conversation.updated_at,
+
+                            unreadCount:
+                                Number(
+                                    conversation.unreadCount || 0
+                                ),
+
+                            lastMessageId:
+                                lastMessage.id ||
+                                null,
+
+                            lastMessage:
+                                lastMessage.message ||
+                                "",
+
+                            lastMessageCreatedAt:
+                                lastMessage.created_at ||
+                                null
+                        };
+
+                    }
+                )
+            );
+
+
+        const conversationsChanged =
+            force ||
+            newSignature !==
+                lastSupportConversationSignature;
+
+
+        supportConversations =
+            newConversations;
+
+
+        document.getElementById(
+            "supportConversationCount"
+        ).textContent =
+            "(" +
+            supportConversations.length +
+            ")";
+
+
+        /*
+            If nothing changed during background
+            polling, leave the existing UI alone.
+        */
+
+        if (
+            !conversationsChanged &&
+            silent
+        ) {
+
+            return;
+
+        }
+
+
+        lastSupportConversationSignature =
+            newSignature;
+
+
+        /*
+            Preserve conversation-list scroll.
+        */
+
+        const previousListScrollTop =
+            list.scrollTop;
+
+
+        renderSupportConversations();
+
+
+        /*
+            Restore list scroll position after
+            rendering.
+        */
+
+        list.scrollTop =
+            previousListScrollTop;
+
+
+        /*
+            Check whether the selected conversation
+            still exists.
+        */
+
+        if (
+            selectedSupportConversationId
+        ) {
+
+            const stillExists =
+                supportConversations.some(
+                    conversation =>
+                        String(
+                            conversation.id
+                        ) ===
+                        String(
+                            selectedSupportConversationId
+                        )
+                );
+
+
+            if (stillExists) {
+
+                /*
+                    Only reload messages here when
+                    the conversation list changed
+                    or this was explicitly forced.
+                */
+
+                if (
+                    conversationsChanged ||
+                    force
+                ) {
+
+                    await loadSupportMessages(
+                        selectedSupportConversationId,
+                        false,
+                        {
+                            silent:
+                                silent,
+                            force:
+                                force
+                        }
+                    );
+
+                }
+
+            }
+
+            else {
+
+                clearSupportChat();
+
+            }
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Customer Care loading error:",
+            error
+        );
+
+
+        /*
+            Do not destroy the current chat during
+            silent/background polling if a temporary
+            request fails.
+        */
+
+        if (!silent) {
+
+            list.innerHTML = `
+
+                <div
+                    class="support-empty"
+                    style="
+                        min-height:220px;
+                        color:#fca5a5;
+                    "
+                >
+                    ${escapeHtml(
+                        error.message ||
+                        "Unable to load conversations."
+                    )}
+                </div>
+
+            `;
+
+        }
+
+    }
+
+}
+
+
+/*
+    Render conversation list.
+*/
+
+function renderSupportConversations() {
+
+    const list =
+        document.getElementById(
+            "supportConversationList"
+        );
+
+
+    if (
+        !supportConversations.length
+    ) {
+
+        list.innerHTML = `
+
+            <div
+                class="support-empty"
+                style="min-height:220px;"
+            >
+                No conversations found.
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    list.innerHTML =
+        supportConversations
+            .map(
+                conversation => {
+
+                    const customer =
+                        conversation.customer ||
+                        {};
+
+
+                    const lastMessage =
+                        conversation.lastMessage ||
+                        {};
+
+
+                    const customerName =
+                        customer.full_name ||
+                        customer.username ||
+                        customer.email ||
+                        conversation.user_id ||
+                        "Customer";
+
+
+                    const preview =
+                        lastMessage.message ||
+                        "No messages yet";
+
+
+                    const unread =
+                        Number(
+                            conversation.unreadCount || 0
+                        );
+
+
+                    const selected =
+                        String(
+                            conversation.id
+                        ) ===
+                        String(
+                            selectedSupportConversationId
+                        );
+
+
+                    const time =
+                        conversation.updated_at ||
+                        lastMessage.created_at ||
+                        conversation.created_at;
+
+
+                    return `
+
+                        <button
+                            type="button"
+                            class="
+                                support-conversation
+                                ${
+                                    selected
+                                        ? "selected"
+                                        : ""
+                                }
+                            "
+                            onclick="selectSupportConversation(
+                                '${escapeJs(
+                                    conversation.id
+                                )}'
+                            )"
+                        >
+
+                            <div class="support-customer">
+
+                                ${escapeHtml(
+                                    customerName
+                                )}
+
+                                ${
+                                    unread > 0
+                                        ? `
+                                            <span class="support-unread">
+                                                ${unread}
+                                            </span>
+                                        `
+                                        : ""
+                                }
+
+                            </div>
+
+
+                            <div class="support-preview">
+
+                                ${escapeHtml(
+                                    preview
+                                )}
+
+                            </div>
+
+
+                            <div class="support-time">
+
+                                ${
+                                    time
+                                        ? formatSupportTime(
+                                            time
+                                        )
+                                        : "-"
+                                }
+
+                                ${
+                                    conversation.status === "closed"
+                                        ? " • Closed"
+                                        : " • Open"
+                                }
+
+                            </div>
+
+                        </button>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+}
+
+
+/*
+    Select conversation.
+*/
+
+async function selectSupportConversation(
+    conversationId
+) {
+
+    selectedSupportConversationId =
+        conversationId;
+
+
+    /*
+        Selecting a conversation is a real UI
+        action, so render immediately.
+    */
+
+    renderSupportConversations();
+
+
+    lastSupportMessagesConversationId =
+        null;
+
+    lastSupportMessagesSignature =
+        "";
+
+
+    await loadSupportMessages(
+        conversationId,
+        true,
+        {
+            silent:
+                false,
+            force:
+                true
+        }
+    );
+
+
+    try {
+
+        await apiRequest(
+            "/api/admin/support/conversations/" +
+            encodeURIComponent(
+                conversationId
+            ) +
+            "/read",
+            {
+                method: "PATCH"
+            }
+        );
+
+
+        /*
+            Update unread count silently.
+        */
+
+        await loadSupportConversations(
+            {
+                silent:
+                    true,
+                force:
+                    true
+            }
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Mark conversation read error:",
+            error
+        );
+
+    }
+
+}
+
+
+/*
+    Load messages for selected conversation.
+*/
+
+async function loadSupportMessages(
+    conversationId,
+    scrollToBottom = true,
+    options = {}
+) {
+
+    const messagesBox =
+        document.getElementById(
+            "supportMessages"
+        );
+
+
+    const silent =
+        options.silent === true;
+
+    const force =
+        options.force === true;
+
+
+    /*
+        Never show "Loading messages..."
+        during background polling.
+    */
+
+    if (!silent) {
+
+        messagesBox.innerHTML = `
+
+            <div class="support-empty">
+                Loading messages...
+            </div>
+
+        `;
+
+    }
+
+
+    try {
+
+        const data =
+            await apiRequest(
+                "/api/admin/support/conversations/" +
+                encodeURIComponent(
+                    conversationId
+                ) +
+                "/messages"
+            );
+
+
+        const conversation =
+            data.conversation ||
+            findSupportConversation(
+                conversationId
+            );
+
+
+        const messages =
+            Array.isArray(
+                data.messages
+            )
+                ? data.messages
+                : [];
+
+
+        /*
+            Build a signature from the actual
+            messages.
+        */
+
+        const newSignature =
+            JSON.stringify(
+                messages.map(
+                    message => ({
+                        id:
+                            message.id,
+
+                        sender_type:
+                            message.sender_type,
+
+                        message:
+                            message.message,
+
+                        created_at:
+                            message.created_at,
+
+                        read_at:
+                            message.read_at
+                    })
+                )
+            );
+
+
+        const conversationChanged =
+            String(
+                lastSupportMessagesConversationId
+            ) !==
+            String(
+                conversationId
+            );
+
+
+        const messagesChanged =
+            force ||
+            conversationChanged ||
+            newSignature !==
+                lastSupportMessagesSignature;
+
+
+        /*
+            Always update the header because
+            status can change from open/closed.
+        */
+
+        renderSupportChatHeader(
+            conversation
+        );
+
+
+        /*
+            Nothing changed during background
+            polling — leave the message box alone.
+        */
+
+        if (
+            !messagesChanged &&
+            silent
+        ) {
+
+            return;
+
+        }
+
+
+        /*
+            Remember current scroll position.
+        */
+
+        const previousScrollTop =
+            messagesBox.scrollTop;
+
+
+        const wasAtBottom =
+            messagesBox.scrollHeight -
+            messagesBox.scrollTop -
+            messagesBox.clientHeight <
+            40;
+
+
+        renderSupportMessages(
+            messages
+        );
+
+
+        lastSupportMessagesSignature =
+            newSignature;
+
+        lastSupportMessagesConversationId =
+            conversationId;
+
+
+        /*
+            If this is a new selection or the user
+            was already at the bottom, scroll down.
+        */
+
+        if (
+            scrollToBottom ||
+            wasAtBottom ||
+            conversationChanged
+        ) {
+
+            scrollSupportMessagesToBottom();
+
+        }
+
+        else {
+
+            /*
+                User was reading older messages.
+                Keep exactly where they were.
+            */
+
+            messagesBox.scrollTop =
+                previousScrollTop;
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Customer Care messages error:",
+            error
+        );
+
+
+        /*
+            Don't destroy the existing chat during
+            silent background polling.
+        */
+
+        if (!silent) {
+
+            messagesBox.innerHTML = `
+
+                <div
+                    class="support-empty"
+                    style="color:#fca5a5;"
+                >
+                    ${escapeHtml(
+                        error.message ||
+                        "Unable to load messages."
+                    )}
+                </div>
+
+            `;
+
+        }
+
+    }
+
+}
+
+
+/*
+    Find conversation in current list.
+*/
+
+function findSupportConversation(
+    conversationId
+) {
+
+    return supportConversations.find(
+        conversation =>
+            String(
+                conversation.id
+            ) ===
+            String(
+                conversationId
+            )
+    ) || null;
+
+}
+
+
+/*
+    Render selected chat header.
+*/
+
+function renderSupportChatHeader(
+    conversation
+) {
+
+    const customerName =
+        conversation &&
+        conversation.customer
+            ? (
+                conversation.customer.full_name ||
+                conversation.customer.username ||
+                conversation.customer.email ||
+                "Customer"
+            )
+            : "Customer";
+
+
+    const status =
+        conversation &&
+        conversation.status
+            ? String(
+                conversation.status
+            ).toLowerCase()
+            : "open";
+
+
+    document.getElementById(
+        "supportChatCustomer"
+    ).textContent =
+        customerName;
+
+
+    const statusElement =
+        document.getElementById(
+            "supportChatStatus"
+        );
+
+
+    statusElement.textContent =
+        status === "closed"
+            ? "Conversation closed"
+            : "Conversation open";
+
+
+    statusElement.className =
+        status === "closed"
+            ? "support-chat-status closed"
+            : "support-chat-status";
+
+
+    document.getElementById(
+        "supportChatActions"
+    ).style.display =
+        "flex";
+
+
+    const closeButton =
+        document.getElementById(
+            "supportCloseButton"
+        );
+
+
+    if (status === "closed") {
+
+        closeButton.textContent =
+            "Reopen";
+
+        closeButton.className =
+            "support-reopen";
+
+        closeButton.onclick =
+            reopenSupportConversation;
+
+
+        document.getElementById(
+            "supportCompose"
+        ).style.display =
+            "none";
+
+    }
+
+    else {
+
+        closeButton.textContent =
+            "Close";
+
+        closeButton.className =
+            "support-close";
+
+        closeButton.onclick =
+            closeSupportConversation;
+
+
+        document.getElementById(
+            "supportCompose"
+        ).style.display =
+            "flex";
+
+    }
+
+}
+
+
+/*
+    Render messages.
+*/
+
+function renderSupportMessages(
+    messages
+) {
+
+    const box =
+        document.getElementById(
+            "supportMessages"
+        );
+
+
+    if (!messages.length) {
+
+        box.innerHTML = `
+
+            <div class="support-empty">
+                No messages in this conversation yet.
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    box.innerHTML =
+        messages.map(
+            message => {
+
+                const senderType =
+                    String(
+                        message.sender_type ||
+                        "customer"
+                    ).toLowerCase();
+
+
+                const isSupport =
+                    senderType === "support";
+
+
+                return `
+
+                    <div
+                        class="
+                            support-message
+                            ${
+                                isSupport
+                                    ? "support"
+                                    : "customer"
+                            }
+                        "
+                    >
+
+                        <div class="support-bubble">
+
+                            ${escapeHtml(
+                                message.message || ""
+                            )}
+
+
+                            <span
+                                class="support-message-time"
+                            >
+
+                                ${
+                                    message.created_at
+                                        ? formatSupportTime(
+                                            message.created_at
+                                        )
+                                        : ""
+                                }
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+        )
+        .join("");
+
+}
+
+
+/*
+    Send admin reply.
+*/
+
+async function sendSupportMessage() {
+
+    if (
+        !selectedSupportConversationId
+    ) {
+
+        showError(
+            "Select a conversation first."
+        );
+
+        return;
+
+    }
+
+
+    const input =
+        document.getElementById(
+            "supportMessageInput"
+        );
+
+
+    const sendButton =
+        document.getElementById(
+            "supportSendButton"
+        );
+
+
+    const message =
+        String(
+            input.value || ""
+        ).trim();
+
+
+    if (!message) {
+
+        showError(
+            "Enter a message first."
+        );
+
+        return;
+
+    }
+
+
+    if (message.length > 5000) {
+
+        showError(
+            "Message is too long."
+        );
+
+        return;
+
+    }
+
+
+    sendButton.disabled =
+        true;
+
+
+    try {
+
+        const result =
+            await apiRequest(
+                "/api/admin/support/conversations/" +
+                encodeURIComponent(
+                    selectedSupportConversationId
+                ) +
+                "/messages",
+                {
+                    method: "POST",
+
+                    body:
+                        JSON.stringify({
+                            message:
+                                message
+                        })
+
+                }
+            );
+
+
+        input.value =
+            "";
+
+
+        showSuccess(
+            result.message ||
+            "Reply sent."
+        );
+
+
+        /*
+            Force-refresh the selected chat because
+            we know a new message was just sent.
+        */
+
+        await loadSupportMessages(
+            selectedSupportConversationId,
+            true,
+            {
+                silent:
+                    false,
+                force:
+                    true
+            }
+        );
+
+
+        /*
+            Update the conversation preview and
+            timestamp without showing a loading screen.
+        */
+
+        await loadSupportConversations(
+            {
+                silent:
+                    true,
+                force:
+                    true
+            }
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Customer Care send error:",
+            error
+        );
+
+
+        showError(
+            error.message ||
+            "Unable to send reply."
+        );
+
+    }
+
+    finally {
+
+        sendButton.disabled =
+            false;
+
+        /*
+            Return focus to the message box after
+            sending, so replying remains smooth.
+        */
+
+        input.focus();
+
+    }
+
+}
+
+
+/*
+    Mark selected conversation read.
+*/
+
+async function markSupportConversationRead() {
+
+    if (
+        !selectedSupportConversationId
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        await apiRequest(
+            "/api/admin/support/conversations/" +
+            encodeURIComponent(
+                selectedSupportConversationId
+            ) +
+            "/read",
+            {
+                method: "PATCH"
+            }
+        );
+
+
+        showSuccess(
+            "Conversation marked as read."
+        );
+
+
+        await loadSupportConversations(
+            {
+                silent:
+                    true,
+                force:
+                    true
+            }
+        );
+
+    }
+
+    catch (error) {
+
+        showError(
+            error.message
+        );
+
+    }
+
+}
+
+
+/*
+    Close selected conversation.
+*/
+
+async function closeSupportConversation() {
+
+    if (
+        !selectedSupportConversationId
+    ) {
+
+        return;
+
+    }
+
+
+    const confirmed =
+        window.confirm(
+            "Close this customer support conversation?"
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const result =
+            await apiRequest(
+                "/api/admin/support/conversations/" +
+                encodeURIComponent(
+                    selectedSupportConversationId
+                ) +
+                "/close",
+                {
+                    method: "PATCH"
+                }
+            );
+
+
+        showSuccess(
+            result.message ||
+            "Conversation closed."
+        );
+
+
+        await loadSupportConversations(
+            {
+                silent:
+                    true,
+                force:
+                    true
+            }
+        );
+
+
+        await loadSupportMessages(
+            selectedSupportConversationId,
+            false,
+            {
+                silent:
+                    true,
+                force:
+                    true
+            }
+        );
+
+    }
+
+    catch (error) {
+
+        showError(
+            error.message
+        );
+
+    }
+
+}
+
+
+/*
+    Reopen selected conversation.
+*/
+
+async function reopenSupportConversation() {
+
+    if (
+        !selectedSupportConversationId
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const result =
+            await apiRequest(
+                "/api/admin/support/conversations/" +
+                encodeURIComponent(
+                    selectedSupportConversationId
+                ) +
+                "/reopen",
+                {
+                    method: "PATCH"
+                }
+            );
+
+
+        showSuccess(
+            result.message ||
+            "Conversation reopened."
+        );
+
+
+        await loadSupportConversations(
+            {
+                silent:
+                    true,
+                force:
+                    true
+            }
+        );
+
+
+        await loadSupportMessages(
+            selectedSupportConversationId,
+            false,
+            {
+                silent:
+                    true,
+                force:
+                    true
+            }
+        );
+
+    }
+
+    catch (error) {
+
+        showError(
+            error.message
+        );
+
+    }
+
+}
+
+
+/*
+    Refresh Customer Care.
+*/
+
+async function refreshCustomerCare() {
+
+    try {
+
+        /*
+            Manual refresh is allowed to update
+            everything immediately.
+        */
+
+        await loadSupportConversations(
+            {
+                silent:
+                    false,
+                force:
+                    true
+            }
+        );
+
+
+        if (
+            selectedSupportConversationId
+        ) {
+
+            await loadSupportMessages(
+                selectedSupportConversationId,
+                true,
+                {
+                    silent:
+                        false,
+                    force:
+                        true
+                }
+            );
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Customer Care refresh error:",
+            error
+        );
+
+    }
+
+}
+
+
+/*
+    Clear selected chat.
+*/
+
+function clearSupportChat() {
+
+    selectedSupportConversationId =
+        null;
+
+
+    lastSupportMessagesConversationId =
+        null;
+
+    lastSupportMessagesSignature =
+        "";
+
+
+    document.getElementById(
+        "supportChatCustomer"
+    ).textContent =
+        "Select a conversation";
+
+
+    document.getElementById(
+        "supportChatStatus"
+    ).textContent =
+        "No conversation selected";
+
+
+    document.getElementById(
+        "supportChatStatus"
+    ).className =
+        "support-chat-status";
+
+
+    document.getElementById(
+        "supportChatActions"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "supportCompose"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "supportMessages"
+    ).innerHTML = `
+
+        <div class="support-empty">
+
+            Select a customer conversation
+            to view messages.
+
+        </div>
+
+    `;
+
+
+    renderSupportConversations();
+
+}
+
+
+/*
+    Format support time.
+*/
+
+function formatSupportTime(
+    value
+) {
+
+    const date =
+        new Date(value);
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return "-";
+
+    }
+
+
+    return date.toLocaleString();
+
+}
+
+
+/*
+    Scroll chat to bottom.
+*/
+
+function scrollSupportMessagesToBottom() {
+
+    const box =
+        document.getElementById(
+            "supportMessages"
+        );
+
+
+    box.scrollTop =
+        box.scrollHeight;
+
+}
+
+
+/*
+    Start Customer Care polling.
+*/
+
+function startSupportPolling() {
+
+    clearSupportPolling();
+
+
+    supportPollingTimer =
+        setInterval(
+            async () => {
+
+                /*
+                    Prevent overlapping requests if
+                    one polling cycle takes longer
+                    than expected.
+                */
+
+                if (
+                    supportPollingInProgress
+                ) {
+
+                    return;
+
+                }
+
+
+                supportPollingInProgress =
+                    true;
+
+
+                try {
+
+                    await loadSupportConversations(
+                        {
+                            silent:
+                                true,
+                            force:
+                                false
+                        }
+                    );
+
+
+                    /*
+                        loadSupportConversations()
+                        already checks whether the
+                        conversation changed.
+
+                        We only need to check messages
+                        separately if a conversation is
+                        selected.
+                    */
+
+                    if (
+                        selectedSupportConversationId
+                    ) {
+
+                        await loadSupportMessages(
+                            selectedSupportConversationId,
+                            false,
+                            {
+                                silent:
+                                    true,
+                                force:
+                                    false
+                            }
+                        );
+
+                    }
+
+                }
+
+                catch (error) {
+
+                    console.error(
+                        "Customer Care polling error:",
+                        error
+                    );
+
+                }
+
+                finally {
+
+                    supportPollingInProgress =
+                        false;
+
+                }
+
+            },
+            5000
+        );
+
+}
+
+
+/*
+    Stop Customer Care polling.
+*/
+
+function clearSupportPolling() {
+
+    if (
+        supportPollingTimer
+    ) {
+
+        clearInterval(
+            supportPollingTimer
+        );
+
+        supportPollingTimer =
+            null;
+
+    }
+
+}
+/* ==========================================
+   HTML ESCAPING
+========================================== */
+
+function escapeHtml(value) {
+
+    return String(value)
+
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
+
+}
+
+
+/* ==========================================
+   JAVASCRIPT STRING ESCAPING
+========================================== */
+
+function escapeJs(value) {
+
+    return String(value)
+
+        .replace(
+            /\\/g,
+            "\\\\"
+        )
+
+        .replace(
+            /'/g,
+            "\\'"
+        )
+
+        .replace(
+            /\r/g,
+            "\\r"
+        )
+
+        .replace(
+            /\n/g,
+            "\\n"
+        );
+
+}
+
+
+/* ==========================================
+   LOGOUT
+========================================== */
+
+async function logout() {
+
+    clearSupportPolling();
+
+
+    await supabaseClient.auth.signOut();
+
+
+    window.location.href =
+        "login.html";
+
+}
+
+
+/* ==========================================
+   ADMIN INITIALIZATION
+========================================== */
+
+async function initAdmin() {
+
+    try {
+
+        await checkAdmin();
+
+
+    await Promise.all([
+    loadDashboard(),
+    loadUsers(),
+    loadTrades(),
+    loadTransactions(),
+    loadFinance(),
+    loadDeposits(),
+    loadWithdrawals(),
+    loadOwnerWallets(),
+    loadSupportConversations(),
+    loadKmfTransferUsers(),
+    loadKmfPlatformStatus(),
+    loadReferralSettings()
+]);
+
+        startSupportPolling();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Admin initialization error:",
+            error
+        );
+
+
+        showError(
+            error.message
+        );
+
+
+        document.getElementById(
+            "adminInfo"
+        ).textContent =
+            "Access denied";
+
+    }
+
+}
+
+
+/* ==========================================
+   CUSTOMER CARE ENTER KEY
+========================================== */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key !== "Enter"
+        ) {
+
+            return;
+
+        }
+
+
+        if (
+            event.ctrlKey ||
+            event.metaKey
+        ) {
+
+            const active =
+                document.activeElement;
+
+
+            if (
+                active &&
+                active.id ===
+                    "supportMessageInput"
+            ) {
+
+                event.preventDefault();
+
+                sendSupportMessage();
+
+            }
+
+        }
+
+    }
+);
+
+
+/* ==========================================
+   START
+========================================== */
+/* ==========================================
+   ADMIN SECTION NAVIGATION
+========================================== */
+function showAdminSection(sectionId) {
+
+    const target = document.getElementById(sectionId);
+
+    if (!target) {
+        console.error(
+            "Admin section not found:",
+            sectionId
+        );
+
+        showError(
+            "The requested admin section could not be opened."
+        );
+
+        return;
+    }
+
+    /* ==========================================
+       OWNER WALLET SECURITY
+    ========================================== */
+
+    if (sectionId === "ownerWalletSection") {
+
+        if (
+            adminRole !== "owner" ||
+            adminPermissions.manageWalletBalances !== true
+        ) {
+
+            showError(
+                "Owner access is required."
+            );
+
+            return;
+        }
+
+        /*
+         * IMPORTANT:
+         * Do NOT hide other admin sections.
+         * This admin page uses normal scrolling.
+         */
+
+        target.style.display = "block";
+
+        loadOwnerWallets();
+        loadKmfTransferUsers();
+        loadKmfPlatformStatus();
+    }
+
+    /* ==========================================
+       SCROLL TO SELECTED SECTION
+    ========================================== */
+
+    target.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+    /* ==========================================
+       ACTIVE SIDEBAR ITEM
+    ========================================== */
+
+    document
+        .querySelectorAll(".sidebar-link")
+        .forEach(link => {
+
+            link.classList.remove("active");
+
+        });
+
+    const activeLink =
+        document.querySelector(
+            '.sidebar-link[href="#' +
+            sectionId +
+            '"]'
+        );
+
+    if (activeLink) {
+        activeLink.classList.add("active");
+    }
+
+}
+
+
+initAdmin();
+
+</script>
+
+
+</body>
+
+</html>

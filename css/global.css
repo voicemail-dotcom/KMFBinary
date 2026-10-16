@@ -1,0 +1,133 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #080d15;
+    --panel: #0d141f;
+    --panel2: #111b28;
+    --border: #1e2b3b;
+
+    --text: #edf2f7;
+    --muted: #8290a2;
+
+    --green: #55d69a;
+    --red: #e56f7e;
+    --blue: #5c9ded;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.5;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.green {
+    color: var(--green) !important;
+}
+
+.red {
+    color: var(--red) !important;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 11px 20px;
+    border-radius: 8px;
+
+    font-weight: 600;
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.btn-primary {
+    background: var(--green);
+    color: #07120d;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+.btn-outline {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+}
+
+.btn-outline:hover {
+    background: var(--panel2);
+}
+
+.btn-large {
+    padding: 14px 25px;
+}
+
+.section {
+    padding: 100px 7%;
+}
+
+.section-heading {
+    max-width: 700px;
+    margin-bottom: 45px;
+}
+
+.section-label {
+    color: var(--green);
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.section-heading h2 {
+    font-size: 40px;
+    margin: 10px 0;
+}
+
+.section-heading p {
+    color: var(--muted);
+}
+
+footer {
+    border-top: 1px solid var(--border);
+    padding: 30px 7%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--muted);
+}
+
+.logo {
+    font-size: 23px;
+    font-weight: 800;
+}
+
+.logo span {
+    color: var(--green);
+}
+
+@media (max-width: 800px) {
+
+    .section {
+        padding: 70px 5%;
+    }
+
+    footer {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+}

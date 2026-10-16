@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identity Verification - KMFBinary</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/api.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #0f172a;
+            color: #e5e7eb;
+        }
+
+        .page {
+            min-height: 100vh;
+        }
+
+        .topbar {
+            height: 70px;
+            background: #111827;
+            border-bottom: 1px solid #263244;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        .brand {
+            font-size: 21px;
+            font-weight: 800;
+            color: #22c55e;
+        }
+
+        .brand span {
+            color: #f8fafc;
+        }
+
+        .back-btn {
+            border: 1px solid #334155;
+            background: #1e293b;
+            color: #e5e7eb;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .back-btn:hover {
+            background: #263449;
+        }
+
+        .container {
+            width: min(900px, calc(100% - 30px));
+            margin: 35px auto 60px;
+        }
+
+        .header-card {
+            background: #111827;
+            border: 1px solid #263244;
+            border-radius: 14px;
+            padding: 28px;
+            margin-bottom: 20px;
+        }
+
+        .header-card h1 {
+            margin: 0 0 10px;
+            font-size: 27px;
+            color: #f8fafc;
+        }
+
+        .header-card p {
+            margin: 0;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        .security-note {
+            margin-top: 18px;
+            padding: 14px 16px;
+            border-radius: 9px;
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.25);
+            color: #bbf7d0;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .card {
+            background: #111827;
+            border: 1px solid #263244;
+            border-radius: 14px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            margin: 0 0 20px;
+            font-size: 19px;
+            color: #f8fafc;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #cbd5e1;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: #f8fafc;
+            border-radius: 8px;
+            padding: 12px 13px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #22c55e;
+        }
+
+        textarea {
+            min-height: 95px;
+            resize: vertical;
+        }
+
+        input[type="file"] {
+            padding: 10px;
+        }
+
+        .help-text {
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .document-box {
+            border: 1px dashed #475569;
+            border-radius: 10px;
+            padding: 16px;
+            background: #0f172a;
+        }
+
+        .document-box label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .required {
+            color: #ef4444;
+        }
+
+        .optional {
+            color: #64748b;
+            font-weight: normal;
+        }
+
+        .declaration {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .declaration input {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            flex-shrink: 0;
+            accent-color: #22c55e;
+        }
+
+        .declaration label {
+            font-weight: normal;
+            line-height: 1.5;
+            cursor: pointer;
+        }
+
+        .submit-area {
+            margin-top: 24px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .submit-btn {
+            border: 0;
+            background: #22c55e;
+            color: #052e16;
+            padding: 13px 25px;
+            border-radius: 9px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            min-width: 190px;
+        }
+
+        .submit-btn:hover {
+            background: #16a34a;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .message {
+            display: none;
+            padding: 14px 16px;
+            border-radius: 9px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .message.success {
+            display: block;
+            background: rgba(34, 197, 94, 0.10);
+            border: 1px solid rgba(34, 197, 94, 0.35);
+            color: #bbf7d0;
+        }
+
+        .message.error {
+            display: block;
+            background: rgba(239, 68, 68, 0.10);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            color: #fecaca;
+        }
+
+        .message.info {
+            display: block;
+            background: rgba(59, 130, 246, 0.10);
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            color: #bfdbfe;
+        }
+
+        .status-card {
+            text-align: center;
+            padding: 45px 25px;
+        }
+
+        .status-icon {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            margin: 0 auto 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .status-icon.success {
+            background: rgba(34, 197, 94, 0.12);
+            color: #22c55e;
+        }
+
+        .status-icon.pending {
+            background: rgba(234, 179, 8, 0.12);
+            color: #eab308;
+        }
+
+        .status-icon.error {
+            background: rgba(239, 68, 68, 0.12);
+            color: #ef4444;
+        }
+
+        .status-card h2 {
+            margin-bottom: 10px;
+        }
+
+        .status-card p {
+            color: #94a3b8;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .status-badge {
+            display: inline-block;
+            margin-bottom: 15px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: #1e293b;
+            color: #cbd5e1;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .rejection {
+            margin: 20px auto 0;
+            max-width: 600px;
+            padding: 13px 15px;
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            border-radius: 8px;
+            color: #fecaca;
+            text-align: left;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+
+        @media (max-width: 700px) {
+            .topbar {
+                padding: 0 15px;
+            }
+
+            .container {
+                width: min(100% - 20px, 900px);
+                margin-top: 20px;
+            }
+
+            .header-card,
+            .card {
+                padding: 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full {
+                grid-column: auto;
+            }
+
+            .submit-area {
+                justify-content: stretch;
+            }
+
+            .submit-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <header class="topbar">
+        <div class="brand">
+            KMF<span>Binary</span>
+        </div>
+
+        <button
+            type="button"
+            class="back-btn"
+            onclick="window.location.href='wallet.html'"
+        >
+            ← Back to Wallet
+        </button>
+    </header>
+
+    <main class="container">
+
+        <div id="loadingState" class="card loading">
+            Checking verification status...
+        </div>
+
+        <div id="pageContent" class="hidden">
+
+            <section class="header-card">
+                <h1>Identity Verification</h1>
+
+                <p>
+                    Complete your identity verification before withdrawing
+                    funds from your KMFBinary account.
+                </p>
+
+                <div class="security-note">
+                    Your information is used to verify your identity and
+                    protect your account. Please provide accurate information
+                    matching your official documents.
+                </div>
+            </section>
+
+            <div id="pageMessage" class="message"></div>
+
+            <section id="statusCard" class="card status-card hidden">
+
+                <div id="statusIcon" class="status-icon"></div>
+
+                <div id="statusBadge" class="status-badge"></div>
+
+                <h2 id="statusTitle"></h2>
+
+                <p id="statusText"></p>
+
+                <div id="rejectionReason" class="rejection hidden"></div>
+
+                <div style="margin-top:25px;">
+                    <button
+                        type="button"
+                        class="back-btn"
+                        onclick="window.location.href='wallet.html'"
+                    >
+                        Return to Wallet
+                    </button>
+                </div>
+
+            </section>
+
+            <form id="verificationForm" class="hidden">
+
+                <section class="card">
+
+                    <h2>Personal Information</h2>
+
+                    <div class="form-grid">
+
+                        <div class="form-group full">
+                            <label for="fullLegalName">
+                                Full Legal Name
+                                <span class="required">*</span>
+                            </label>
+
+                            <input
+                                type="text"
+                                id="fullLegalName"
+                                name="full_legal_name"
+                                autocomplete="name"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dateOfBirth">
+                                Date of Birth
+                                <span class="required">*</span>
+                            </label>
+
+                            <input
+                                type="date"
+                                id="dateOfBirth"
+                                name="date_of_birth"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="countryOfResidence">
+                                Country of Residence
+                                <span class="required">*</span>
+                            </label>
+
+                            <select
+                                id="countryOfResidence"
+                                name="country_of_residence"
+                                required
+                            >
+                                <option value="">Select country</option>
+                                <option value="Kenya">Kenya</option>
+                                <option value="Uganda">Uganda</option>
+                                <option value="Tanzania">Tanzania</option>
+                                <option value="Rwanda">Rwanda</option>
+                                <option value="Nigeria">Nigeria</option>
+                                <option value="Ghana">Ghana</option>
+                                <option value="South Africa">South Africa</option>
+                                <option value="United States">United States</option>
+                                <option value="United Kingdom">United Kingdom</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phoneNumber">
+                                Phone Number
+                                <span class="required">*</span>
+                            </label>
+
+                            <input
+                                type="tel"
+                                id="phoneNumber"
+                                name="phone_number"
+                                placeholder="2547XXXXXXXX"
+                                required
+                            >
+
+                            <div class="help-text">
+                                Use your active phone number.
+                            </div>
+                        </div>
+
+                        <div class="form-group full">
+                            <label for="residentialAddress">
+                                Residential Address
+                                <span class="required">*</span>
+                            </label>
+
+                            <textarea
+                                id="residentialAddress"
+                                name="residential_address"
+                                placeholder="Enter your current residential address"
+                                required
+                            ></textarea>
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <section class="card">
+
+                    <h2>Government Identification</h2>
+
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label for="governmentIdType">
+                                ID Type
+                                <span class="required">*</span>
+                            </label>
+
+                            <select
+                                id="governmentIdType"
+                                name="government_id_type"
+                                required
+                            >
+                                <option value="">Select ID type</option>
+                                <option value="National ID">National ID</option>
+                                <option value="Passport">Passport</option>
+                                <option value="Driving Licence">Driving Licence</option>
+                                <option value="Other Government ID">Other Government ID</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="governmentIdNumber">
+                                ID Number
+                                <span class="required">*</span>
+                            </label>
+
+                            <input
+                                type="text"
+                                id="governmentIdNumber"
+                                name="government_id_number"
+                                autocomplete="off"
+                                required
+                            >
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <section class="card">
+
+                    <h2>Identity Documents</h2>
+
+                    <div class="form-grid">
+
+                        <div class="form-group full">
+                            <div class="document-box">
+
+                                <label for="idFront">
+                                    ID Front
+                                    <span class="required">*</span>
+                                </label>
+
+                                <input
+                                    type="file"
+                                    id="idFront"
+                                    name="id_front"
+                                    accept="image/*,.pdf"
+                                    required
+                                >
+
+                                <div class="help-text">
+                                    Upload a clear image or PDF of the front
+                                    of your identification document.
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="form-group full">
+                            <div class="document-box">
+
+                                <label for="idBack">
+                                    ID Back
+                                    <span class="optional">
+                                        (required where applicable)
+                                    </span>
+                                </label>
+
+                                <input
+                                    type="file"
+                                    id="idBack"
+                                    name="id_back"
+                                    accept="image/*,.pdf"
+                                >
+
+                                <div class="help-text">
+                                    Upload the back of your ID if your document
+                                    has information on both sides.
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="form-group full">
+                            <div class="document-box">
+
+                                <label for="selfie">
+                                    Selfie / Identity Photo
+                                    <span class="required">*</span>
+                                </label>
+
+                                <input
+                                    type="file"
+                                    id="selfie"
+                                    name="selfie"
+                                    accept="image/*"
+                                    required
+                                >
+
+                                <div class="help-text">
+                                    Upload a clear recent photo of yourself.
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="form-group full">
+                            <div class="document-box">
+
+                                <label for="proofOfAddress">
+                                    Proof of Address
+                                    <span class="optional">
+                                        (optional)
+                                    </span>
+                                </label>
+
+                                <input
+                                    type="file"
+                                    id="proofOfAddress"
+                                    name="proof_of_address"
+                                    accept="image/*,.pdf"
+                                >
+
+                                <div class="help-text">
+                                    Examples include a recent utility bill,
+                                    bank statement, or other accepted proof
+                                    of residence.
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <section class="card">
+
+                    <h2>Declaration</h2>
+
+                    <div class="declaration">
+
+                        <input
+                            type="checkbox"
+                            id="declarationAccepted"
+                            required
+                        >
+
+                        <label for="declarationAccepted">
+                            I confirm that the information I have provided is
+                            true, accurate, and belongs to me. I understand
+                            that KMFBinary may review the information and
+                            documents before approving withdrawals.
+                        </label>
+
+                    </div>
+
+                    <div class="submit-area">
+
+                        <button
+                            type="submit"
+                            id="submitButton"
+                            class="submit-btn"
+                        >
+                            Submit Verification
+                        </button>
+
+                    </div>
+
+                </section>
+
+            </form>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script>
+"use strict";
+
+/*
+    KMFBinary Identity Verification
+
+    IMPORTANT:
+    Supabase is already initialized by js/api.js.
+    We reuse window.supabaseClient here.
+*/
+
+const API_BASE =
+    "http://localhost:3000";
+
+const loadingState =
+    document.getElementById("loadingState");
+
+const pageContent =
+    document.getElementById("pageContent");
+
+const pageMessage =
+    document.getElementById("pageMessage");
+
+const statusCard =
+    document.getElementById("statusCard");
+
+const verificationForm =
+    document.getElementById("verificationForm");
+
+const statusIcon =
+    document.getElementById("statusIcon");
+
+const statusBadge =
+    document.getElementById("statusBadge");
+
+const statusTitle =
+    document.getElementById("statusTitle");
+
+const statusText =
+    document.getElementById("statusText");
+
+const rejectionReason =
+    document.getElementById("rejectionReason");
+
+const submitButton =
+    document.getElementById("submitButton");
+
+
+function showPageMessage(message, type = "info") {
+
+    pageMessage.textContent = message;
+
+    pageMessage.className =
+        "message " + type;
+}
+
+
+function hidePageMessage() {
+
+    pageMessage.textContent = "";
+
+    pageMessage.className =
+        "message";
+}
+
+
+function setLoading(loading) {
+
+    if (loading) {
+
+        loadingState.classList.remove("hidden");
+
+        pageContent.classList.add("hidden");
+
+    } else {
+
+        loadingState.classList.add("hidden");
+
+        pageContent.classList.remove("hidden");
+    }
+}
+
+
+async function getSession() {
+
+    const client =
+        window.supabaseClient;
+
+    if (!client) {
+
+        throw new Error(
+            "Authentication service is unavailable."
+        );
+    }
+
+    const {
+        data,
+        error
+    } = await client.auth.getSession();
+
+    if (error) {
+        throw error;
+    }
+
+    return data?.session || null;
+}
+
+
+async function apiRequest(endpoint, options = {}) {
+
+    const session =
+        await getSession();
+
+    if (!session?.access_token) {
+
+        throw new Error(
+            "Your session has expired. Please log in again."
+        );
+    }
+
+    const headers = {
+        "Authorization":
+            "Bearer " + session.access_token
+    };
+
+    if (!(options.body instanceof FormData)) {
+
+        headers["Content-Type"] =
+            "application/json";
+    }
+
+    const response =
+        await fetch(
+            API_BASE + endpoint,
+            {
+                ...options,
+
+                headers: {
+                    ...headers,
+                    ...(options.headers || {})
+                }
+            }
+        );
+
+    let data = null;
+
+    try {
+
+        data =
+            await response.json();
+
+    } catch (_) {
+
+        data = null;
+    }
+
+    if (!response.ok) {
+
+        throw new Error(
+            data?.message ||
+            data?.error ||
+            "Request failed."
+        );
+    }
+
+    return data;
+}
+
+
+async function checkCompletedDeposit() {
+
+    const data =
+        await apiRequest(
+            "/api/wallet/withdrawal-status"
+        );
+
+    return data;
+}
+
+
+function showStatus(
+    status,
+    title,
+    text,
+    icon,
+    rejection = null
+) {
+
+    verificationForm.classList.add("hidden");
+
+    statusCard.classList.remove("hidden");
+
+    statusIcon.textContent =
+        icon;
+
+    statusIcon.className =
+        "status-icon " +
+        (
+            status === "approved"
+                ? "success"
+                : status === "rejected"
+                    ? "error"
+                    : "pending"
+        );
+
+    statusBadge.textContent =
+        status;
+
+    statusTitle.textContent =
+        title;
+
+    statusText.textContent =
+        text;
+
+    if (rejection) {
+
+        rejectionReason.textContent =
+            "Reason: " + rejection;
+
+        rejectionReason.classList.remove(
+            "hidden"
+        );
+
+    } else {
+
+        rejectionReason.textContent =
+            "";
+
+        rejectionReason.classList.add(
+            "hidden"
+        );
+    }
+}
+
+
+function showVerificationForm() {
+
+    statusCard.classList.add(
+        "hidden"
+    );
+
+    verificationForm.classList.remove(
+        "hidden"
+    );
+}
+
+
+async function loadExistingStatus() {
+
+    try {
+
+        const data =
+            await apiRequest(
+                "/api/kyc/status"
+            );
+
+        const status =
+            String(
+                data?.status ||
+                data?.kycStatus ||
+                "unverified"
+            ).toLowerCase();
+
+        if (status === "approved") {
+
+            showStatus(
+                "approved",
+                "Verification Approved",
+                "Your identity has been verified. You can now withdraw funds from your approved account.",
+                "✓"
+            );
+
+            return true;
+        }
+
+        if (status === "pending") {
+
+            showStatus(
+                "pending",
+                "Verification Under Review",
+                "Your verification documents have been submitted and are currently being reviewed. You will be able to withdraw once your verification is approved.",
+                "⏳"
+            );
+
+            return true;
+        }
+
+        if (status === "rejected") {
+
+            showStatus(
+                "rejected",
+                "Verification Rejected",
+                "Your previous verification submission was rejected. Please review the reason below and submit your information again.",
+                "!",
+                data?.rejection_reason ||
+                data?.rejectionReason ||
+                "No rejection reason was provided."
+            );
+
+            verificationForm.classList.remove(
+                "hidden"
+            );
+
+            statusCard.classList.remove(
+                "hidden"
+            );
+
+            return false;
+        }
+
+        return false;
+
+    } catch (error) {
+
+        console.error(
+            "KYC status error:",
+            error
+        );
+
+        throw error;
+    }
+}
+
+
+async function verifyDepositEligibility() {
+
+    /*
+        The withdrawal-status endpoint checks
+        whether the user has a COMPLETED deposit.
+
+        A pending deposit does NOT unlock verification.
+    */
+
+    const data =
+        await checkCompletedDeposit();
+
+    if (
+        data?.reason === "no_deposit" ||
+        data?.hasCompletedDeposit === false
+    ) {
+
+        showStatus(
+            "pending",
+            "Make a Deposit First",
+            "Identity verification becomes available after you have made at least one completed deposit. Please return to your wallet and make a deposit first.",
+            "$"
+        );
+
+        return false;
+    }
+
+    return true;
+}
+
+
+function populateExistingValues() {
+
+    const fullName =
+        document.getElementById(
+            "fullLegalName"
+        );
+
+    const phone =
+        document.getElementById(
+            "phoneNumber"
+        );
+
+    if (!fullName.value) {
+
+        const storedName =
+            localStorage.getItem(
+                "kmf_full_name"
+            );
+
+        if (storedName) {
+
+            fullName.value =
+                storedName;
+        }
+    }
+
+    if (!phone.value) {
+
+        const storedPhone =
+            localStorage.getItem(
+                "kmf_phone"
+            );
+
+        if (storedPhone) {
+
+            phone.value =
+                storedPhone;
+        }
+    }
+}
+
+
+async function initializeVerification() {
+
+    try {
+
+        setLoading(true);
+
+        const session =
+            await getSession();
+
+        if (!session) {
+
+            window.location.href =
+                "login.html";
+
+            return;
+        }
+
+        const depositStatus =
+            await verifyDepositEligibility();
+
+        if (!depositStatus) {
+
+            setLoading(false);
+
+            return;
+        }
+
+        const hasFinalStatus =
+            await loadExistingStatus();
+
+        if (!hasFinalStatus) {
+
+            if (
+                verificationForm.classList.contains(
+                    "hidden"
+                )
+            ) {
+
+                verificationForm.classList.remove(
+                    "hidden"
+                );
+            }
+        }
+
+        populateExistingValues();
+
+        setLoading(false);
+
+    } catch (error) {
+
+        console.error(
+            "Verification initialization error:",
+            error
+        );
+
+        showPageMessage(
+            error.message ||
+            "Unable to load verification information.",
+            "error"
+        );
+
+        setLoading(false);
+    }
+}
+
+
+async function submitVerification(event) {
+
+    event.preventDefault();
+
+    hidePageMessage();
+
+    if (
+        !document.getElementById(
+            "declarationAccepted"
+        ).checked
+    ) {
+
+        showPageMessage(
+            "Please accept the declaration before submitting.",
+            "error"
+        );
+
+        return;
+    }
+
+    /*
+        Check again immediately before submission.
+    */
+
+    try {
+
+        const depositStatus =
+            await checkCompletedDeposit();
+
+        if (
+            depositStatus?.reason === "no_deposit" ||
+            depositStatus?.hasCompletedDeposit === false
+        ) {
+
+            showPageMessage(
+                "Please make a completed deposit before submitting identity verification.",
+                "error"
+            );
+
+            return;
+        }
+
+    } catch (error) {
+
+        showPageMessage(
+            error.message ||
+            "Unable to confirm your deposit status.",
+            "error"
+        );
+
+        return;
+    }
+
+    const form =
+        document.getElementById(
+            "verificationForm"
+        );
+
+    if (!form.checkValidity()) {
+
+        form.reportValidity();
+
+        return;
+    }
+
+    submitButton.disabled =
+        true;
+
+    submitButton.textContent =
+        "Submitting...";
+
+    try {
+
+        const formData =
+            new FormData();
+
+        formData.append(
+            "full_legal_name",
+            document.getElementById(
+                "fullLegalName"
+            ).value.trim()
+        );
+
+        formData.append(
+            "date_of_birth",
+            document.getElementById(
+                "dateOfBirth"
+            ).value
+        );
+
+        formData.append(
+            "country_of_residence",
+            document.getElementById(
+                "countryOfResidence"
+            ).value
+        );
+
+        formData.append(
+            "phone_number",
+            document.getElementById(
+                "phoneNumber"
+            ).value.trim()
+        );
+
+        formData.append(
+            "residential_address",
+            document.getElementById(
+                "residentialAddress"
+            ).value.trim()
+        );
+
+        formData.append(
+            "government_id_type",
+            document.getElementById(
+                "governmentIdType"
+            ).value
+        );
+
+        formData.append(
+            "government_id_number",
+            document.getElementById(
+                "governmentIdNumber"
+            ).value.trim()
+        );
+
+        const idFront =
+            document.getElementById(
+                "idFront"
+            ).files[0];
+
+        const idBack =
+            document.getElementById(
+                "idBack"
+            ).files[0];
+
+        const selfie =
+            document.getElementById(
+                "selfie"
+            ).files[0];
+
+        const proofOfAddress =
+            document.getElementById(
+                "proofOfAddress"
+            ).files[0];
+
+        if (idFront) {
+
+            formData.append(
+                "id_front",
+                idFront
+            );
+        }
+
+        if (idBack) {
+
+            formData.append(
+                "id_back",
+                idBack
+            );
+        }
+
+        if (selfie) {
+
+            formData.append(
+                "selfie",
+                selfie
+            );
+        }
+
+        if (proofOfAddress) {
+
+            formData.append(
+                "proof_of_address",
+                proofOfAddress
+            );
+        }
+
+        formData.append(
+            "declaration_accepted",
+            "true"
+        );
+
+        const result =
+            await apiRequest(
+                "/api/kyc/submit",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+        console.log(
+            "KYC submission result:",
+            result
+        );
+
+        showStatus(
+            "pending",
+            "Verification Submitted",
+            "Your identity verification has been submitted successfully. Our team will review your information. Withdrawals will become available after your verification is approved.",
+            "✓"
+        );
+
+        showPageMessage(
+            "Verification submitted successfully.",
+            "success"
+        );
+
+        verificationForm.classList.add(
+            "hidden"
+        );
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+    } catch (error) {
+
+        console.error(
+            "KYC submission error:",
+            error
+        );
+
+        showPageMessage(
+            error.message ||
+            "Unable to submit verification.",
+            "error"
+        );
+
+    } finally {
+
+        submitButton.disabled =
+            false;
+
+        submitButton.textContent =
+            "Submit Verification";
+    }
+}
+
+
+document
+    .getElementById(
+        "verificationForm"
+    )
+    .addEventListener(
+        "submit",
+        submitVerification
+    );
+
+
+/*
+    Reuse the Supabase client already
+    initialized by js/api.js.
+*/
+
+if (window.supabaseClient) {
+
+    window.supabaseClient.auth.onAuthStateChange(
+        (event, session) => {
+
+            if (
+                event === "SIGNED_OUT" ||
+                !session
+            ) {
+
+                window.location.href =
+                    "login.html";
+            }
+        }
+    );
+}
+
+
+initializeVerification();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1224 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - KMFBinary</title>
+    <link rel="stylesheet" href="css/global.css">
+
+    <style>
+        .auth-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 16px;
+            box-sizing: border-box;
+        }
+
+        .auth-box {
+            width: 100%;
+            max-width: 500px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 35px;
+            box-sizing: border-box;
+        }
+
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .auth-box h1 {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .auth-description {
+            text-align: center;
+            color: var(--muted);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group > label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 13px;
+            background: var(--panel2);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--green);
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 48px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+        }
+
+        .password-toggle:hover {
+            color: var(--text);
+        }
+
+        .password-requirements {
+            margin-top: 8px;
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .requirement-valid {
+            color: var(--green);
+        }
+
+        .requirement-invalid {
+            color: var(--muted);
+        }
+
+        .password-match {
+            margin-top: 7px;
+            font-size: 12px;
+        }
+
+        .match-valid {
+            color: var(--green);
+        }
+
+        .match-invalid {
+            color: #ff6b6b;
+        }
+
+        .referral-note {
+            margin-top: 7px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .full {
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .auth-footer {
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 20px;
+        }
+
+        .auth-footer a,
+        .terms-links a,
+        .small-link {
+            color: var(--green);
+        }
+
+        .demo-warning {
+            background: rgba(85, 214, 154, 0.08);
+            border: 1px solid rgba(85, 214, 154, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        #message,
+        #otpMessage {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 13px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        .message-success {
+            color: var(--green);
+        }
+
+        .message-error {
+            color: #ff6b6b;
+        }
+
+        .message-info {
+            color: var(--muted);
+        }
+
+        #otpSection {
+            display: none;
+        }
+
+        .otp-description {
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 22px;
+        }
+
+        .otp-email {
+            color: var(--text);
+            font-weight: 600;
+            overflow-wrap: anywhere;
+        }
+
+        .otp-input {
+            text-align: center;
+            font-size: 24px;
+            letter-spacing: 8px;
+            font-weight: 600;
+            padding: 14px;
+        }
+
+        .otp-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .otp-actions button {
+            flex: 1;
+        }
+
+        .secondary-button {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        .secondary-button:hover {
+            border-color: var(--green);
+        }
+
+        .small-link {
+            display: block;
+            text-align: center;
+            margin: 15px auto 0;
+            background: transparent;
+            border: none;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .terms-label {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            cursor: pointer;
+            line-height: 1.6;
+            font-size: 13px;
+        }
+
+        .terms-label input {
+            width: auto;
+            flex-shrink: 0;
+            margin-top: 4px;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 480px) {
+            .auth-box {
+                padding: 24px 18px;
+            }
+
+            .auth-page {
+                padding: 16px 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="auth-page">
+    <div class="auth-box">
+
+        <div class="auth-logo logo">
+            <span>KMF</span>Binary
+        </div>
+
+        <!-- REGISTRATION -->
+        <div id="registrationSection">
+            <h1>Create your account</h1>
+
+            <p class="auth-description">
+                Create your KMFBinary account and verify your email.
+            </p>
+
+            <div class="demo-warning">
+                Your email must be verified before your account can be used.
+            </div>
+
+            <form id="registerForm">
+
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input
+                        id="fullName"
+                        type="text"
+                        autocomplete="name"
+                        maxlength="100"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input
+                        id="email"
+                        type="email"
+                        autocomplete="email"
+                        maxlength="254"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="country">Country</label>
+                    <select id="country" required>
+                        <option value="Kenya">Kenya</option>
+                        <option value="Uganda">Uganda</option>
+                        <option value="Tanzania">Tanzania</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input
+                        id="phone"
+                        type="tel"
+                        autocomplete="tel"
+                        placeholder="+254..."
+                        maxlength="30"
+                        required
+                    >
+                </div>
+
+                <!-- REFERRAL CODE -->
+                <div class="form-group">
+                    <label for="referralCode">
+                        Referral Code (Optional)
+                    </label>
+
+                    <input
+                        id="referralCode"
+                        type="text"
+                        autocomplete="off"
+                        maxlength="40"
+                        placeholder="Enter referral code"
+                        autocapitalize="characters"
+                        spellcheck="false"
+                    >
+
+                    <div class="referral-note">
+                        If someone invited you, enter their referral code.
+                        Each account can use only one referral code.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+
+                    <div class="password-wrapper">
+                        <input
+                            id="password"
+                            type="password"
+                            autocomplete="new-password"
+                            minlength="8"
+                            maxlength="72"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            data-target="password"
+                            aria-label="Show password"
+                        >👁</button>
+                    </div>
+
+                    <div class="password-requirements">
+                        <div id="reqLength" class="requirement-invalid">
+                            • At least 8 characters
+                        </div>
+                        <div id="reqUpper" class="requirement-invalid">
+                            • At least one uppercase letter
+                        </div>
+                        <div id="reqLower" class="requirement-invalid">
+                            • At least one lowercase letter
+                        </div>
+                        <div id="reqNumber" class="requirement-invalid">
+                            • At least one number
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+
+                    <div class="password-wrapper">
+                        <input
+                            id="confirmPassword"
+                            type="password"
+                            autocomplete="new-password"
+                            minlength="8"
+                            maxlength="72"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            data-target="confirmPassword"
+                            aria-label="Show password"
+                        >👁</button>
+                    </div>
+
+                    <div id="passwordMatch" class="password-match"></div>
+                </div>
+
+                <div class="form-group" style="margin-top:5px;">
+                    <label class="terms-label">
+                        <input id="terms" type="checkbox" required>
+                        <span>
+                            I agree to the
+                            <span class="terms-links">
+                                <a href="terms.html" target="_blank"
+                                   rel="noopener noreferrer">Terms</a>
+                                and
+                                <a href="privacy.html" target="_blank"
+                                   rel="noopener noreferrer">Privacy Policy</a>
+                            </span>.
+                        </span>
+                    </label>
+                </div>
+
+                <button
+                    id="registerButton"
+                    class="btn btn-primary full"
+                    type="submit"
+                >
+                    Create Account
+                </button>
+
+                <div id="message" aria-live="polite"></div>
+            </form>
+
+            <div class="auth-footer">
+                Already have an account?
+                <a href="login.html">Sign in</a>
+            </div>
+
+            <div class="auth-footer">
+                <a href="index.html">← Back to home</a>
+            </div>
+        </div>
+
+        <!-- EMAIL OTP VERIFICATION -->
+        <div id="otpSection">
+            <h1>Verify your email</h1>
+
+            <p class="otp-description">
+                We sent a 6-digit verification code to:
+                <br>
+                <span id="otpEmail" class="otp-email"></span>
+                <br><br>
+                Enter the code below to confirm your email address.
+            </p>
+
+            <form id="otpForm">
+                <div class="form-group">
+                    <label for="otp">Verification Code</label>
+                    <input
+                        id="otp"
+                        class="otp-input"
+                        type="text"
+                        inputmode="numeric"
+                        autocomplete="one-time-code"
+                        maxlength="6"
+                        pattern="[0-9]{6}"
+                        placeholder="000000"
+                        required
+                    >
+                </div>
+
+                <button
+                    id="verifyButton"
+                    class="btn btn-primary full"
+                    type="submit"
+                >
+                    Verify Email
+                </button>
+
+                <div id="otpMessage" class="message-info"
+                     aria-live="polite"></div>
+            </form>
+
+            <div class="otp-actions">
+                <button
+                    id="resendButton"
+                    type="button"
+                    class="secondary-button"
+                >
+                    Resend Code
+                </button>
+            </div>
+
+            <button
+                id="backToRegistration"
+                type="button"
+                class="small-link"
+            >
+                ← Back to registration
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+"use strict";
+
+/* ==========================================
+   SUPABASE CONFIGURATION
+========================================== */
+
+const SUPABASE_URL =
+    "https://nugufikdivanyzmghofq.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_NfsjmPephsaJrRB6vLXglw_G6yTdPTl";
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+/* ==========================================
+   ELEMENTS
+========================================== */
+
+const registrationSection =
+    document.getElementById("registrationSection");
+
+const otpSection =
+    document.getElementById("otpSection");
+
+const registerForm =
+    document.getElementById("registerForm");
+
+const otpForm =
+    document.getElementById("otpForm");
+
+const registerButton =
+    document.getElementById("registerButton");
+
+const verifyButton =
+    document.getElementById("verifyButton");
+
+const resendButton =
+    document.getElementById("resendButton");
+
+const backToRegistration =
+    document.getElementById("backToRegistration");
+
+const message =
+    document.getElementById("message");
+
+const otpMessage =
+    document.getElementById("otpMessage");
+
+const otpEmail =
+    document.getElementById("otpEmail");
+
+const emailInput =
+    document.getElementById("email");
+
+const referralCodeInput =
+    document.getElementById("referralCode");
+
+const passwordInput =
+    document.getElementById("password");
+
+const confirmPasswordInput =
+    document.getElementById("confirmPassword");
+
+const passwordMatch =
+    document.getElementById("passwordMatch");
+
+const otpInput =
+    document.getElementById("otp");
+
+/* ==========================================
+   STATE
+========================================== */
+
+let registrationEmail = "";
+let resendCooldown = false;
+
+/* ==========================================
+   REFERRAL CODE FROM URL
+
+   Supported examples:
+   register.html?ref=KIM123
+   register.html?referral=KIM123
+   register.html?referral_code=KIM123
+========================================== */
+
+(function prefillReferralCode() {
+    try {
+        const params = new URLSearchParams(
+            window.location.search
+        );
+
+        const referralCode = String(
+            params.get("ref") ||
+            params.get("referral") ||
+            params.get("referral_code") ||
+            ""
+        ).trim().toUpperCase();
+
+        if (referralCode) {
+            referralCodeInput.value = referralCode;
+        }
+    } catch (error) {
+        console.warn(
+            "Unable to read referral code from URL:",
+            error
+        );
+    }
+})();
+
+/* ==========================================
+   CHECK EXISTING SESSION
+========================================== */
+
+(async function checkExistingSession() {
+    try {
+        const { data, error } =
+            await supabaseClient.auth.getSession();
+
+        if (error) {
+            console.warn("Session check error:", error);
+            return;
+        }
+
+        if (data && data.session) {
+            window.location.replace("dashboard.html");
+        }
+    } catch (error) {
+        console.error("Session check failed:", error);
+    }
+})();
+
+/* ==========================================
+   MESSAGE HELPERS
+========================================== */
+
+function showMessage(text, type = "info") {
+    message.textContent = text;
+    message.className = "message-" + type;
+}
+
+function showOtpMessage(text, type = "info") {
+    otpMessage.textContent = text;
+    otpMessage.className = "message-" + type;
+}
+
+/* ==========================================
+   PASSWORD VISIBILITY
+========================================== */
+
+document.querySelectorAll(".password-toggle").forEach(
+    function(button) {
+        button.addEventListener("click", function() {
+            const targetId = button.dataset.target;
+            const input = document.getElementById(targetId);
+
+            if (input.type === "password") {
+                input.type = "text";
+                button.textContent = "🙈";
+                button.setAttribute("aria-label", "Hide password");
+            } else {
+                input.type = "password";
+                button.textContent = "👁";
+                button.setAttribute("aria-label", "Show password");
+            }
+        });
+    }
+);
+
+/* ==========================================
+   PASSWORD VALIDATION
+========================================== */
+
+function validatePassword(password) {
+    return {
+        length: password.length >= 8,
+        upper: /[A-Z]/.test(password),
+        lower: /[a-z]/.test(password),
+        number: /[0-9]/.test(password)
+    };
+}
+
+function updatePasswordRequirements() {
+    const result = validatePassword(passwordInput.value);
+
+    document.getElementById("reqLength").className =
+        result.length ? "requirement-valid" : "requirement-invalid";
+
+    document.getElementById("reqUpper").className =
+        result.upper ? "requirement-valid" : "requirement-invalid";
+
+    document.getElementById("reqLower").className =
+        result.lower ? "requirement-valid" : "requirement-invalid";
+
+    document.getElementById("reqNumber").className =
+        result.number ? "requirement-valid" : "requirement-invalid";
+
+    checkPasswordMatch();
+}
+
+function checkPasswordMatch() {
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
+
+    if (confirmPassword.length === 0) {
+        passwordMatch.textContent = "";
+        passwordMatch.className = "password-match";
+        return false;
+    }
+
+    if (password === confirmPassword) {
+        passwordMatch.textContent = "✓ Passwords match.";
+        passwordMatch.className =
+            "password-match match-valid";
+        return true;
+    }
+
+    passwordMatch.textContent = "Passwords do not match.";
+    passwordMatch.className =
+        "password-match match-invalid";
+    return false;
+}
+
+passwordInput.addEventListener(
+    "input",
+    updatePasswordRequirements
+);
+
+confirmPasswordInput.addEventListener(
+    "input",
+    checkPasswordMatch
+);
+
+/* ==========================================
+   NORMALIZE INPUTS
+========================================== */
+
+function normalizeEmail(email) {
+    return String(email || "").trim().toLowerCase();
+}
+
+function normalizePhone(phone) {
+    return String(phone || "")
+        .trim()
+        .replace(/[\s()-]/g, "");
+}
+
+function normalizeReferralCode(code) {
+    return String(code || "")
+        .trim()
+        .toUpperCase();
+}
+
+/* ==========================================
+   SHOW OTP SCREEN
+========================================== */
+
+function showOtpScreen(email) {
+    registrationEmail = normalizeEmail(email);
+    otpEmail.textContent = registrationEmail;
+
+    registrationSection.style.display = "none";
+    otpSection.style.display = "block";
+
+    otpInput.value = "";
+
+    showOtpMessage(
+        "Enter the 6-digit code sent to your email.",
+        "info"
+    );
+
+    setTimeout(function() {
+        otpInput.focus();
+    }, 100);
+}
+
+/* ==========================================
+   BACK TO REGISTRATION
+========================================== */
+
+backToRegistration.addEventListener("click", function() {
+    otpSection.style.display = "none";
+    registrationSection.style.display = "block";
+    showOtpMessage("");
+});
+
+/* ==========================================
+   REGISTER ACCOUNT
+========================================== */
+
+registerForm.addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    if (registerButton.disabled) {
+        return;
+    }
+
+    const fullName = document
+        .getElementById("fullName")
+        .value
+        .trim();
+
+    const email = normalizeEmail(emailInput.value);
+
+    const country = document
+        .getElementById("country")
+        .value;
+
+    const phone = normalizePhone(
+        document.getElementById("phone").value
+    );
+
+    const referralCode = normalizeReferralCode(
+        referralCodeInput.value
+    );
+
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
+
+    const termsAccepted = document
+        .getElementById("terms")
+        .checked;
+
+    showMessage("");
+
+    /* VALIDATE FULL NAME */
+    if (fullName.length < 2) {
+        showMessage(
+            "Please enter your full name.",
+            "error"
+        );
+        return;
+    }
+
+    /* VALIDATE EMAIL */
+    if (!email) {
+        showMessage(
+            "Please enter your email address.",
+            "error"
+        );
+        return;
+    }
+
+    /* VALIDATE PASSWORD */
+    const passwordRules = validatePassword(password);
+
+    if (
+        !passwordRules.length ||
+        !passwordRules.upper ||
+        !passwordRules.lower ||
+        !passwordRules.number
+    ) {
+        showMessage(
+            "Please meet all password requirements.",
+            "error"
+        );
+        return;
+    }
+
+    /* CONFIRM PASSWORD */
+    if (password !== confirmPassword) {
+        showMessage(
+            "Passwords do not match.",
+            "error"
+        );
+        confirmPasswordInput.focus();
+        return;
+    }
+
+    /* VALIDATE PHONE */
+    if (phone.length < 7) {
+        showMessage(
+            "Please enter a valid phone number.",
+            "error"
+        );
+        return;
+    }
+
+    /* VALIDATE REFERRAL CODE LENGTH */
+    if (referralCode.length > 40) {
+        showMessage(
+            "The referral code is too long.",
+            "error"
+        );
+        return;
+    }
+
+    /* TERMS */
+    if (!termsAccepted) {
+        showMessage(
+            "Please agree to the Terms and Privacy Policy.",
+            "error"
+        );
+        return;
+    }
+
+    registerButton.disabled = true;
+    registerButton.textContent = "Creating account...";
+
+    try {
+        const { data, error } =
+            await supabaseClient.auth.signUp({
+                email: email,
+                password: password,
+
+                options: {
+                    data: {
+                        full_name: fullName,
+                        country: country,
+                        phone: phone,
+
+                        /*
+                         * This saves the entered code in
+                         * Supabase user metadata.
+                         *
+                         * The backend must validate the code
+                         * and assign the referrer securely.
+                         */
+                        referral_code: referralCode || null
+                    }
+                }
+            });
+
+        if (error) {
+            throw error;
+        }
+
+        /*
+         * Supabase may return no identities when
+         * an email already belongs to an account.
+         */
+        if (
+            data &&
+            data.user &&
+            Array.isArray(data.user.identities) &&
+            data.user.identities.length === 0
+        ) {
+            showMessage(
+                "An account with this email already exists. Please sign in or use Forgot Password.",
+                "error"
+            );
+
+            registerButton.disabled = false;
+            registerButton.textContent = "Create Account";
+            return;
+        }
+
+        registrationEmail = email;
+
+        /*
+         * If a session is returned, email confirmation
+         * is already complete.
+         */
+        if (data && data.session) {
+            showMessage(
+                "Account created successfully.",
+                "success"
+            );
+
+            window.location.replace("dashboard.html");
+            return;
+        }
+
+        /*
+         * Email confirmation is required.
+         */
+        showOtpScreen(email);
+
+        registerButton.disabled = false;
+        registerButton.textContent = "Create Account";
+
+    } catch (error) {
+        console.error("Registration error:", error);
+
+        let errorMessage =
+            error.message ||
+            "Unable to create your account.";
+
+        const lowerMessage = errorMessage.toLowerCase();
+
+        if (
+            lowerMessage.includes("already registered") ||
+            lowerMessage.includes("user already registered")
+        ) {
+            errorMessage =
+                "An account with this email already exists. Please sign in or use Forgot Password.";
+        } else if (
+            lowerMessage.includes("password") &&
+            lowerMessage.includes("weak")
+        ) {
+            errorMessage =
+                "Your password is too weak. Please use a stronger password.";
+        } else if (
+            lowerMessage.includes("rate limit") ||
+            lowerMessage.includes("too many requests")
+        ) {
+            errorMessage =
+                "Too many registration attempts. Please wait a while and try again.";
+        }
+
+        showMessage(errorMessage, "error");
+
+        registerButton.disabled = false;
+        registerButton.textContent = "Create Account";
+    }
+});
+
+/* ==========================================
+   VERIFY EMAIL OTP
+========================================== */
+
+otpForm.addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    if (verifyButton.disabled) {
+        return;
+    }
+
+    const token = otpInput.value
+        .trim()
+        .replace(/\D/g, "");
+
+    if (token.length !== 6) {
+        showOtpMessage(
+            "Please enter the 6-digit verification code.",
+            "error"
+        );
+        return;
+    }
+
+    verifyButton.disabled = true;
+    verifyButton.textContent = "Verifying...";
+
+    showOtpMessage(
+        "Verifying your email...",
+        "info"
+    );
+
+    try {
+        const { data, error } =
+            await supabaseClient.auth.verifyOtp({
+                email: registrationEmail,
+                token: token,
+                type: "signup"
+            });
+
+        if (error) {
+            throw error;
+        }
+
+        if (!data || !data.session) {
+            showOtpMessage(
+                "Email verified. Please sign in to continue.",
+                "success"
+            );
+
+            setTimeout(function() {
+                window.location.replace("login.html");
+            }, 1200);
+
+            return;
+        }
+
+        showOtpMessage(
+            "Email verified successfully. Redirecting...",
+            "success"
+        );
+
+        setTimeout(function() {
+            window.location.replace("dashboard.html");
+        }, 700);
+
+    } catch (error) {
+        console.error("OTP verification error:", error);
+
+        let errorMessage =
+            error.message ||
+            "Invalid verification code.";
+
+        const lowerMessage = errorMessage.toLowerCase();
+
+        if (lowerMessage.includes("expired")) {
+            errorMessage =
+                "This verification code has expired. Please request a new code.";
+        } else if (lowerMessage.includes("invalid")) {
+            errorMessage =
+                "Invalid verification code. Please check the code and try again.";
+        }
+
+        showOtpMessage(errorMessage, "error");
+
+        verifyButton.disabled = false;
+        verifyButton.textContent = "Verify Email";
+    }
+});
+
+/* ==========================================
+   RESEND OTP
+========================================== */
+
+resendButton.addEventListener("click", async function() {
+    if (resendCooldown) {
+        return;
+    }
+
+    if (!registrationEmail) {
+        showOtpMessage(
+            "Please return to registration and enter your email.",
+            "error"
+        );
+        return;
+    }
+
+    resendButton.disabled = true;
+    resendButton.textContent = "Sending...";
+
+    try {
+        const { error } =
+            await supabaseClient.auth.resend({
+                type: "signup",
+                email: registrationEmail
+            });
+
+        if (error) {
+            throw error;
+        }
+
+        showOtpMessage(
+            "A new verification code has been sent.",
+            "success"
+        );
+
+        resendCooldown = true;
+
+        let seconds = 30;
+
+        resendButton.textContent = "Resend in " + seconds + "s";
+
+        const timer = setInterval(function() {
+            seconds--;
+
+            if (seconds <= 0) {
+                clearInterval(timer);
+                resendCooldown = false;
+                resendButton.disabled = false;
+                resendButton.textContent = "Resend Code";
+                return;
+            }
+
+            resendButton.textContent =
+                "Resend in " + seconds + "s";
+        }, 1000);
+
+    } catch (error) {
+        console.error("Resend OTP error:", error);
+
+        let errorMessage =
+            error.message ||
+            "Unable to resend the verification code.";
+
+        const lowerMessage = errorMessage.toLowerCase();
+
+        if (
+            lowerMessage.includes("rate limit") ||
+            lowerMessage.includes("too many")
+        ) {
+            errorMessage =
+                "Too many email requests. Please wait before requesting another code.";
+        }
+
+        showOtpMessage(errorMessage, "error");
+
+        resendButton.disabled = false;
+        resendButton.textContent = "Resend Code";
+    }
+});
+
+/* ==========================================
+   OTP INPUT: NUMBERS ONLY
+========================================== */
+
+otpInput.addEventListener("input", function() {
+    otpInput.value = otpInput.value
+        .replace(/\D/g, "")
+        .slice(0, 6);
+
+    if (otpInput.value.length === 6) {
+        otpInput.blur();
+    }
+});
+</script>
+</body>
+</html>

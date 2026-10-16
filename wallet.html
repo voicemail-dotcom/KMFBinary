@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>KMF Binary - Wallet</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #07120d;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .page {
+            min-height: 100vh;
+        }
+
+        /* =====================================================
+           TOP BAR
+        ===================================================== */
+
+        .topbar {
+            height: 64px;
+            background: #0b1c14;
+            border-bottom: 1px solid #193b2a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand {
+            font-size: 21px;
+            font-weight: 800;
+            color: #21d07a;
+        }
+
+        .page-title {
+            color: #d9e7df;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .dashboard-btn {
+            border: 1px solid #28523d;
+            background: #10271b;
+            color: #dff8ea;
+            padding: 9px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .dashboard-btn:hover {
+            background: #173a27;
+        }
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
+
+        .container {
+            width: min(1180px, calc(100% - 32px));
+            margin: 25px auto 50px;
+        }
+
+        /* =====================================================
+           ACCOUNT BAR
+        ===================================================== */
+
+        .account-bar {
+            background: #0b1c14;
+            border: 1px solid #193b2a;
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 18px;
+        }
+
+        .account-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .account-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #21d07a;
+            box-shadow: 0 0 12px rgba(33, 208, 122, .6);
+        }
+
+        .account-name {
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .account-subtitle {
+            color: #8fa99c;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        .switch-btn {
+            background: #10271b;
+            border: 1px solid #28523d;
+            color: #dff8ea;
+            padding: 9px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+
+        .switch-btn:hover {
+            background: #173a27;
+        }
+
+        /* =====================================================
+           MESSAGE
+        ===================================================== */
+
+        #messageBox {
+            display: none;
+            padding: 12px 15px;
+            border-radius: 9px;
+            margin-bottom: 18px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        #messageBox.success {
+            display: block;
+            background: rgba(33, 208, 122, .12);
+            border: 1px solid rgba(33, 208, 122, .35);
+            color: #71efaa;
+        }
+
+        #messageBox.error {
+            display: block;
+            background: rgba(255, 82, 82, .10);
+            border: 1px solid rgba(255, 82, 82, .35);
+            color: #ff9a9a;
+        }
+
+        #messageBox.info {
+            display: block;
+            background: rgba(83, 145, 255, .10);
+            border: 1px solid rgba(83, 145, 255, .30);
+            color: #9fc0ff;
+        }
+
+        /* =====================================================
+           BALANCE AREA
+        ===================================================== */
+
+        .balance-card {
+            background: linear-gradient(
+                145deg,
+                #0e2519,
+                #0a1811
+            );
+            border: 1px solid #205337;
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 18px;
+        }
+
+        .balance-card-title {
+            color: #93aa9e;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            font-weight: 700;
+        }
+
+        #balance {
+            font-size: 36px;
+            font-weight: 900;
+            margin-top: 7px;
+            color: #ffffff;
+        }
+
+        #balanceNote {
+            color: #8fa99c;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        /* =====================================================
+           BALANCE BREAKDOWN
+        ===================================================== */
+
+        .balance-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .balance-box {
+            background: #0b1c14;
+            border: 1px solid #193b2a;
+            border-radius: 12px;
+            padding: 17px;
+        }
+
+        .balance-box-title {
+            color: #91a79b;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
+
+        .balance-box-value {
+            font-size: 22px;
+            font-weight: 900;
+            margin-top: 8px;
+        }
+
+        .balance-box-value.green {
+            color: #43df8c;
+        }
+
+        .balance-box-value.gold {
+            color: #f2ca62;
+        }
+
+        .balance-box-value.blue {
+            color: #6eb0ff;
+        }
+
+        .balance-box-note {
+            color: #71877b;
+            font-size: 11px;
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        /* =====================================================
+           GRID
+        ===================================================== */
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .card {
+            background: #0b1c14;
+            border: 1px solid #193b2a;
+            border-radius: 13px;
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .card-subtitle {
+            color: #81978c;
+            font-size: 12px;
+            line-height: 1.5;
+            margin-bottom: 18px;
+        }
+
+        /* =====================================================
+           FORMS
+        ===================================================== */
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            color: #b6c9bf;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 7px;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            background: #07120d;
+            border: 1px solid #284b39;
+            color: #ffffff;
+            border-radius: 9px;
+            padding: 12px 13px;
+            outline: none;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            border-color: #21d07a;
+            box-shadow: 0 0 0 2px rgba(33, 208, 122, .08);
+        }
+
+        .form-help {
+            color: #71877b;
+            font-size: 11px;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
+        .primary-btn {
+            width: 100%;
+            background: #21d07a;
+            border: none;
+            color: #031109;
+            padding: 13px 15px;
+            border-radius: 9px;
+            font-weight: 900;
+            transition: .15s;
+        }
+
+        .primary-btn:hover {
+            background: #38e38c;
+        }
+
+        .primary-btn:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+        .secondary-btn {
+            width: 100%;
+            background: #10271b;
+            border: 1px solid #28523d;
+            color: #dff8ea;
+            padding: 12px 15px;
+            border-radius: 9px;
+            font-weight: 800;
+        }
+
+        /* =====================================================
+           WITHDRAWAL SUMMARY
+        ===================================================== */
+
+        .withdraw-summary {
+            margin: 17px 0;
+            background: #07120d;
+            border: 1px solid #193b2a;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 13px;
+            border-bottom: 1px solid #12281c;
+            font-size: 13px;
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            color: #8ea69a;
+        }
+
+        .summary-value {
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .summary-row.total {
+            background: rgba(33, 208, 122, .05);
+        }
+
+        .summary-row.total .summary-label {
+            color: #cce9d9;
+            font-weight: 800;
+        }
+
+        .summary-row.total .summary-value {
+            color: #43df8c;
+            font-size: 16px;
+        }
+
+        .fee-value {
+            color: #ffcb6b !important;
+        }
+
+        /* =====================================================
+           VERIFICATION
+        ===================================================== */
+
+        .status-box {
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .status-box.success {
+            display: block;
+            background: rgba(33, 208, 122, .08);
+            border: 1px solid rgba(33, 208, 122, .25);
+        }
+
+        .status-box.warning {
+            display: block;
+            background: rgba(255, 193, 7, .08);
+            border: 1px solid rgba(255, 193, 7, .25);
+        }
+
+        .status-box.error {
+            display: block;
+            background: rgba(255, 82, 82, .08);
+            border: 1px solid rgba(255, 82, 82, .25);
+        }
+
+        .status-title {
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .status-message {
+            color: #8ea69a;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        /* =====================================================
+           DEMO NOTICE
+        ===================================================== */
+
+        .demo-notice {
+            background: rgba(76, 135, 255, .07);
+            border: 1px solid rgba(76, 135, 255, .22);
+            color: #a9c5ff;
+            border-radius: 10px;
+            padding: 13px;
+            font-size: 12px;
+            line-height: 1.5;
+            margin-bottom: 18px;
+        }
+
+        /* =====================================================
+           LIVE FUNDING
+        ===================================================== */
+
+        #walletActions {
+            display: none;
+        }
+
+        /* =====================================================
+           TRANSACTION HISTORY
+        ===================================================== */
+
+        .history-card {
+            margin-top: 18px;
+        }
+
+        .history-controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .history-tab {
+            background: #07120d;
+            color: #8ea69a;
+            border: 1px solid #193b2a;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .history-tab.active {
+            background: #153624;
+            color: #43df8c;
+            border-color: #2c704c;
+        }
+
+        .history-search {
+            flex: 1;
+            min-width: 180px;
+            background: #07120d;
+            border: 1px solid #193b2a;
+            color: #ffffff;
+            border-radius: 8px;
+            padding: 9px 11px;
+            outline: none;
+        }
+
+        .history-date {
+            background: #07120d;
+            border: 1px solid #193b2a;
+            color: #ffffff;
+            border-radius: 8px;
+            padding: 8px 10px;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .history-item {
+            background: #07120d;
+            border: 1px solid #193b2a;
+            border-radius: 9px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .history-left {
+            min-width: 0;
+        }
+
+        .history-type {
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .history-date-text {
+            color: #71877b;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .history-right {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .history-amount {
+            font-weight: 800;
+        }
+
+        .history-status {
+            font-size: 10px;
+            text-transform: uppercase;
+            margin-top: 4px;
+            color: #8ea69a;
+        }
+
+        .empty-history {
+            color: #71877b;
+            text-align: center;
+            padding: 30px 15px;
+            font-size: 13px;
+        }
+
+        /* =====================================================
+           MODAL
+        ===================================================== */
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .72);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-card {
+            width: min(500px, 100%);
+            background: #0b1c14;
+            border: 1px solid #28523d;
+            border-radius: 13px;
+            padding: 20px;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: #8ea69a;
+            font-size: 22px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 10px 0;
+            border-bottom: 1px solid #193b2a;
+            font-size: 13px;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #81978c;
+        }
+
+        .detail-value {
+            text-align: right;
+            font-weight: 700;
+        }
+
+        /* =====================================================
+           HIDDEN
+        ===================================================== */
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 800px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .balance-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                padding: 0 14px;
+            }
+
+            .container {
+                width: min(100% - 20px, 1180px);
+                margin-top: 15px;
+            }
+
+            .brand {
+                font-size: 17px;
+            }
+
+            .page-title {
+                font-size: 15px;
+            }
+
+            .dashboard-btn {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+
+            #balance {
+                font-size: 30px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .topbar {
+                height: auto;
+                min-height: 62px;
+                padding: 11px;
+                gap: 8px;
+            }
+
+            .topbar-left {
+                gap: 8px;
+            }
+
+            .page-title {
+                display: none;
+            }
+
+            .account-bar {
+                align-items: flex-start;
+            }
+
+            .history-item {
+                align-items: flex-start;
+            }
+
+            .history-right {
+                text-align: right;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <!-- =====================================================
+         TOP BAR
+    ====================================================== -->
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <div class="brand">KMF Binary</div>
+            <div class="page-title">Wallet</div>
+        </div>
+
+        <a
+            href="dashboard.html"
+            class="dashboard-btn"
+        >
+            Dashboard
+        </a>
+    </header>
+
+    <main class="container">
+
+        <!-- =================================================
+             ACCOUNT BAR
+        ================================================== -->
+
+        <div class="account-bar">
+
+            <div class="account-info">
+                <div class="account-dot" id="accountDot"></div>
+
+                <div>
+                    <div
+                        class="account-name"
+                        id="accountName"
+                    >
+                        DEMO ACCOUNT
+                    </div>
+
+                    <div
+                        class="account-subtitle"
+                        id="accountSubtitle"
+                    >
+                        Virtual funds only
+                    </div>
+                </div>
+            </div>
+
+            <button
+                type="button"
+                class="switch-btn"
+                id="switchAccountButton"
+            >
+                Switch Account
+            </button>
+
+        </div>
+
+        <!-- =================================================
+             MESSAGE
+        ================================================== -->
+
+        <div id="messageBox"></div>
+
+        <!-- =================================================
+             MAIN BALANCE
+        ================================================== -->
+
+        <section class="balance-card">
+
+            <div class="balance-card-title">
+                <span id="balanceLabel">
+                    Demo Available Balance
+                </span>
+            </div>
+
+            <div id="balance">
+                $0.00
+            </div>
+
+            <div id="balanceNote">
+                Virtual funds only
+            </div>
+
+        </section>
+
+        <!-- =================================================
+             BALANCE BREAKDOWN
+        ================================================== -->
+
+        <section class="balance-grid">
+
+            <div class="balance-box">
+
+                <div class="balance-box-title">
+                    Trading Balance
+                </div>
+
+                <div
+                    class="balance-box-value blue"
+                    id="tradingBalance"
+                >
+                    $0.00
+                </div>
+
+                <div class="balance-box-note">
+                    Total live account value available for trading.
+                </div>
+
+            </div>
+
+            <div class="balance-box">
+
+                <div class="balance-box-title">
+                    Bonus Balance
+                </div>
+
+                <div
+                    class="balance-box-value gold"
+                    id="bonusBalance"
+                >
+                    $0.00
+                </div>
+
+                <div class="balance-box-note">
+                    Promotional credit protected from withdrawal.
+                </div>
+
+            </div>
+
+            <div class="balance-box">
+
+                <div class="balance-box-title">
+                    Withdrawable Amount
+                </div>
+
+                <div
+                    class="balance-box-value green"
+                    id="withdrawableBalance"
+                >
+                    $0.00
+                </div>
+
+                <div class="balance-box-note">
+                    Maximum amount you can request before the 10% fee.
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- =================================================
+             DEMO NOTICE
+        ================================================== -->
+
+        <div
+            class="demo-notice"
+            id="demoNotice"
+        >
+            Demo Account uses virtual funds. Deposits and withdrawals
+            are available only on the Live Account.
+        </div>
+
+        <!-- =================================================
+             LIVE FUNDING AREA
+        ================================================== -->
+
+        <div id="walletActions">
+
+            <div class="main-grid">
+
+                <!-- =========================================
+                     DEPOSIT
+                ========================================== -->
+
+                <section class="card">
+
+                    <div class="card-title">
+                        Deposit
+                    </div>
+
+                    <div class="card-subtitle">
+                        Fund your Live Account.
+                    </div>
+
+                    <form id="depositForm">
+
+                        <div class="form-group">
+
+                            <label
+                                class="form-label"
+                                for="depositAmount"
+                            >
+                                Amount (USD)
+                            </label>
+
+                            <input
+                                type="number"
+                                id="depositAmount"
+                                class="form-input"
+                                min="0.01"
+                                step="0.01"
+                                placeholder="Enter amount"
+                            >
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label
+                                class="form-label"
+                                for="depositMethod"
+                            >
+                                Payment Method
+                            </label>
+
+                            <select
+                                id="depositMethod"
+                                class="form-select"
+                            >
+                                <option value="mpesa">
+                                    M-Pesa
+                                </option>
+
+                                <option value="airtel">
+                                    Airtel Money
+                                </option>
+
+                                <option value="card">
+                                    Card
+                                </option>
+
+                                <option value="bank">
+                                    Bank
+                                </option>
+
+                                <option value="usdt">
+                                    USDT
+                                </option>
+                            </select>
+
+                        </div>
+
+                        <div
+                            class="form-group"
+                            id="mpesaPhoneGroup"
+                        >
+
+                            <label
+                                class="form-label"
+                                for="mpesaPhone"
+                            >
+                                M-Pesa Number
+                            </label>
+
+                            <input
+                                type="tel"
+                                id="mpesaPhone"
+                                class="form-input"
+                                placeholder="07XXXXXXXX"
+                            >
+
+                            <div class="form-help">
+                                Enter the M-Pesa number that will authorize the deposit.
+                            </div>
+
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="primary-btn"
+                            id="depositButton"
+                        >
+                            Deposit
+                        </button>
+
+                    </form>
+
+                </section>
+
+                <!-- =========================================
+                     WITHDRAW
+                ========================================== -->
+
+                <section class="card">
+
+                    <div class="card-title">
+                        Withdraw
+                    </div>
+
+                    <div class="card-subtitle">
+                        Withdraw from your available Live Account balance.
+                    </div>
+
+                    <!-- Verification -->
+
+                    <div
+                        class="status-box"
+                        id="withdrawalStatusBox"
+                    >
+
+                        <div
+                            class="status-title"
+                            id="withdrawalStatusTitle"
+                        >
+                            Withdrawal Status
+                        </div>
+
+                        <div
+                            class="status-message"
+                            id="withdrawalStatusMessage"
+                        >
+                        </div>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        class="secondary-btn hidden"
+                        id="openVerificationButton"
+                    >
+                        Complete Verification
+                    </button>
+
+                    <form
+                        id="withdrawalForm"
+                        class="hidden"
+                    >
+
+                        <div class="form-group">
+
+                            <label
+                                class="form-label"
+                                for="withdrawAmount"
+                            >
+                                Withdrawal Amount (USD)
+                            </label>
+
+                            <input
+                                type="number"
+                                id="withdrawAmount"
+                                class="form-input"
+                                min="0.10"
+                                step="0.01"
+                                placeholder="Enter amount"
+                            >
+
+                            <div class="form-help">
+                                Maximum:
+                                <strong id="withdrawMaxAmount">
+                                    $0.00
+                                </strong>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label
+                                class="form-label"
+                                for="withdrawMethod"
+                            >
+                                Payment Method
+                            </label>
+
+                            <select
+                                id="withdrawMethod"
+                                class="form-select"
+                            >
+                                <option value="mpesa">
+                                    M-Pesa
+                                </option>
+
+                                <option value="airtel">
+                                    Airtel Money
+                                </option>
+
+                                <option value="bank">
+                                    Bank
+                                </option>
+
+                                <option value="usdt">
+                                    USDT
+                                </option>
+                            </select>
+
+                        </div>
+
+                        <div
+                            class="form-group"
+                            id="withdrawPhoneGroup"
+                        >
+
+                            <label
+                                class="form-label"
+                                for="withdrawPhone"
+                            >
+                                M-Pesa Number
+                            </label>
+
+                            <input
+                                type="tel"
+                                id="withdrawPhone"
+                                class="form-input"
+                                placeholder="07XXXXXXXX"
+                            >
+
+                            <div class="form-help">
+                                Withdrawals are currently processed through M-Pesa.
+                            </div>
+
+                        </div>
+
+                        <!-- Withdrawal Calculation -->
+
+                        <div class="withdraw-summary">
+
+                            <div class="summary-row">
+
+                                <span class="summary-label">
+                                    Trading Balance
+                                </span>
+
+                                <span
+                                    class="summary-value"
+                                    id="withdrawSummaryTrading"
+                                >
+                                    $0.00
+                                </span>
+
+                            </div>
+
+                            <div class="summary-row">
+
+                                <span class="summary-label">
+                                    Protected Bonus
+                                </span>
+
+                                <span
+                                    class="summary-value"
+                                    id="withdrawSummaryBonus"
+                                >
+                                    $0.00
+                                </span>
+
+                            </div>
+
+                            <div class="summary-row">
+
+                                <span class="summary-label">
+                                    Withdrawable Amount
+                                </span>
+
+                                <span
+                                    class="summary-value"
+                                    id="withdrawSummaryWithdrawable"
+                                >
+                                    $0.00
+                                </span>
+
+                            </div>
+
+                            <div class="summary-row">
+
+                                <span class="summary-label">
+                                    Withdrawal Request
+                                </span>
+
+                                <span
+                                    class="summary-value"
+                                    id="withdrawSummaryRequest"
+                                >
+                                    $0.00
+                                </span>
+
+                            </div>
+
+                            <div class="summary-row">
+
+                                <span class="summary-label">
+                                    Processing Fee (10%)
+                                </span>
+
+                                <span
+                                    class="summary-value fee-value"
+                                    id="withdrawSummaryFee"
+                                >
+                                    $0.00
+                                </span>
+
+                            </div>
+
+                            <div class="summary-row total">
+
+                                <span class="summary-label">
+                                    Amount You Receive
+                                </span>
+
+                                <span
+                                    class="summary-value"
+                                    id="withdrawSummaryPayout"
+                                >
+                                    $0.00
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div
+                            class="form-help"
+                            style="margin-bottom:14px;"
+                        >
+                            The processing fee is 10% of the requested withdrawal
+                            amount. Promotional bonus cannot be withdrawn.
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="primary-btn"
+                            id="withdrawButton"
+                        >
+                            Request Withdrawal
+                        </button>
+
+                    </form>
+
+                </section>
+
+            </div>
+
+        </div>
+
+        <!-- =================================================
+             TRANSACTION HISTORY
+        ================================================== -->
+
+        <section class="card history-card">
+
+            <div class="card-title">
+                Transaction History
+            </div>
+
+            <div class="card-subtitle">
+                Deposits, withdrawals and account transactions.
+            </div>
+
+            <div class="history-controls">
+
+                <button
+                    type="button"
+                    class="history-tab active"
+                    data-history-filter="all"
+                >
+                    All
+                </button>
+
+                <button
+                    type="button"
+                    class="history-tab"
+                    data-history-filter="deposit"
+                >
+                    Deposits
+                </button>
+
+                <button
+                    type="button"
+                    class="history-tab"
+                    data-history-filter="withdrawal"
+                >
+                    Withdrawals
+                </button>
+
+                <input
+                    type="text"
+                    id="historySearch"
+                    class="history-search"
+                    placeholder="Search transactions..."
+                >
+
+                <input
+                    type="date"
+                    id="historyDate"
+                    class="history-date"
+                >
+
+            </div>
+
+            <div
+                id="historyList"
+                class="history-list"
+            >
+                <div class="empty-history">
+                    Loading transactions...
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<!-- =========================================================
+     TRANSACTION MODAL
+========================================================= -->
+
+<div
+    class="modal"
+    id="transactionModal"
+>
+
+    <div class="modal-card">
+
+        <div class="modal-header">
+
+            <div class="card-title">
+                Transaction Details
+            </div>
+
+            <button
+                type="button"
+                class="modal-close"
+                id="closeTransactionModal"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div id="transactionDetails"></div>
+
+    </div>
+
+</div>
+
+<!-- =========================================================
+     SCRIPTS
+========================================================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="js/api.js"></script>
+<script src="js/wallet.js"></script>
+
+</body>
+</html>

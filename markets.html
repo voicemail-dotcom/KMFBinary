@@ -1,0 +1,2113 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+```
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0">
+
+<title>Markets | KMFBinary</title>
+
+<link
+    rel="stylesheet"
+    href="css/global.css">
+
+<style>
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+            radial-gradient(
+                circle at top right,
+                rgba(37, 99, 235, 0.08),
+                transparent 32%
+            ),
+            var(--bg, #080b12);
+    }
+
+
+    /* =====================================================
+       PAGE
+    ===================================================== */
+
+    .markets-page {
+        width: 100%;
+        max-width: 1500px;
+        margin: 0 auto;
+        padding: 34px 30px 50px;
+    }
+
+
+    /* =====================================================
+       HEADER
+    ===================================================== */
+
+    .markets-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+
+    .markets-heading-left {
+        min-width: 0;
+    }
+
+    .section-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--green, #55d69a);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .section-label::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--green, #55d69a);
+        box-shadow:
+            0 0 0 4px rgba(85, 214, 154, 0.08),
+            0 0 12px rgba(85, 214, 154, 0.5);
+    }
+
+    .markets-header h1 {
+        margin: 0;
+        font-size: clamp(30px, 4vw, 42px);
+        line-height: 1.1;
+        letter-spacing: -1px;
+    }
+
+    .markets-header p {
+        margin: 10px 0 0;
+        max-width: 650px;
+        line-height: 1.6;
+    }
+
+
+    /* =====================================================
+       MARKET ENGINE STATUS
+    ===================================================== */
+
+    .engine-status {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 11px 15px;
+        border: 1px solid var(--border, #202735);
+        border-radius: 12px;
+        background: rgba(255,255,255,0.025);
+        white-space: nowrap;
+        font-size: 12px;
+        color: var(--muted, #8e98a8);
+    }
+
+    .engine-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--green, #55d69a);
+        box-shadow: 0 0 10px rgba(85, 214, 154, 0.6);
+        animation: enginePulse 1.7s infinite;
+    }
+
+    @keyframes enginePulse {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.45;
+        }
+
+    }
+
+
+    /* =====================================================
+       TOOLBAR
+    ===================================================== */
+
+    .markets-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 28px;
+        padding: 15px;
+        border: 1px solid var(--border, #202735);
+        border-radius: 15px;
+        background: rgba(255,255,255,0.02);
+    }
+
+    .market-search-wrap {
+        position: relative;
+        flex: 1;
+        max-width: 420px;
+    }
+
+    .market-search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--muted, #8e98a8);
+        font-size: 15px;
+        pointer-events: none;
+    }
+
+    #marketSearch {
+        width: 100%;
+        height: 43px;
+        padding: 0 14px 0 40px;
+        border: 1px solid var(--border, #202735);
+        border-radius: 10px;
+        outline: none;
+        background: var(--panel2, #111722);
+        color: var(--text, #f5f7fa);
+        font-size: 13px;
+    }
+
+    #marketSearch:focus {
+        border-color: rgba(85, 214, 154, 0.5);
+        box-shadow:
+            0 0 0 3px rgba(85, 214, 154, 0.07);
+    }
+
+    .market-count {
+        color: var(--muted, #8e98a8);
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    .market-count strong {
+        color: var(--text, #f5f7fa);
+    }
+
+
+    /* =====================================================
+       SECTIONS
+    ===================================================== */
+
+    .market-section {
+        margin-bottom: 36px;
+    }
+
+    .market-section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .market-section-title {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+    }
+
+    .market-section-icon {
+        width: 34px;
+        height: 34px;
+        display: grid;
+        place-items: center;
+        border-radius: 10px;
+        background: rgba(37, 99, 235, 0.12);
+        color: #70a3ff;
+        font-size: 15px;
+        font-weight: 800;
+    }
+
+    .market-section-title h2 {
+        margin: 0;
+        font-size: 18px;
+    }
+
+    .market-section-title span {
+        display: block;
+        margin-top: 3px;
+        color: var(--muted, #8e98a8);
+        font-size: 11px;
+    }
+
+    .market-section-line {
+        flex: 1;
+        height: 1px;
+        background: var(--border, #202735);
+    }
+
+
+    /* =====================================================
+       GRID
+    ===================================================== */
+
+    .markets-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 17px;
+    }
+
+
+    /* =====================================================
+       MARKET CARD
+    ===================================================== */
+
+    .market-box {
+        position: relative;
+        overflow: hidden;
+        padding: 21px;
+        border: 1px solid var(--border, #202735);
+        border-radius: 17px;
+        background:
+            linear-gradient(
+                145deg,
+                rgba(255,255,255,0.035),
+                rgba(255,255,255,0.012)
+            ),
+            var(--panel, #0f141d);
+        transition:
+            transform 0.2s ease,
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+    .market-box::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: transparent;
+        transition: background 0.2s ease;
+    }
+
+    .market-box:hover {
+        transform: translateY(-3px);
+        border-color: rgba(85, 214, 154, 0.32);
+        box-shadow:
+            0 12px 35px rgba(0,0,0,0.18);
+    }
+
+    .market-box:hover::before {
+        background: var(--green, #55d69a);
+    }
+
+
+    /* =====================================================
+       CARD TOP
+    ===================================================== */
+
+    .market-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .market-identity {
+        min-width: 0;
+    }
+
+    .market-name {
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: -0.2px;
+    }
+
+    .market-symbol {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 5px;
+        color: var(--muted, #8e98a8);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .market-symbol-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #70a3ff;
+    }
+
+    .market-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 9px;
+        border: 1px solid rgba(85, 214, 154, 0.14);
+        border-radius: 999px;
+        background: rgba(85, 214, 154, 0.08);
+        color: var(--green, #55d69a);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+    }
+
+    .market-status::before {
+        content: "";
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+
+    /* =====================================================
+       PRICE
+    ===================================================== */
+
+    .price-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 15px;
+        margin-bottom: 7px;
+    }
+
+    .market-price {
+        font-size: clamp(25px, 3vw, 32px);
+        line-height: 1;
+        font-weight: 800;
+        letter-spacing: -0.8px;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .price-currency {
+        margin-left: 5px;
+        color: var(--muted, #8e98a8);
+        font-size: 10px;
+        font-weight: 600;
+    }
+
+    .market-change {
+        min-height: 18px;
+        margin-bottom: 18px;
+        font-size: 11px;
+        font-weight: 700;
+        transition: color 0.2s ease;
+    }
+
+    .change-up {
+        color: var(--green, #55d69a);
+    }
+
+    .change-down {
+        color: #ff6b6b;
+    }
+
+    .change-flat {
+        color: var(--muted, #8e98a8);
+    }
+
+
+    /* =====================================================
+       PRICE ACTIVITY
+    ===================================================== */
+
+    .price-activity {
+        position: relative;
+        height: 4px;
+        overflow: hidden;
+        margin-bottom: 18px;
+        border-radius: 99px;
+        background: rgba(255,255,255,0.06);
+    }
+
+    .price-activity-bar {
+        height: 100%;
+        width: 35%;
+        border-radius: 99px;
+        background: var(--green, #55d69a);
+        transition:
+            width 0.4s ease,
+            background 0.2s ease;
+    }
+
+
+    /* =====================================================
+       INFO
+    ===================================================== */
+
+    .market-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+        margin-bottom: 17px;
+    }
+
+    .info-item {
+        min-width: 0;
+        padding: 11px 12px;
+        border: 1px solid rgba(255,255,255,0.045);
+        border-radius: 10px;
+        background: var(--panel2, #111722);
+    }
+
+    .info-label {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--muted, #8e98a8);
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+    }
+
+    .info-value {
+        display: block;
+        overflow: hidden;
+        color: var(--text, #f5f7fa);
+        font-size: 12px;
+        font-weight: 700;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+
+    /* =====================================================
+       RISK
+    ===================================================== */
+
+    .risk-low {
+        color: var(--green, #55d69a);
+    }
+
+    .risk-moderate {
+        color: #78b7ff;
+    }
+
+    .risk-medium {
+        color: #f4c95d;
+    }
+
+    .risk-high {
+        color: #ff9f5a;
+    }
+
+    .risk-very-high {
+        color: #ff6b6b;
+    }
+
+
+    /* =====================================================
+       TRADE BUTTON
+    ===================================================== */
+
+    .trade-market-btn {
+        position: relative;
+        width: 100%;
+        min-height: 45px;
+        padding: 12px 15px;
+        border: 1px solid rgba(85, 214, 154, 0.25);
+        border-radius: 10px;
+        background:
+            linear-gradient(
+                135deg,
+                rgba(85,214,154,0.15),
+                rgba(37,99,235,0.12)
+            );
+        color: var(--text, #f5f7fa);
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+        transition:
+            transform 0.18s ease,
+            border-color 0.18s ease,
+            background 0.18s ease;
+    }
+
+    .trade-market-btn:hover {
+        transform: translateY(-1px);
+        border-color: rgba(85, 214, 154, 0.55);
+        background:
+            linear-gradient(
+                135deg,
+                rgba(85,214,154,0.22),
+                rgba(37,99,235,0.17)
+            );
+    }
+
+    .trade-market-btn:active {
+        transform: translateY(0);
+    }
+
+
+    /* =====================================================
+       LOADING / ERROR / EMPTY
+    ===================================================== */
+
+    .loading-message,
+    .error-message,
+    .empty-message {
+        grid-column: 1 / -1;
+        min-height: 180px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 12px;
+        padding: 30px;
+        text-align: center;
+        border: 1px solid var(--border, #202735);
+        border-radius: 16px;
+        background: var(--panel, #0f141d);
+        color: var(--muted, #8e98a8);
+        font-size: 13px;
+    }
+
+    .loading-spinner {
+        width: 25px;
+        height: 25px;
+        border: 2px solid rgba(255,255,255,0.08);
+        border-top-color: var(--green, #55d69a);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .error-message {
+        color: #ff6b6b;
+    }
+
+
+    /* =====================================================
+       HIDDEN FILTER
+    ===================================================== */
+
+    .market-box.market-hidden {
+        display: none;
+    }
+
+
+    /* =====================================================
+       MOBILE
+    ===================================================== */
+
+    @media (max-width: 900px) {
+
+        .markets-page {
+            padding: 25px 18px 40px;
+        }
+
+        .markets-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .markets-toolbar {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .market-search-wrap {
+            max-width: none;
+        }
+
+        .markets-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .engine-status {
+            align-self: flex-start;
+        }
+
+    }
+
+
+    @media (max-width: 500px) {
+
+        .markets-page {
+            padding: 20px 13px 35px;
+        }
+
+        .market-box {
+            padding: 17px;
+        }
+
+        .market-section-header {
+            align-items: flex-start;
+        }
+
+        .market-section-line {
+            display: none;
+        }
+
+        .market-section-title h2 {
+            font-size: 16px;
+        }
+
+        .market-price {
+            font-size: 26px;
+        }
+
+    }
+
+</style>
+```
+
+</head>
+
+<body>
+
+<div class="markets-page">
+
+```
+<!-- =====================================================
+     HEADER
+====================================================== -->
+
+<header class="markets-header">
+
+    <div class="markets-heading-left">
+
+        <div class="section-label">
+            KMF MARKET ENGINE
+        </div>
+
+        <h1>
+            Markets
+        </h1>
+
+        <p class="muted">
+            Explore live synthetic markets,
+            monitor current prices and choose
+            a market to start trading.
+        </p>
+
+    </div>
+
+
+    <div class="engine-status">
+
+        <span class="engine-dot"></span>
+
+        <span>
+            Market engine
+            <strong>LIVE</strong>
+        </span>
+
+    </div>
+
+</header>
+
+
+<!-- =====================================================
+     TOOLBAR
+====================================================== -->
+
+<div class="markets-toolbar">
+
+    <div class="market-search-wrap">
+
+        <span class="market-search-icon">
+            🔎
+        </span>
+
+        <input
+            type="search"
+            id="marketSearch"
+            placeholder="Search markets..."
+            autocomplete="off">
+
+    </div>
+
+
+    <div
+        class="market-count"
+        id="marketCount">
+
+        Loading markets...
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     KMF MARKETS
+====================================================== -->
+
+<section
+    class="market-section"
+    id="kmfSection">
+
+    <div class="market-section-header">
+
+        <div class="market-section-title">
+
+            <div class="market-section-icon">
+                K
+            </div>
+
+            <div>
+
+                <h2>
+                    KMF Markets
+                </h2>
+
+                <span>
+                    Core KMF synthetic markets
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="market-section-line"></div>
+
+    </div>
+
+
+    <div
+        class="markets-grid"
+        id="kmfMarketsGrid">
+
+        <div class="loading-message">
+
+            <div class="loading-spinner"></div>
+
+            Loading KMF markets...
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     VOLATILITY MARKETS
+====================================================== -->
+
+<section
+    class="market-section"
+    id="volSection">
+
+    <div class="market-section-header">
+
+        <div class="market-section-title">
+
+            <div class="market-section-icon">
+                V
+            </div>
+
+            <div>
+
+                <h2>
+                    Volatility Markets
+                </h2>
+
+                <span>
+                    Synthetic volatility instruments
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="market-section-line"></div>
+
+    </div>
+
+
+    <div
+        class="markets-grid"
+        id="volMarketsGrid">
+
+        <div class="loading-message">
+
+            <div class="loading-spinner"></div>
+
+            Loading volatility markets...
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     NO SEARCH RESULTS
+====================================================== -->
+
+<div
+    class="empty-message"
+    id="noResults"
+    style="display:none;">
+
+    <div style="font-size:26px;">
+        🔍
+    </div>
+
+    <strong>
+        No markets found
+    </strong>
+
+    <span>
+        Try searching for another market or symbol.
+    </span>
+
+</div>
+```
+
+</div>
+
+<!-- =========================================================
+     SUPABASE
+========================================================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- =========================================================
+     API
+========================================================= -->
+
+<script src="js/api.js"></script>
+
+<!-- =========================================================
+     AUTHENTICATION
+========================================================= -->
+
+<script>
+
+async function checkAuthentication() {
+
+    try {
+
+        const token =
+            await getAuthToken();
+
+        if (!token) {
+
+            window.location.replace(
+                "login.html"
+            );
+
+            return false;
+
+        }
+
+        const user =
+            await getCurrentUser();
+
+        console.log(
+            "Authenticated user:",
+            user ? user.email : "Unknown"
+        );
+
+        return true;
+
+    } catch (error) {
+
+        console.error(
+            "Authentication error:",
+            error
+        );
+
+        window.location.replace(
+            "login.html"
+        );
+
+        return false;
+
+    }
+
+}
+
+</script>
+
+<!-- =========================================================
+     MARKET ENGINE
+========================================================= -->
+
+<script src="js/market-engine.js"></script>
+
+<!-- =========================================================
+     MARKETS PAGE
+========================================================= -->
+
+<script>
+
+let allMarkets = [];
+
+let priceTimer = null;
+
+
+/* =========================================================
+   CONTRACT TYPE
+========================================================= */
+
+function formatContractType(type) {
+
+    const names = {
+
+        rise_fall:
+            "Rise / Fall",
+
+        higher_lower:
+            "Higher / Lower",
+
+        odd_even:
+            "Odd / Even",
+
+        over_under:
+            "Over / Under",
+
+        matches_differs:
+            "Matches / Differs",
+
+        touch_no_touch:
+            "Touch / No Touch",
+
+        accumulator:
+            "Accumulator"
+
+    };
+
+    return names[type] || type;
+
+}
+
+
+/* =========================================================
+   MARKET CATEGORY
+========================================================= */
+
+function isVolatilityMarket(market) {
+
+    const symbol =
+        String(
+            market?.symbol ||
+            ""
+        ).toUpperCase();
+
+    const name =
+        String(
+            market?.market_name ||
+            ""
+        ).toUpperCase();
+
+    return (
+        symbol.startsWith("VOL-") ||
+        name.includes("VOLATILITY")
+    );
+
+}
+
+
+/* =========================================================
+   RISK LABEL
+========================================================= */
+
+function getRiskInfo(market) {
+
+    const symbol =
+        String(
+            market?.symbol ||
+            ""
+        ).toUpperCase();
+
+
+    if (
+        symbol.includes("15") ||
+        symbol.includes("10")
+    ) {
+
+        return {
+            label: "LOW",
+            className: "risk-low"
+        };
+
+    }
+
+
+    if (
+        symbol.includes("25")
+    ) {
+
+        return {
+            label: "MODERATE",
+            className: "risk-moderate"
+        };
+
+    }
+
+
+    if (
+        symbol.includes("50")
+    ) {
+
+        return {
+            label: "MEDIUM",
+            className: "risk-medium"
+        };
+
+    }
+
+
+    if (
+        symbol.includes("75")
+    ) {
+
+        return {
+            label: "HIGH",
+            className: "risk-high"
+        };
+
+    }
+
+
+    if (
+        symbol.includes("100")
+    ) {
+
+        return {
+            label: "VERY HIGH",
+            className: "risk-very-high"
+        };
+
+    }
+
+
+    return {
+        label: "VARIABLE",
+        className: "risk-moderate"
+    };
+
+}
+
+
+/* =========================================================
+   PRICE EXTRACTION
+========================================================= */
+
+function extractMarketPrice(data) {
+
+    if (
+        typeof data === "number" &&
+        Number.isFinite(data)
+    ) {
+
+        return data;
+
+    }
+
+
+    if (
+        typeof data === "string" &&
+        data.trim() !== ""
+    ) {
+
+        const number =
+            Number(data);
+
+        if (
+            Number.isFinite(number)
+        ) {
+
+            return number;
+
+        }
+
+    }
+
+
+    if (
+        data &&
+        typeof data === "object"
+    ) {
+
+        const candidates = [
+
+            data.price,
+            data.currentPrice,
+            data.current_price,
+            data.lastPrice,
+            data.last_price,
+            data.value
+
+        ];
+
+
+        for (
+            const candidate
+            of candidates
+        ) {
+
+            const number =
+                Number(candidate);
+
+            if (
+                Number.isFinite(number)
+            ) {
+
+                return number;
+
+            }
+
+        }
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =========================================================
+   PRICE FORMAT
+========================================================= */
+
+function formatMarketPrice(price) {
+
+    const number =
+        Number(price);
+
+    if (
+        !Number.isFinite(number)
+    ) {
+
+        return "—";
+
+    }
+
+    return number.toLocaleString(
+        "en-US",
+        {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }
+    );
+
+}
+
+
+/* =========================================================
+   CREATE CARD
+========================================================= */
+
+function createMarketCard(market) {
+
+    const card =
+        document.createElement(
+            "div"
+        );
+
+    card.className =
+        "market-box";
+
+    card.dataset.symbol =
+        market.symbol || "";
+
+    card.dataset.name =
+        market.market_name || "";
+
+    card.dataset.contract =
+        market.contract_type || "";
+
+
+    const risk =
+        getRiskInfo(market);
+
+
+    card.innerHTML = `
+
+        <div class="market-top">
+
+            <div class="market-identity">
+
+                <div class="market-name">
+
+                    ${market.market_name || "Market"}
+
+                </div>
+
+                <div class="market-symbol">
+
+                    <span class="market-symbol-dot"></span>
+
+                    ${market.symbol || "—"}
+
+                </div>
+
+            </div>
+
+
+            <div class="market-status">
+
+                LIVE
+
+            </div>
+
+        </div>
+
+
+        <div class="price-row">
+
+            <div
+                class="market-price"
+                id="price-${market.symbol}">
+
+                —
+
+                <span class="price-currency">
+                    USD
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="market-change change-flat"
+            id="change-${market.symbol}">
+
+            Waiting for live price...
+
+        </div>
+
+
+        <div class="price-activity">
+
+            <div
+                class="price-activity-bar"
+                id="activity-${market.symbol}">
+            </div>
+
+        </div>
+
+
+        <div class="market-info">
+
+            <div class="info-item">
+
+                <span class="info-label">
+                    Contract
+                </span>
+
+                <span class="info-value">
+                    ${formatContractType(
+                        market.contract_type
+                    )}
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <span class="info-label">
+                    Risk
+                </span>
+
+                <span class="info-value ${risk.className}">
+                    ${risk.label}
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <span class="info-label">
+                    Engine
+                </span>
+
+                <span class="info-value">
+                    KMF Synthetic
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <span class="info-label">
+                    Status
+                </span>
+
+                <span class="info-value risk-low">
+                    Active
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <button
+            class="trade-market-btn"
+            data-market-id="${market.id || ""}"
+            data-market-symbol="${market.symbol || ""}"
+            data-contract="${market.contract_type || ""}">
+
+            Trade ${market.market_name || market.symbol}
+
+            <span style="margin-left:6px;">
+                →
+            </span>
+
+        </button>
+
+    `;
+
+
+    return card;
+
+}
+
+
+/* =========================================================
+   RENDER MARKETS
+========================================================= */
+
+function renderMarkets() {
+
+    const kmfGrid =
+        document.getElementById(
+            "kmfMarketsGrid"
+        );
+
+    const volGrid =
+        document.getElementById(
+            "volMarketsGrid"
+        );
+
+
+    kmfGrid.innerHTML = "";
+
+    volGrid.innerHTML = "";
+
+
+    const kmfMarkets =
+        allMarkets.filter(
+            market =>
+                !isVolatilityMarket(market)
+        );
+
+
+    const volMarkets =
+        allMarkets.filter(
+            market =>
+                isVolatilityMarket(market)
+        );
+
+
+    if (
+        kmfMarkets.length === 0
+    ) {
+
+        kmfGrid.innerHTML = `
+            <div class="empty-message">
+                No KMF markets available.
+            </div>
+        `;
+
+    } else {
+
+        kmfMarkets.forEach(
+            market => {
+
+                kmfGrid.appendChild(
+                    createMarketCard(market)
+                );
+
+            }
+        );
+
+    }
+
+
+    if (
+        volMarkets.length === 0
+    ) {
+
+        volGrid.innerHTML = `
+            <div class="empty-message">
+                No volatility markets available.
+            </div>
+        `;
+
+    } else {
+
+        volMarkets.forEach(
+            market => {
+
+                volGrid.appendChild(
+                    createMarketCard(market)
+                );
+
+            }
+        );
+
+    }
+
+
+    attachTradeButtons();
+
+    updateMarketCount();
+
+}
+
+/* =========================================================
+   TRADE BUTTONS
+========================================================= */
+
+function attachTradeButtons() {
+
+    document
+        .querySelectorAll(".trade-market-btn")
+        .forEach(button => {
+
+            button.addEventListener("click", () => {
+
+                /*
+                 * Read the EXACT market information
+                 * stored on this button.
+                 */
+                const marketId =
+                    button.dataset.marketId || "";
+
+                const symbol =
+                    String(
+                        button.dataset.marketSymbol || ""
+                    ).toUpperCase();
+
+                const contractType =
+                    String(
+                        button.dataset.contract || "rise_fall"
+                    ).toLowerCase();
+
+                /*
+                 * Safety check.
+                 */
+                if (!marketId || !symbol) {
+
+                    console.error(
+                        "Trade button is missing market data:",
+                        {
+                            marketId,
+                            symbol,
+                            contractType
+                        }
+                    );
+
+                    return;
+                }
+
+                /*
+                 * Store the EXACT market selected.
+                 *
+                 * Example:
+                 * VOL-25 stays VOL-25.
+                 * VOL-25-1S stays VOL-25-1S.
+                 */
+                localStorage.setItem(
+                    "selectedMarketId",
+                    String(marketId)
+                );
+
+                localStorage.setItem(
+                    "selectedMarketSymbol",
+                    symbol
+                );
+
+                localStorage.setItem(
+                    "selectedContractType",
+                    contractType
+                );
+
+                localStorage.setItem(
+                    "kmf_dashboard_market",
+                    symbol
+                );
+
+                /*
+                 * Explicit trade-page values.
+                 */
+                localStorage.setItem(
+                    "kmf_trade_market_id",
+                    String(marketId)
+                );
+
+                localStorage.setItem(
+                    "kmf_trade_market_symbol",
+                    symbol
+                );
+
+                localStorage.setItem(
+                    "kmf_trade_contract_type",
+                    contractType
+                );
+
+                console.log(
+                    "Opening trade for exact market:",
+                    {
+                        marketId,
+                        symbol,
+                        contractType
+                    }
+                );
+
+                /*
+                 * Open Trade page.
+                 */
+                window.location.href = "trade.html";
+            });
+
+        });
+}
+/* =========================================================
+   UPDATE MARKET COUNT
+========================================================= */
+
+function updateMarketCount() {
+
+    const visibleCards =
+        document.querySelectorAll(
+            ".market-box:not(.market-hidden)"
+        );
+
+
+    const count =
+        document.getElementById(
+            "marketCount"
+        );
+
+
+    if (!count) return;
+
+
+    count.innerHTML = `
+        <strong>${visibleCards.length}</strong>
+        market${visibleCards.length === 1 ? "" : "s"} available
+    `;
+
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+function setupSearch() {
+
+    const search =
+        document.getElementById(
+            "marketSearch"
+        );
+
+
+    if (!search) return;
+
+
+    search.addEventListener(
+        "input",
+        () => {
+
+            const query =
+                search.value
+                    .trim()
+                    .toLowerCase();
+
+
+            let visibleCount = 0;
+
+
+            document
+                .querySelectorAll(
+                    ".market-box"
+                )
+                .forEach(
+                    card => {
+
+                        const text = [
+
+                            card.dataset.symbol,
+                            card.dataset.name,
+                            card.dataset.contract
+
+                        ]
+                            .join(" ")
+                            .toLowerCase();
+
+
+                        const match =
+                            !query ||
+                            text.includes(query);
+
+
+                        card.classList.toggle(
+                            "market-hidden",
+                            !match
+                        );
+
+
+                        if (match) {
+                            visibleCount++;
+                        }
+
+                    }
+                );
+
+
+            document
+                .getElementById(
+                    "noResults"
+                )
+                .style.display =
+                    visibleCount === 0
+                    ? "flex"
+                    : "none";
+
+
+            updateMarketCount();
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   LOAD LIVE PRICES
+========================================================= */
+
+async function loadLivePrices() {
+
+    try {
+
+        const response =
+            await fetch(
+                "http://localhost:3000/api/prices",
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    }
+                }
+            );
+
+
+        if (!response.ok) {
+            return;
+        }
+
+
+        const data =
+            await response.json();
+
+
+        const prices =
+            data?.prices;
+
+
+        if (
+            !prices ||
+            typeof prices !== "object"
+        ) {
+
+            return;
+
+        }
+
+
+        allMarkets.forEach(
+            market => {
+
+                const symbol =
+                    market.symbol;
+
+
+                const marketData =
+                    prices[symbol];
+
+
+                const price =
+                    extractMarketPrice(
+                        marketData
+                    );
+
+
+                if (
+                    !Number.isFinite(price)
+                ) {
+
+                    return;
+
+                }
+
+
+                updateMarketPrice(
+                    symbol,
+                    price
+                );
+
+            }
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Market price update error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   UPDATE PRICE
+========================================================= */
+
+function updateMarketPrice(
+    symbol,
+    price
+) {
+
+    const priceElement =
+        document.getElementById(
+            `price-${symbol}`
+        );
+
+
+    const changeElement =
+        document.getElementById(
+            `change-${symbol}`
+        );
+
+
+    const activityElement =
+        document.getElementById(
+            `activity-${symbol}`
+        );
+
+
+    if (!priceElement) {
+        return;
+    }
+
+
+    const previousPrice =
+        Number(
+            priceElement.dataset.price
+        );
+
+
+    priceElement.innerHTML = `
+        ${formatMarketPrice(price)}
+        <span class="price-currency">
+            USD
+        </span>
+    `;
+
+
+    priceElement.dataset.price =
+        String(price);
+
+
+    if (
+        changeElement
+    ) {
+
+        if (
+            Number.isFinite(previousPrice)
+        ) {
+
+            const difference =
+                price - previousPrice;
+
+
+            const percent =
+                previousPrice !== 0
+                    ? (
+                        difference /
+                        previousPrice
+                    ) * 100
+                    : 0;
+
+
+            if (
+                difference > 0
+            ) {
+
+                changeElement.className =
+                    "market-change change-up";
+
+                changeElement.textContent =
+                    `▲ ${Math.abs(difference).toFixed(2)}  (+${Math.abs(percent).toFixed(3)}%)`;
+
+            } else if (
+                difference < 0
+            ) {
+
+                changeElement.className =
+                    "market-change change-down";
+
+                changeElement.textContent =
+                    `▼ ${Math.abs(difference).toFixed(2)}  (-${Math.abs(percent).toFixed(3)}%)`;
+
+            } else {
+
+                changeElement.className =
+                    "market-change change-flat";
+
+                changeElement.textContent =
+                    "• Price unchanged";
+
+            }
+
+        } else {
+
+            changeElement.className =
+                "market-change change-flat";
+
+            changeElement.textContent =
+                "● Live market price";
+
+        }
+
+    }
+
+
+    if (
+        activityElement
+    ) {
+
+        /*
+           Create a small visual activity
+           effect from the last digit.
+        */
+
+        const lastDigit =
+            Math.abs(
+                Math.floor(
+                    price * 100
+                )
+            ) % 10;
+
+
+        const width =
+            25 +
+            (lastDigit * 7);
+
+
+        activityElement.style.width =
+            `${Math.min(width, 90)}%`;
+
+    }
+
+}
+
+
+/* =========================================================
+   START PRICE LOOP
+========================================================= */
+
+function startPriceLoop() {
+
+    if (priceTimer) {
+
+        clearInterval(
+            priceTimer
+        );
+
+    }
+
+
+    /*
+       500ms keeps the market page
+       responsive with the faster
+       synthetic market engine.
+    */
+
+    priceTimer =
+        setInterval(
+            loadLivePrices,
+            500
+        );
+
+}
+
+
+/* =========================================================
+   LOAD MARKETS
+========================================================= */
+
+async function loadMarkets() {
+
+    const kmfGrid =
+        document.getElementById(
+            "kmfMarketsGrid"
+        );
+
+    const volGrid =
+        document.getElementById(
+            "volMarketsGrid"
+        );
+
+
+    try {
+
+        const markets =
+            await getMarkets();
+
+
+        console.log(
+            "Markets from backend:",
+            markets
+        );
+
+
+        if (
+            !markets ||
+            markets.length === 0
+        ) {
+
+            kmfGrid.innerHTML = `
+                <div class="error-message">
+                    No active markets available.
+                </div>
+            `;
+
+            volGrid.innerHTML = `
+                <div class="error-message">
+                    No active markets available.
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+        allMarkets =
+            Array.isArray(markets)
+                ? markets
+                : [];
+
+
+        renderMarkets();
+
+
+        /*
+           Load prices immediately.
+        */
+
+        await loadLivePrices();
+
+
+        /*
+           Continue receiving live prices.
+        */
+
+        startPriceLoop();
+
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load markets:",
+            error
+        );
+
+
+        kmfGrid.innerHTML = `
+            <div class="error-message">
+
+                Unable to load markets.
+
+                <span style="font-size:11px;color:var(--muted);">
+                    Please refresh the page and try again.
+                </span>
+
+            </div>
+        `;
+
+
+        volGrid.innerHTML = `
+            <div class="error-message">
+
+                Unable to load markets.
+
+                <span style="font-size:11px;color:var(--muted);">
+                    Please refresh the page and try again.
+                </span>
+
+            </div>
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+async function initializeMarketsPage() {
+
+    const authenticated =
+        await checkAuthentication();
+
+
+    if (!authenticated) {
+        return;
+    }
+
+
+    setupSearch();
+
+
+    await loadMarkets();
+
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+initializeMarketsPage();
+
+</script>
+
+</body>
+
+</html>

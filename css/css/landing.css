@@ -1,0 +1,310 @@
+.landing-header {
+    height: 75px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 7%;
+
+    border-bottom: 1px solid var(--border);
+    background: rgba(8, 13, 21, 0.95);
+
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.landing-header nav {
+    display: flex;
+    gap: 30px;
+}
+
+.landing-header nav a {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.landing-header nav a:hover {
+    color: var(--text);
+}
+
+.header-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.hero {
+    min-height: 650px;
+
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: center;
+    gap: 70px;
+
+    padding: 90px 7%;
+}
+
+.badge {
+    display: inline-block;
+
+    padding: 7px 12px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+
+    color: var(--green);
+    font-size: 11px;
+    font-weight: bold;
+
+    margin-bottom: 25px;
+}
+
+.hero h1 {
+    font-size: clamp(45px, 6vw, 75px);
+    line-height: 1.05;
+    letter-spacing: -3px;
+}
+
+.hero h1 span {
+    color: var(--green);
+}
+
+.hero-content > p {
+    max-width: 620px;
+
+    color: var(--muted);
+    font-size: 17px;
+
+    margin: 25px 0;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.hero-note {
+    margin-top: 18px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.hero-card {
+    background: var(--panel);
+
+    border: 1px solid var(--border);
+    border-radius: 15px;
+
+    padding: 25px;
+
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.mini-header {
+    display: flex;
+    justify-content: space-between;
+    color: var(--muted);
+}
+
+.mini-price {
+    font-size: 38px;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+.mini-chart {
+    height: 180px;
+    margin-top: 25px;
+
+    color: var(--green);
+
+    border-bottom: 1px solid var(--border);
+}
+
+.mini-chart svg {
+    width: 100%;
+    height: 100%;
+}
+
+.mini-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+
+    margin-top: 20px;
+    gap: 15px;
+}
+
+.mini-stats div {
+    background: var(--panel2);
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.mini-stats small {
+    display: block;
+    color: var(--muted);
+}
+
+.market-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+.market-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    padding: 22px;
+}
+
+.market-top {
+    display: flex;
+    justify-content: space-between;
+}
+
+.market-top span {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.market-card h3 {
+    margin-top: 20px;
+    font-size: 25px;
+}
+
+.market-card p {
+    margin-top: 5px;
+}
+
+.dark-section {
+    background: #070b12;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.feature {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 25px;
+}
+
+.feature-icon {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9px;
+    background: rgba(85,214,154,0.1);
+
+    color: var(--green);
+    font-weight: bold;
+
+    margin-bottom: 18px;
+}
+
+.feature h3 {
+    margin-bottom: 8px;
+}
+
+.feature p {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.step {
+    border-left: 2px solid var(--green);
+    padding-left: 20px;
+}
+
+.step span {
+    color: var(--green);
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.step h3 {
+    margin: 10px 0;
+}
+
+.step p {
+    color: var(--muted);
+}
+
+.cta {
+    text-align: center;
+    padding: 100px 20px;
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+.cta h2 {
+    font-size: 42px;
+    margin-bottom: 12px;
+}
+
+.cta p {
+    color: var(--muted);
+    margin-bottom: 25px;
+}
+
+@media (max-width: 1000px) {
+
+    .hero {
+        grid-template-columns: 1fr;
+    }
+
+    .market-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .steps {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 650px) {
+
+    .landing-header nav {
+        display: none;
+    }
+
+    .hero {
+        padding: 70px 5%;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+    }
+
+    .market-grid,
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cta h2 {
+        font-size: 32px;
+    }
+
+}

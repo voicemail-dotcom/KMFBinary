@@ -1,0 +1,5175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>Trading Terminal - KMFBinary</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #07111f;
+            color: #ffffff;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar {
+            height: 64px;
+            background: #0b1728;
+            border-bottom: 1px solid #1c2b40;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 22px;
+        }
+
+        .brand {
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: .4px;
+        }
+
+        .brand span {
+            color: #22c55e;
+        }
+
+        /* =====================================================
+           TOP WALLET BALANCE
+        ===================================================== */
+
+        .top-balance {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-left: auto;
+            margin-right: 18px;
+        }
+
+        .top-balance-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            white-space: nowrap;
+        }
+.top-balance-flag {
+    width: 28px;
+    height: 19px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 3px;
+    display: block;
+    flex-shrink: 0;
+}
+
+        .top-balance-info {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+
+        .top-balance-label {
+            color: #71849e;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .top-balance-value {
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 800;
+            margin-top: 2px;
+        }
+
+        .account-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .account-select {
+            background: #101f34;
+            color: white;
+            border: 1px solid #263852;
+            border-radius: 8px;
+            padding: 9px 12px;
+            outline: none;
+        }
+
+        .back-btn {
+            background: #17263b;
+            color: white;
+            border: 1px solid #293c56;
+            padding: 9px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            background: #20334e;
+        }
+
+        .content {
+            width: 100%;
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .market-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .market-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .market-title h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .live-dot {
+            width: 9px;
+            height: 9px;
+            background: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #22c55e;
+        }
+
+        .price-box {
+            background: #0d1c30;
+            border: 1px solid #20334d;
+            border-radius: 10px;
+            padding: 10px 16px;
+            min-width: 150px;
+            text-align: right;
+        }
+
+        .price-label {
+            font-size: 11px;
+            color: #7f91aa;
+            text-transform: uppercase;
+        }
+
+        .price {
+            font-size: 24px;
+            font-weight: 800;
+            margin-top: 3px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 330px;
+            gap: 18px;
+        }
+
+        .chart-card {
+            background: #0b1728;
+            border: 1px solid #1d2d43;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .chart-top {
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            border-bottom: 1px solid #1d2d43;
+        }
+
+        .timeframe {
+            color: #9eb0c8;
+            font-size: 13px;
+        }
+
+        .market-status {
+            color: #22c55e;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .chart-wrap {
+            position: relative;
+            width: 100%;
+            height: 570px;
+            background: #07111f;
+        }
+
+        #chart {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .panel {
+            background: #0b1728;
+            border: 1px solid #1d2d43;
+            border-radius: 12px;
+            padding: 18px;
+        }
+
+        .panel h2 {
+            margin: 0 0 16px;
+            font-size: 19px;
+        }
+
+        .field {
+            margin-bottom: 16px;
+        }
+
+        .field label {
+            display: block;
+            color: #9eb0c8;
+            font-size: 12px;
+            margin-bottom: 7px;
+        }
+
+        .stake-input,
+        .duration-select,
+        .mode-select,
+        .tp-select {
+            width: 100%;
+            height: 45px;
+            background: #101f34;
+            color: white;
+            border: 1px solid #2a3c55;
+            border-radius: 8px;
+            padding: 0 12px;
+            outline: none;
+            font-size: 15px;
+        }
+
+        .stake-input:focus,
+        .duration-select:focus,
+        .mode-select:focus,
+        .tp-select:focus {
+            border-color: #3b82f6;
+        }
+
+        .currency {
+            position: relative;
+        }
+
+        .currency span {
+            position: absolute;
+            left: 12px;
+            top: 14px;
+            color: #9eb0c8;
+            font-size: 13px;
+            pointer-events: none;
+        }
+
+        .currency input {
+            padding-left: 48px;
+        }
+
+        .tp-info {
+            margin-top: 7px;
+            padding: 8px 10px;
+            background: #0a1729;
+            border-radius: 7px;
+            color: #8ea1bb;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .tp-info strong {
+            color: #ffffff;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .trade-btn {
+            height: 58px;
+            border: 0;
+            border-radius: 9px;
+            color: white;
+            font-size: 17px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: transform .1s ease;
+        }
+
+        .trade-btn:active {
+            transform: scale(.98);
+        }
+
+        .buy-btn {
+            background: #16a34a;
+        }
+
+        .buy-btn:hover {
+            background: #15803d;
+        }
+
+        .sell-btn {
+            background: #dc2626;
+        }
+
+        .sell-btn:hover {
+            background: #b91c1c;
+        }
+
+        .trade-btn:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+        .cashout-wrap {
+            margin-top: 12px;
+        }
+
+        .cashout-btn {
+            width: 100%;
+            height: 48px;
+            border: 0;
+            border-radius: 9px;
+            background: #f59e0b;
+            color: #111827;
+            font-size: 15px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: .15s ease;
+        }
+
+        .cashout-btn:hover:not(:disabled) {
+            background: #fbbf24;
+        }
+
+        .cashout-btn:active:not(:disabled) {
+            transform: scale(.98);
+        }
+
+        .cashout-btn:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+        .cashout-info {
+            margin-top: 7px;
+            text-align: center;
+            color: #8ea1bb;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .cashout-value {
+            margin-top: 8px;
+            padding: 9px 10px;
+            background: #0a1729;
+            border-radius: 7px;
+            font-size: 12px;
+            color: #9eb0c8;
+            display: none;
+        }
+
+        .cashout-value strong {
+            color: #ffffff;
+        }
+
+        .position-card {
+            margin-top: 18px;
+            background: #0e1d31;
+            border: 1px solid #20344e;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .position-title {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .position-title strong {
+            font-size: 14px;
+        }
+
+        .position-status {
+            font-size: 12px;
+            color: #22c55e;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .position-status.tp-hit {
+            color: #22c55e;
+        }
+
+        .position-status.loss {
+            color: #ef4444;
+        }
+
+        .position-status.cashout {
+            color: #f59e0b;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat {
+            background: #0a1729;
+            border-radius: 7px;
+            padding: 10px;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #71849e;
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            margin-top: 5px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .pnl {
+            font-size: 24px;
+            font-weight: 900;
+        }
+
+        .message {
+            margin-top: 14px;
+            min-height: 20px;
+            font-size: 12px;
+            color: #8ea1bb;
+            line-height: 1.5;
+        }
+
+        .message.error {
+            color: #f87171;
+        }
+
+        .message.success {
+            color: #4ade80;
+        }
+
+        /* =====================================================
+           TRADING JOURNAL
+        ===================================================== */
+
+        .journal-section {
+            margin-top: 20px;
+            background: #0b1728;
+            border: 1px solid #1d2d43;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .journal-header {
+            padding: 17px 18px;
+            border-bottom: 1px solid #1d2d43;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .journal-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .journal-title h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .journal-count {
+            background: #16283f;
+            color: #9eb0c8;
+            padding: 4px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .journal-clear {
+            background: #17263b;
+            color: #9eb0c8;
+            border: 1px solid #293c56;
+            border-radius: 7px;
+            padding: 7px 11px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .journal-clear:hover {
+            background: #20334e;
+            color: #ffffff;
+        }
+
+        .journal-table-wrap {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .journal-table {
+            width: 100%;
+            min-width: 1050px;
+            border-collapse: collapse;
+        }
+
+        .journal-table th {
+            background: #0e1d31;
+            color: #71849e;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: .3px;
+            padding: 12px 10px;
+            text-align: left;
+            white-space: nowrap;
+            border-bottom: 1px solid #1d2d43;
+        }
+
+        .journal-table td {
+            padding: 12px 10px;
+            font-size: 12px;
+            color: #c8d4e4;
+            border-bottom: 1px solid #15263a;
+            white-space: nowrap;
+        }
+
+        .journal-table tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .journal-table tbody tr:hover {
+            background: #0d1b2e;
+        }
+
+        .journal-empty {
+            padding: 35px 20px;
+            text-align: center;
+            color: #71849e;
+            font-size: 13px;
+        }
+
+        .direction-buy {
+            color: #22c55e;
+            font-weight: 800;
+        }
+
+        .direction-sell {
+            color: #ef4444;
+            font-weight: 800;
+        }
+
+        .result-win {
+            color: #22c55e;
+            font-weight: 800;
+        }
+
+        .result-loss {
+            color: #ef4444;
+            font-weight: 800;
+        }
+
+        .result-cashout {
+            color: #f59e0b;
+            font-weight: 800;
+        }
+
+        .pnl-positive {
+            color: #22c55e !important;
+            font-weight: 800;
+        }
+
+        .pnl-negative {
+            color: #ef4444 !important;
+            font-weight: 800;
+        }
+
+        .pnl-zero {
+            color: #9eb0c8 !important;
+            font-weight: 800;
+        }
+
+        .journal-reason {
+            color: #8ea1bb !important;
+        }
+
+        @media (max-width: 900px) {
+
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-wrap {
+                height: 450px;
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .content {
+                padding: 12px;
+            }
+
+            .topbar {
+                padding: 0 12px;
+            }
+
+            .brand {
+                font-size: 18px;
+            }
+
+            .account-select {
+                max-width: 120px;
+            }
+
+            .top-balance {
+                gap: 8px;
+                margin-right: 8px;
+            }
+
+            .top-balance-flag {
+                width: 25px;
+                height: 17px;
+            }
+
+            .top-balance-value {
+                font-size: 11px;
+            }
+
+            .chart-wrap {
+                height: 380px;
+            }
+
+            .panel {
+                padding: 14px;
+            }
+
+            .journal-header {
+                padding: 14px;
+            }
+
+        }
+       img[src*="us-flag.svg"],
+img[src*="kenya-flag.svg"],
+.balance-flag,
+.currency-flag {
+    width: 20px;
+    height: 14px;
+    object-fit: contain;
+    vertical-align: middle;
+    flex-shrink: 0;
+} 
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <header class="topbar">
+
+        <div class="brand">
+            KMF<span>Binary</span>
+        </div>
+
+ <!-- TOP WALLET BALANCE -->
+
+<div class="top-balance">
+
+    <!-- USD -->
+
+    <div class="top-balance-item" id="usdBalanceItem">
+
+        <img
+    src="images/us-flag.svg"
+    alt="USD"
+    class="balance-flag"
+>
+        <div class="top-balance-info">
+
+            <div class="top-balance-label">
+                USD
+            </div>
+
+            <div
+                class="top-balance-value"
+                id="buySellTopUsd"
+            >
+                $0.00
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- KES -->
+
+    <div class="top-balance-item" id="kesBalanceItem">
+
+        <img
+    src="images/kenya-flag.svg"
+    alt="KES"
+    class="balance-flag"
+>
+
+        <div class="top-balance-info">
+
+            <div class="top-balance-label">
+                KES
+            </div>
+
+            <div
+                class="top-balance-value"
+                id="buySellTopKes"
+            >
+                KSh 0.00
+            </div>
+
+        </div>
+
+</div>
+        <div class="account-area">
+
+            <select
+                id="modeSelect"
+                class="account-select"
+            >
+                <option value="demo">
+                    Demo Account
+                </option>
+
+                <option value="real">
+                    Live Account
+                </option>
+            </select>
+
+            <button
+                class="back-btn"
+                id="backBtn"
+            >
+                Back to Trading
+            </button>
+
+        </div>
+
+    </header>
+
+    <main class="content">
+
+        <div class="market-header">
+
+            <div class="market-title">
+
+                <div class="live-dot"></div>
+
+                <div>
+
+                    <h1>
+                        KMF-BS
+                    </h1>
+
+                    <div
+                        style="
+                            color:#8194ad;
+                            font-size:12px;
+                            margin-top:4px;
+                        "
+                    >
+                        Synthetic Trading Market
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="price-box">
+
+                <div class="price-label">
+                    Current Price
+                </div>
+
+                <div
+                    class="price"
+                    id="currentPrice"
+                >
+                    4100.00
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="main-grid">
+
+            <!-- =================================================
+                 CHART
+            ================================================== -->
+
+            <section class="chart-card">
+
+                <div class="chart-top">
+
+                    <div class="timeframe">
+                        Candles: 1 Minute
+                    </div>
+
+                    <div
+                        class="market-status"
+                        id="marketStatus"
+                    >
+                        ● LIVE
+                    </div>
+
+                </div>
+
+                <div class="chart-wrap">
+
+                    <canvas id="chart"></canvas>
+
+                </div>
+
+            </section>
+
+            <!-- =================================================
+                 TRADING PANEL
+            ================================================== -->
+
+            <aside class="panel">
+
+                <h2>
+                    Trade Position
+                </h2>
+
+                <!-- STAKE -->
+
+                <div class="field">
+
+                    <label>
+                        Stake Amount
+                    </label>
+
+                    <div class="currency">
+
+                        <span>
+                            KSh
+                        </span>
+
+                        <input
+                            id="stakeInput"
+                            class="stake-input"
+                            type="number"
+                            min="100"
+                            step="10"
+                            value="100"
+                        >
+
+                    </div>
+
+                </div>
+
+                <!-- DURATION -->
+
+                <div class="field">
+
+                    <label>
+                        Trade Duration
+                    </label>
+
+                    <select
+                        id="durationSelect"
+                        class="duration-select"
+                    >
+
+                        <option value="1">
+                            1 Second
+                        </option>
+
+                        <option value="2">
+                            2 Seconds
+                        </option>
+
+                        <option value="3">
+                            3 Seconds
+                        </option>
+
+                        <option value="4">
+                            4 Seconds
+                        </option>
+
+                        <option value="5">
+                            5 Seconds
+                        </option>
+
+                        <option value="10">
+                            10 Seconds
+                        </option>
+
+                        <option value="15">
+                            15 Seconds
+                        </option>
+
+                        <option value="30">
+                            30 Seconds
+                        </option>
+
+                        <option value="45">
+                            45 Seconds
+                        </option>
+
+                        <option value="60">
+                            1 Minute
+                        </option>
+
+                        <option value="120">
+                            2 Minutes
+                        </option>
+
+                        <option value="300">
+                            5 Minutes
+                        </option>
+
+                        <option value="600">
+                            10 Minutes
+                        </option>
+
+                        <option value="900">
+                            15 Minutes
+                        </option>
+
+                        <option value="1800">
+                            30 Minutes
+                        </option>
+
+                        <option value="2700">
+                            45 Minutes
+                        </option>
+
+                        <option value="3600">
+                            1 Hour
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- TP -->
+
+                <div class="field">
+
+                    <label>
+                        Profit Target
+                    </label>
+
+                    <select
+                        id="tpSelect"
+                        class="tp-select"
+                    >
+
+                        <option value="1.5">
+                            1.5x
+                        </option>
+
+                        <option value="2">
+                            2x
+                        </option>
+
+                        <option value="3">
+                            3x
+                        </option>
+
+                        <option value="4">
+                            4x
+                        </option>
+
+                        <option value="5">
+                            5x
+                        </option>
+
+                        <option value="6">
+                            6x
+                        </option>
+
+                        <option value="7">
+                            7x
+                        </option>
+
+                        <option value="8">
+                            8x
+                        </option>
+
+                        <option value="9">
+                            9x
+                        </option>
+
+                        <option value="10">
+                            10x
+                        </option>
+
+                    </select>
+
+                    <div
+                        class="tp-info"
+                        id="tpInfo"
+                    >
+                        KSh 100 stake →
+                        <strong>
+                            +KSh 150 profit
+                        </strong>
+                        at target 1.5x
+                    </div>
+
+                </div>
+
+                <!-- ACCOUNT -->
+
+                <div class="field">
+
+                    <label>
+                        Account
+                    </label>
+
+                    <select
+                        id="panelModeSelect"
+                        class="mode-select"
+                    >
+
+                        <option value="demo">
+                            Demo Account
+                        </option>
+
+                        <option value="real">
+                            Live Account
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="buttons">
+
+                    <button
+                        id="buyButton"
+                        class="trade-btn buy-btn"
+                    >
+                        BUY
+                    </button>
+
+                    <button
+                        id="sellButton"
+                        class="trade-btn sell-btn"
+                    >
+                        SELL
+                    </button>
+
+                </div>
+
+                <!-- MANUAL CLOSE -->
+
+                <div
+                    class="cashout-wrap"
+                    id="cashoutWrap"
+                    style="display:none;"
+                >
+
+                    <button
+                        id="cashoutButton"
+                        class="cashout-btn"
+                        disabled
+                    >
+                        CLOSE POSITION
+                    </button>
+
+                    <div
+                        id="cashoutInfo"
+                        class="cashout-info"
+                    >
+                        Manual position close is available after 1 minute.
+                    </div>
+
+                    <div
+                        id="cashoutValue"
+                        class="cashout-value"
+                    >
+                        Estimated Close Value:
+
+                        <strong id="cashoutAmount">
+                            KSh 0.00
+                        </strong>
+
+                    </div>
+
+                </div>
+
+                <!-- POSITION -->
+
+                <div
+                    class="position-card"
+                    id="positionCard"
+                >
+
+                    <div class="position-title">
+
+                        <strong>
+                            Position Details
+                        </strong>
+
+                        <span
+                            class="position-status"
+                            id="positionStatus"
+                        >
+                            No Open Position
+                        </span>
+
+                    </div>
+
+                    <div class="stats">
+
+                        <div class="stat">
+
+                            <div class="stat-label">
+                                Direction
+                            </div>
+
+                            <div
+                                class="stat-value"
+                                id="positionSide"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                        <div class="stat">
+
+                            <div class="stat-label">
+                                Entry Price
+                            </div>
+
+                            <div
+                                class="stat-value"
+                                id="entryPrice"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                        <div class="stat">
+
+                            <div class="stat-label">
+                                Current Price
+                            </div>
+
+                            <div
+                                class="stat-value"
+                                id="positionPrice"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                        <div class="stat">
+
+                            <div class="stat-label">
+                                Time Remaining
+                            </div>
+
+                            <div
+                                class="stat-value"
+                                id="timeLeft"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                        <div class="stat">
+
+                            <div class="stat-label">
+                                Target
+                            </div>
+
+                            <div
+                                class="stat-value"
+                                id="positionTp"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                        <div class="stat">
+
+                            <div class="stat-label">
+                                Target Profit
+                            </div>
+
+                            <div
+                                class="stat-value"
+                                id="positionTpTarget"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        style="
+                            margin-top:15px;
+                        "
+                    >
+
+                        <div class="stat-label">
+                            LIVE / FINAL P&L
+                        </div>
+
+                        <div
+                            class="pnl"
+                            id="pnlValue"
+                        >
+                            KSh 0.00
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div
+                    id="message"
+                    class="message"
+                ></div>
+
+            </aside>
+
+        </div>
+
+        <!-- =====================================================
+             TRADING JOURNAL
+        ====================================================== -->
+
+        <section class="journal-section">
+
+            <div class="journal-header">
+
+                <div class="journal-title">
+
+                    <h2>
+                        Trading Journal
+                    </h2>
+
+                    <span
+                        class="journal-count"
+                        id="journalCount"
+                    >
+                        0 Trades
+                    </span>
+
+                </div>
+
+                <button
+                    class="journal-clear"
+                    id="clearJournalButton"
+                    type="button"
+                >
+                    Clear Journal
+                </button>
+
+            </div>
+
+            <div class="journal-table-wrap">
+
+                <table class="journal-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Opened
+                            </th>
+
+                            <th>
+                                Closed
+                            </th>
+
+                            <th>
+                                Direction
+                            </th>
+
+                            <th>
+                                Stake
+                            </th>
+
+                            <th>
+                                Duration
+                            </th>
+
+                            <th>
+                                TP
+                            </th>
+
+                            <th>
+                                Entry
+                            </th>
+
+                            <th>
+                                Exit
+                            </th>
+
+                            <th>
+                                Result
+                            </th>
+
+                            <th>
+                                P&L
+                            </th>
+
+                            <th>
+                                Close Reason
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody
+                        id="journalBody"
+                    >
+                    </tbody>
+
+                </table>
+
+                <div
+                    id="journalEmpty"
+                    class="journal-empty"
+                >
+                    No completed trades yet.
+                    Your completed positions will appear here automatically.
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script>
+"use strict";
+
+/* =========================================================
+   SUPABASE
+========================================================= */
+
+const SUPABASE_URL =
+    "https://nugufikdivanyzmghofq.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_NfsjmPephsaJrRB6vLXglw_G6yTdPTl";
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+const API_BASE =
+    "http://localhost:3000";
+
+/* =========================================================
+   API
+========================================================= */
+
+async function getToken() {
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient.auth.getSession();
+
+    if (
+        error ||
+        !data.session
+    ) {
+
+        return null;
+
+    }
+
+    return data.session.access_token;
+
+}
+
+async function api(
+    endpoint,
+    options = {}
+) {
+
+    const token =
+        await getToken();
+
+    if (!token) {
+
+        throw new Error(
+            "Please log in first."
+        );
+
+    }
+
+    const headers = {
+
+        "Content-Type":
+            "application/json",
+
+        ...(options.headers || {})
+
+    };
+
+    headers.Authorization =
+        "Bearer " + token;
+
+    const response =
+        await fetch(
+            API_BASE + endpoint,
+            {
+                ...options,
+                headers
+            }
+        );
+
+    let data;
+
+    try {
+
+        data =
+            await response.json();
+
+    } catch {
+
+        throw new Error(
+            "Server returned an invalid response."
+        );
+
+    }
+
+    if (!response.ok) {
+
+        throw new Error(
+            data.message ||
+            data.error ||
+            "Request failed."
+        );
+
+    }
+
+    return data;
+
+}
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const canvas =
+    document.getElementById("chart");
+
+const ctx =
+    canvas.getContext("2d");
+
+const currentPriceEl =
+    document.getElementById(
+        "currentPrice"
+    );
+
+const stakeInput =
+    document.getElementById(
+        "stakeInput"
+    );
+
+const durationSelect =
+    document.getElementById(
+        "durationSelect"
+    );
+
+const tpSelect =
+    document.getElementById(
+        "tpSelect"
+    );
+
+const tpInfo =
+    document.getElementById(
+        "tpInfo"
+    );
+
+const modeSelect =
+    document.getElementById(
+        "modeSelect"
+    );
+
+const panelModeSelect =
+    document.getElementById(
+        "panelModeSelect"
+    );
+
+const buyButton =
+    document.getElementById(
+        "buyButton"
+    );
+
+const sellButton =
+    document.getElementById(
+        "sellButton"
+    );
+
+const positionStatus =
+    document.getElementById(
+        "positionStatus"
+    );
+
+const positionSide =
+    document.getElementById(
+        "positionSide"
+    );
+
+const entryPriceEl =
+    document.getElementById(
+        "entryPrice"
+    );
+
+const positionPriceEl =
+    document.getElementById(
+        "positionPrice"
+    );
+
+const timeLeftEl =
+    document.getElementById(
+        "timeLeft"
+    );
+
+const positionTpEl =
+    document.getElementById(
+        "positionTp"
+    );
+
+const positionTpTargetEl =
+    document.getElementById(
+        "positionTpTarget"
+    );
+
+const pnlValueEl =
+    document.getElementById(
+        "pnlValue"
+    );
+
+const messageEl =
+    document.getElementById(
+        "message"
+    );
+
+const cashoutWrap =
+    document.getElementById(
+        "cashoutWrap"
+    );
+
+const cashoutButton =
+    document.getElementById(
+        "cashoutButton"
+    );
+
+const cashoutInfo =
+    document.getElementById(
+        "cashoutInfo"
+    );
+
+const cashoutValue =
+    document.getElementById(
+        "cashoutValue"
+    );
+
+const cashoutAmount =
+    document.getElementById(
+        "cashoutAmount"
+    );
+
+const journalBody =
+    document.getElementById(
+        "journalBody"
+    );
+
+const journalEmpty =
+    document.getElementById(
+        "journalEmpty"
+    );
+
+const journalCount =
+    document.getElementById(
+        "journalCount"
+    );
+
+const clearJournalButton =
+    document.getElementById(
+        "clearJournalButton"
+    );
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let candles = [];
+
+let currentPrice = 4100;
+
+let position = null;
+
+let cashoutInProgress = false;
+
+let positionPollingTimer = null;
+
+let positionClosed = false;
+
+/* =========================================================
+   LOCAL STORAGE KEYS
+========================================================= */
+
+const SETTINGS_KEY =
+    "kmf_buy_sell_settings";
+
+const LAST_RESULT_KEY =
+    "kmf_buy_sell_last_result";
+
+const JOURNAL_KEY =
+    "kmf_buy_sell_journal";
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+function showMessage(
+    message,
+    type = ""
+) {
+
+    messageEl.textContent =
+        message;
+
+    messageEl.className =
+        "message " + type;
+
+}
+
+/* =========================================================
+   SETTINGS
+========================================================= */
+
+function saveTradingSettings() {
+
+    const settings = {
+
+        stake:
+            stakeInput.value,
+
+        duration:
+            durationSelect.value,
+
+        tp:
+            tpSelect.value,
+
+        mode:
+            modeSelect.value
+
+    };
+
+    try {
+
+        localStorage.setItem(
+            SETTINGS_KEY,
+            JSON.stringify(settings)
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Could not save settings:",
+            error
+        );
+
+    }
+
+}
+
+function loadTradingSettings() {
+
+    try {
+
+        const saved =
+            localStorage.getItem(
+                SETTINGS_KEY
+            );
+
+        if (!saved) {
+
+            return;
+
+        }
+
+        const settings =
+            JSON.parse(saved);
+
+        if (
+            settings &&
+            settings.stake !== undefined
+        ) {
+
+            stakeInput.value =
+                settings.stake;
+
+        }
+
+        if (
+            settings &&
+            settings.duration !== undefined
+        ) {
+
+            const durationExists =
+                Array.from(
+                    durationSelect.options
+                ).some(
+                    option =>
+                        option.value ===
+                        String(
+                            settings.duration
+                        )
+                );
+
+            if (durationExists) {
+
+                durationSelect.value =
+                    String(
+                        settings.duration
+                    );
+
+            }
+
+        }
+
+        if (
+            settings &&
+            settings.tp !== undefined
+        ) {
+
+            const tpExists =
+                Array.from(
+                    tpSelect.options
+                ).some(
+                    option =>
+                        option.value ===
+                        String(
+                            settings.tp
+                        )
+                );
+
+            if (tpExists) {
+
+                tpSelect.value =
+                    String(
+                        settings.tp
+                    );
+
+            }
+
+        }
+
+        if (
+            settings &&
+            (
+                settings.mode === "demo" ||
+                settings.mode === "real"
+            )
+        ) {
+
+            modeSelect.value =
+                settings.mode;
+
+            panelModeSelect.value =
+                settings.mode;
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Could not load settings:",
+            error
+        );
+
+    }
+
+}
+
+/* =========================================================
+   SAVE SETTINGS WHEN CHANGED
+========================================================= */
+
+stakeInput.addEventListener(
+    "input",
+    () => {
+
+        saveTradingSettings();
+
+        updateTpInfo();
+
+    }
+);
+
+durationSelect.addEventListener(
+    "change",
+    () => {
+
+        saveTradingSettings();
+
+    }
+);
+
+tpSelect.addEventListener(
+    "change",
+    () => {
+
+        saveTradingSettings();
+
+        updateTpInfo();
+
+    }
+);
+
+modeSelect.addEventListener(
+    "change",
+    () => {
+
+        saveMode(
+            modeSelect.value
+        );
+
+    }
+);
+
+panelModeSelect.addEventListener(
+    "change",
+    () => {
+
+        saveMode(
+            panelModeSelect.value
+        );
+
+    }
+);
+
+/* =========================================================
+   ACCOUNT MODE
+========================================================= */
+
+function loadMode() {
+
+    let saved =
+        localStorage.getItem(
+            "kmf_account_mode"
+        );
+
+    if (
+        saved !== "demo" &&
+        saved !== "real"
+    ) {
+
+        saved = "demo";
+
+    }
+
+    modeSelect.value =
+        saved;
+
+    panelModeSelect.value =
+        saved;
+updateBalanceFlags();
+}
+
+function saveMode(
+    value
+) {
+
+    modeSelect.value =
+        value;
+
+    panelModeSelect.value =
+        value;
+
+    localStorage.setItem(
+        "kmf_account_mode",
+        value
+    );
+
+    localStorage.setItem(
+        "kmf_selected_account",
+        value
+    );
+
+    loadBuySellWallet();
+
+    saveTradingSettings();
+updateBalanceFlags();
+}
+
+/* =========================================================
+   BUY / SELL WALLET BALANCE
+========================================================= */
+
+async function loadBuySellWallet() {
+
+    try {
+
+        const result =
+            await api(
+                "/api/wallet"
+            );
+
+        const wallet =
+            result?.wallet ||
+            result?.data?.wallet ||
+            result?.data ||
+            result;
+
+        const mode =
+            localStorage.getItem(
+                "kmf_account_mode"
+            ) === "real"
+                ? "real"
+                : "demo";
+
+        const usdBalance =
+            mode === "real"
+                ? Number(
+                    wallet.balance || 0
+                )
+                : Number(
+                    wallet.demo_balance || 0
+                );
+
+        /*
+           USD / KES exchange rate
+
+           KMFBinary currently uses
+           approximately 135 KES for 1 USD.
+        */
+
+        const exchangeRate =
+            Number(
+                wallet.exchange_rate ||
+                wallet.usd_kes_rate ||
+                wallet.usdToKes ||
+                135
+            );
+
+        const kesBalance =
+            usdBalance *
+            exchangeRate;
+
+        /* =========================
+           TOP USD BALANCE
+        ========================= */
+
+        const usdElement =
+            document.getElementById(
+                "buySellTopUsd"
+            );
+
+        if (usdElement) {
+
+            usdElement.textContent =
+                "$" +
+                usdBalance.toLocaleString(
+                    "en-US",
+                    {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }
+                );
+
+        }
+
+        /* =========================
+           TOP KES BALANCE
+        ========================= */
+
+        const kesElement =
+            document.getElementById(
+                "buySellTopKes"
+            );
+
+        if (kesElement) {
+
+            kesElement.textContent =
+                "KSh " +
+                kesBalance.toLocaleString(
+                    "en-KE",
+                    {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }
+                );
+
+        }
+
+        /* =========================
+           OLD BALANCE DISPLAY
+        ========================= */
+
+        const oldBalanceElement =
+            document.querySelector(
+                "#buySellBalance strong"
+            );
+
+        if (oldBalanceElement) {
+
+            oldBalanceElement.textContent =
+                "$" +
+                usdBalance.toLocaleString(
+                    "en-US",
+                    {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }
+                );
+
+        }
+
+        const oldKesElement =
+            document.querySelector(
+                "#buySellBalanceKes strong"
+            );
+
+        if (oldKesElement) {
+
+            oldKesElement.textContent =
+                "KSh " +
+                kesBalance.toLocaleString(
+                    "en-KE",
+                    {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }
+                );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Buy/Sell wallet loading error:",
+            error
+        );
+
+    }
+
+}
+
+/* =========================================================
+   TP INFORMATION
+========================================================= */
+
+function updateTpInfo() {
+
+    const stake =
+        Number(
+            stakeInput.value
+        );
+
+    const multiplier =
+        Number(
+            tpSelect.value
+        );
+
+    if (
+        !Number.isFinite(stake) ||
+        stake < 100
+    ) {
+
+        tpInfo.innerHTML =
+            "Minimum stake is <strong>KSh 100</strong>.";
+
+        return;
+
+    }
+
+    const profit =
+        stake * multiplier;
+
+    const total =
+        stake + profit;
+
+    tpInfo.innerHTML =
+        `KSh ${stake.toFixed(2)} stake → ` +
+        `<strong>+KSh ${profit.toFixed(2)} profit</strong> ` +
+        `at target ${multiplier}x ` +
+        `(KSh ${total.toFixed(2)} total returned)`;
+
+}
+
+/* =========================================================
+   LAST RESULT
+========================================================= */
+
+function saveLastResult(
+    trade
+) {
+
+    if (!trade) {
+
+        return;
+
+    }
+
+    try {
+
+        localStorage.setItem(
+            LAST_RESULT_KEY,
+            JSON.stringify(trade)
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Could not save last result:",
+            error
+        );
+
+    }
+
+}
+
+function loadLastResult() {
+
+    try {
+
+        const saved =
+            localStorage.getItem(
+                LAST_RESULT_KEY
+            );
+
+        if (!saved) {
+
+            return null;
+
+        }
+
+        const trade =
+            JSON.parse(saved);
+
+        if (
+            !trade ||
+            !trade.id
+        ) {
+
+            return null;
+
+        }
+
+        return trade;
+
+    } catch (error) {
+
+        console.error(
+            "Could not load last result:",
+            error
+        );
+
+        return null;
+
+    }
+
+}
+
+/* =========================================================
+   JOURNAL STORAGE
+========================================================= */
+
+function getJournal() {
+
+    try {
+
+        const saved =
+            localStorage.getItem(
+                JOURNAL_KEY
+            );
+
+        if (!saved) {
+
+            return [];
+
+        }
+
+        const journal =
+            JSON.parse(saved);
+
+        if (
+            !Array.isArray(journal)
+        ) {
+
+            return [];
+
+        }
+
+        return journal;
+
+    } catch (error) {
+
+        console.error(
+            "Could not load journal:",
+            error
+        );
+
+        return [];
+
+    }
+
+}
+
+function saveJournal(
+    journal
+) {
+
+    try {
+
+        localStorage.setItem(
+            JOURNAL_KEY,
+            JSON.stringify(journal)
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Could not save journal:",
+            error
+        );
+
+    }
+
+}
+
+/* =========================================================
+   ADD TRADE TO JOURNAL
+========================================================= */
+
+function addTradeToJournal(
+    trade
+) {
+
+    if (
+        !trade ||
+        !trade.id
+    ) {
+
+        return;
+
+    }
+
+    const journal =
+        getJournal();
+
+    const alreadyExists =
+        journal.some(
+            item =>
+                String(item.id) ===
+                String(trade.id)
+        );
+
+    if (alreadyExists) {
+
+        return;
+
+    }
+
+    const entryTime =
+        trade.opened_at ||
+        trade.created_at ||
+        trade.open_time ||
+        null;
+
+    const closedTime =
+        trade.closed_at ||
+        trade.updated_at ||
+        trade.closed_time ||
+        null;
+
+    const journalTrade = {
+
+        id:
+            trade.id,
+
+        opened_at:
+            entryTime,
+
+        closed_at:
+            closedTime,
+
+        side:
+            trade.side || "",
+
+        stake_kes:
+            Number(
+                trade.stake_kes || 0
+            ),
+
+        duration_seconds:
+            Number(
+                trade.duration_seconds || 0
+            ),
+
+        take_profit_multiplier:
+            Number(
+                trade.take_profit_multiplier ||
+                1.5
+            ),
+
+        entry_price:
+            Number(
+                trade.entry_price || 0
+            ),
+
+        exit_price:
+            Number(
+                trade.exit_price ??
+                trade.current_price ??
+                0
+            ),
+
+        status:
+            trade.status || "",
+
+        result_kes:
+            Number(
+                trade.result_kes ??
+                trade.pnl_kes ??
+                0
+            ),
+
+        close_reason:
+            trade.close_reason ||
+            ""
+
+    };
+
+    journal.unshift(
+        journalTrade
+    );
+
+    /*
+       Keep the most recent 100
+       completed trades in the browser.
+    */
+
+    const limitedJournal =
+        journal.slice(
+            0,
+            100
+        );
+
+    saveJournal(
+        limitedJournal
+    );
+
+    renderJournal();
+
+}
+
+/* =========================================================
+   FORMAT DATE / TIME
+========================================================= */
+
+function formatDateTime(
+    value
+) {
+
+    if (!value) {
+
+        return "—";
+
+    }
+
+    const date =
+        new Date(value);
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return "—";
+
+    }
+
+    return date.toLocaleString(
+        [],
+        {
+            year: "numeric",
+            month: "short",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
+        }
+    );
+
+}
+
+/* =========================================================
+   FORMAT JOURNAL RESULT
+========================================================= */
+
+function getJournalResult(
+    trade
+) {
+
+    const status =
+        String(
+            trade.status || ""
+        ).toLowerCase();
+
+    const reason =
+        String(
+            trade.close_reason || ""
+        ).toLowerCase();
+
+    if (
+        status === "cashed_out" ||
+        reason.includes("cashout") ||
+        reason.includes("cash out")
+    ) {
+
+        return {
+            text: "CASHED OUT",
+            className: "result-cashout"
+        };
+
+    }
+
+    if (
+        status === "won"
+    ) {
+
+        return {
+            text: "WON",
+            className: "result-win"
+        };
+
+    }
+
+    if (
+        status === "loss"
+    ) {
+
+        return {
+            text: "LOSS",
+            className: "result-loss"
+        };
+
+    }
+
+    return {
+        text:
+            String(
+                trade.status ||
+                "CLOSED"
+            ).toUpperCase(),
+
+        className:
+            "journal-reason"
+
+    };
+
+}
+
+/* =========================================================
+   FORMAT DURATION
+========================================================= */
+
+function formatDuration(
+    seconds
+) {
+
+    seconds =
+        Number(seconds);
+
+    if (
+        !Number.isFinite(seconds)
+    ) {
+
+        return "—";
+
+    }
+
+    if (
+        seconds < 60
+    ) {
+
+        return `${seconds}s`;
+
+    }
+
+    if (
+        seconds < 3600
+    ) {
+
+        const minutes =
+            seconds / 60;
+
+        return Number.isInteger(
+            minutes
+        )
+            ? `${minutes}m`
+            : `${minutes.toFixed(1)}m`;
+
+    }
+
+    const hours =
+        seconds / 3600;
+
+    return Number.isInteger(
+        hours
+    )
+        ? `${hours}h`
+        : `${hours.toFixed(1)}h`;
+
+}
+
+/* =========================================================
+   RENDER JOURNAL
+========================================================= */
+
+function renderJournal() {
+
+    const journal =
+        getJournal();
+
+    journalCount.textContent =
+        journal.length +
+        (
+            journal.length === 1
+                ? " Trade"
+                : " Trades"
+        );
+
+    if (
+        journal.length === 0
+    ) {
+
+        journalBody.innerHTML =
+            "";
+
+        journalEmpty.style.display =
+            "block";
+
+        return;
+
+    }
+
+    journalEmpty.style.display =
+        "none";
+
+    journalBody.innerHTML =
+        journal
+            .map(
+                trade => {
+
+                    const result =
+                        getJournalResult(
+                            trade
+                        );
+
+                    const pnl =
+                        Number(
+                            trade.result_kes || 0
+                        );
+
+                    let pnlClass =
+                        "pnl-zero";
+
+                    if (
+                        pnl > 0
+                    ) {
+
+                        pnlClass =
+                            "pnl-positive";
+
+                    } else if (
+                        pnl < 0
+                    ) {
+
+                        pnlClass =
+                            "pnl-negative";
+
+                    }
+
+                    const pnlText =
+                        (
+                            pnl > 0
+                                ? "+"
+                                : ""
+                        ) +
+                        "KSh " +
+                        pnl.toFixed(2);
+
+                    const direction =
+                        String(
+                            trade.side || ""
+                        ).toLowerCase();
+
+                    const directionClass =
+                        direction === "buy"
+                            ? "direction-buy"
+                            : "direction-sell";
+
+                    return `
+
+                        <tr>
+
+                            <td>
+                                ${escapeHtml(
+                                    formatDateTime(
+                                        trade.opened_at
+                                    )
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    formatDateTime(
+                                        trade.closed_at
+                                    )
+                                )}
+                            </td>
+
+                            <td>
+                                <span class="${directionClass}">
+                                    ${escapeHtml(
+                                        String(
+                                            trade.side ||
+                                            "—"
+                                        ).toUpperCase()
+                                    )}
+                                </span>
+                            </td>
+
+                            <td>
+                                KSh ${Number(
+                                    trade.stake_kes || 0
+                                ).toFixed(2)}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    formatDuration(
+                                        trade.duration_seconds
+                                    )
+                                )}
+                            </td>
+
+                            <td>
+                                ${Number(
+                                    trade.take_profit_multiplier ||
+                                    1.5
+                                ).toFixed(1)}x
+                            </td>
+
+                            <td>
+                                ${Number(
+                                    trade.entry_price || 0
+                                ).toFixed(2)}
+                            </td>
+
+                            <td>
+                                ${Number(
+                                    trade.exit_price || 0
+                                ).toFixed(2)}
+                            </td>
+
+                            <td>
+                                <span class="${result.className}">
+                                    ${escapeHtml(
+                                        result.text
+                                    )}
+                                </span>
+                            </td>
+
+                            <td class="${pnlClass}">
+                                ${pnlText}
+                            </td>
+
+                            <td class="journal-reason">
+                                ${escapeHtml(
+                                    trade.close_reason ||
+                                    "—"
+                                )}
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+}
+
+/* =========================================================
+   HTML ESCAPE
+========================================================= */
+
+function escapeHtml(
+    value
+) {
+
+    return String(
+        value ?? ""
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+/* =========================================================
+   CLEAR JOURNAL
+========================================================= */
+
+clearJournalButton.addEventListener(
+    "click",
+    () => {
+
+        const journal =
+            getJournal();
+
+        if (
+            journal.length === 0
+        ) {
+
+            return;
+
+        }
+
+        const confirmed =
+            window.confirm(
+                "Clear all trades from this Trading Journal?"
+            );
+
+        if (!confirmed) {
+
+            return;
+
+        }
+
+        localStorage.removeItem(
+            JOURNAL_KEY
+        );
+
+        renderJournal();
+
+        showMessage(
+            "Trading journal cleared.",
+            "success"
+        );
+
+    }
+);
+
+/* =========================================================
+   REFRESH AFTER POSITION CLOSE
+   NO FULL PAGE RELOAD
+========================================================= */
+
+async function refreshAfterPositionClosed() {
+
+    try {
+
+        /*
+           Refresh the wallet balance in place.
+           This updates USD and KES without
+           refreshing the browser page.
+        */
+
+        await loadBuySellWallet();
+
+        /*
+           Refresh the current market price.
+        */
+
+        await loadMarket();
+
+        /*
+           Refresh the candlestick data.
+        */
+
+        await loadCandles();
+
+        /*
+           Update the position interface.
+        */
+
+        updatePrice();
+
+        updatePosition();
+
+        updateCashoutUI();
+
+        /*
+           Redraw the chart.
+        */
+
+        drawChart();
+
+        /*
+           Refresh the journal display.
+        */
+
+        renderJournal();
+
+    } catch (error) {
+
+        console.error(
+            "Post-close refresh error:",
+            error
+        );
+
+    }
+
+}
+
+/* =========================================================
+   MARKET
+========================================================= */
+
+async function loadMarket() {
+
+    try {
+
+        const data =
+            await api(
+                "/api/buy-sell/market"
+            );
+
+        currentPrice =
+            Number(
+                data.market.price
+            );
+
+        updatePrice();
+
+    } catch (error) {
+
+        console.error(
+            "Market error:",
+            error
+        );
+
+        showMessage(
+            error.message,
+            "error"
+        );
+
+    }
+
+}
+
+async function loadCandles() {
+
+    try {
+
+        const data =
+            await api(
+                "/api/buy-sell/candles"
+            );
+
+        candles =
+            Array.isArray(
+                data.candles
+            )
+                ? data.candles
+                : [];
+
+        drawChart();
+
+    } catch (error) {
+
+        console.error(
+            "Candle error:",
+            error
+        );
+
+    }
+
+}
+
+function updatePrice() {
+
+    currentPriceEl.textContent =
+        Number(
+            currentPrice
+        ).toFixed(2);
+
+}
+
+/* =========================================================
+   CANVAS
+========================================================= */
+
+function resizeCanvas() {
+
+    const rect =
+        canvas.getBoundingClientRect();
+
+    const ratio =
+        window.devicePixelRatio ||
+        1;
+
+    canvas.width =
+        rect.width * ratio;
+
+    canvas.height =
+        rect.height * ratio;
+
+    ctx.setTransform(
+        ratio,
+        0,
+        0,
+        ratio,
+        0,
+        0
+    );
+
+    drawChart();
+
+}
+
+window.addEventListener(
+    "resize",
+    resizeCanvas
+);
+
+/* =========================================================
+   TIME
+========================================================= */
+
+function formatTime(
+    timestamp
+) {
+
+    const date =
+        new Date(
+            Number(timestamp)
+        );
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return "";
+
+    }
+
+    return date.toLocaleTimeString(
+        [],
+        {
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
+
+}
+
+/* =========================================================
+   CHART
+========================================================= */
+
+function drawChart() {
+
+    const rect =
+        canvas.getBoundingClientRect();
+
+    const width =
+        rect.width;
+
+    const height =
+        rect.height;
+
+    if (
+        width <= 0 ||
+        height <= 0
+    ) {
+
+        return;
+
+    }
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+    ctx.fillStyle =
+        "#07111f";
+
+    ctx.fillRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+    if (
+        !candles.length
+    ) {
+
+        return;
+
+    }
+
+    const visible =
+        candles.slice(-60);
+
+    let min =
+        Infinity;
+
+    let max =
+        -Infinity;
+
+    for (
+        const candle of visible
+    ) {
+
+        min =
+            Math.min(
+                min,
+                Number(candle.low)
+            );
+
+        max =
+            Math.max(
+                max,
+                Number(candle.high)
+            );
+
+    }
+
+    if (
+        Number.isFinite(
+            currentPrice
+        )
+    ) {
+
+        min =
+            Math.min(
+                min,
+                currentPrice
+            );
+
+        max =
+            Math.max(
+                max,
+                currentPrice
+            );
+
+    }
+
+    if (position) {
+
+        const entry =
+            Number(
+                position.entry_price
+            );
+
+        if (
+            Number.isFinite(entry)
+        ) {
+
+            min =
+                Math.min(
+                    min,
+                    entry
+                );
+
+            max =
+                Math.max(
+                    max,
+                    entry
+                );
+
+        }
+
+    }
+
+    let range =
+        max - min;
+
+    if (
+        range <= 0
+    ) {
+
+        range = 10;
+
+    }
+
+    const padding =
+        Math.max(
+            range * 0.08,
+            1
+        );
+
+    min -= padding;
+
+    max += padding;
+
+    const left = 58;
+
+    const right = 78;
+
+    const top = 18;
+
+    const bottom = 48;
+
+    const chartWidth =
+        Math.max(
+            50,
+            width -
+            left -
+            right
+        );
+
+    const chartHeight =
+        Math.max(
+            50,
+            height -
+            top -
+            bottom
+        );
+
+    const columnWidth =
+        chartWidth /
+        visible.length;
+
+    const candleWidth =
+        Math.max(
+            2,
+            columnWidth * 0.58
+        );
+
+    function y(price) {
+
+        return (
+            top +
+            (
+                max - price
+            ) /
+            (
+                max - min
+            ) *
+            chartHeight
+        );
+
+    }
+
+    function x(index) {
+
+        return (
+            left +
+            (
+                index + 0.5
+            ) *
+            columnWidth
+        );
+
+    }
+
+    ctx.strokeStyle =
+        "#16263a";
+
+    ctx.lineWidth =
+        1;
+
+    ctx.setLineDash([]);
+
+    const gridCount =
+        6;
+
+    for (
+        let i = 0;
+        i < gridCount;
+        i++
+    ) {
+
+        const ratio =
+            i /
+            (gridCount - 1);
+
+        const gy =
+            top +
+            chartHeight *
+            ratio;
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            left,
+            gy
+        );
+
+        ctx.lineTo(
+            left +
+            chartWidth,
+            gy
+        );
+
+        ctx.stroke();
+
+    }
+
+    const timeGridIndexes = [
+
+        0,
+
+        Math.floor(
+            visible.length *
+            0.25
+        ),
+
+        Math.floor(
+            visible.length *
+            0.50
+        ),
+
+        Math.floor(
+            visible.length *
+            0.75
+        ),
+
+        visible.length - 1
+
+    ];
+
+    ctx.strokeStyle =
+        "#102136";
+
+    for (
+        const index of timeGridIndexes
+    ) {
+
+        if (
+            index < 0 ||
+            index >= visible.length
+        ) {
+
+            continue;
+
+        }
+
+        const gx =
+            x(index);
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            gx,
+            top
+        );
+
+        ctx.lineTo(
+            gx,
+            top +
+            chartHeight
+        );
+
+        ctx.stroke();
+
+    }
+
+    visible.forEach(
+        (
+            candle,
+            index
+        ) => {
+
+            const candleX =
+                x(index);
+
+            const open =
+                Number(
+                    candle.open
+                );
+
+            const close =
+                Number(
+                    candle.close
+                );
+
+            const high =
+                Number(
+                    candle.high
+                );
+
+            const low =
+                Number(
+                    candle.low
+                );
+
+            const bullish =
+                close >= open;
+
+            const candleColor =
+                bullish
+                    ? "#22c55e"
+                    : "#ef4444";
+
+            ctx.strokeStyle =
+                candleColor;
+
+            ctx.lineWidth =
+                1;
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                candleX,
+                y(high)
+            );
+
+            ctx.lineTo(
+                candleX,
+                y(low)
+            );
+
+            ctx.stroke();
+
+            const bodyTop =
+                y(
+                    Math.max(
+                        open,
+                        close
+                    )
+                );
+
+            const bodyBottom =
+                y(
+                    Math.min(
+                        open,
+                        close
+                    )
+                );
+
+            const bodyHeight =
+                Math.max(
+                    bodyBottom -
+                    bodyTop,
+                    1
+                );
+
+            ctx.fillStyle =
+                candleColor;
+
+            ctx.fillRect(
+                candleX -
+                candleWidth / 2,
+                bodyTop,
+                candleWidth,
+                bodyHeight
+            );
+
+        }
+    );
+
+    ctx.fillStyle =
+        "#8ea1bb";
+
+    ctx.font =
+        "11px Arial";
+
+    ctx.textAlign =
+        "right";
+
+    ctx.textBaseline =
+        "middle";
+
+    for (
+        let i = 0;
+        i < gridCount;
+        i++
+    ) {
+
+        const ratio =
+            i /
+            (gridCount - 1);
+
+        const price =
+            max -
+            (
+                max - min
+            ) *
+            ratio;
+
+        const py =
+            top +
+            chartHeight *
+            ratio;
+
+        ctx.fillText(
+            price.toFixed(2),
+            width - 8,
+            py
+        );
+
+    }
+
+    ctx.save();
+
+    ctx.translate(
+        16,
+        top +
+        chartHeight / 2
+    );
+
+    ctx.rotate(
+        -Math.PI / 2
+    );
+
+    ctx.fillStyle =
+        "#647891";
+
+    ctx.font =
+        "11px Arial";
+
+    ctx.textAlign =
+        "center";
+
+    ctx.textBaseline =
+        "middle";
+
+    ctx.fillText(
+        "PRICE",
+        0,
+        0
+    );
+
+    ctx.restore();
+
+    ctx.fillStyle =
+        "#8ea1bb";
+
+    ctx.font =
+        "10px Arial";
+
+    ctx.textAlign =
+        "center";
+
+    ctx.textBaseline =
+        "top";
+
+    const uniqueIndexes =
+        [
+            ...new Set(
+                timeGridIndexes
+            )
+        ];
+
+    for (
+        const index of uniqueIndexes
+    ) {
+
+        if (
+            index < 0 ||
+            index >= visible.length
+        ) {
+
+            continue;
+
+        }
+
+        const candle =
+            visible[index];
+
+        const label =
+            formatTime(
+                candle.time
+            );
+
+        ctx.fillText(
+            label,
+            x(index),
+            top +
+            chartHeight +
+            12
+        );
+
+    }
+
+    const priceY =
+        y(currentPrice);
+
+    ctx.strokeStyle =
+        "#f59e0b";
+
+    ctx.lineWidth =
+        1;
+
+    ctx.setLineDash([
+        5,
+        4
+    ]);
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        left,
+        priceY
+    );
+
+    ctx.lineTo(
+        left +
+        chartWidth,
+        priceY
+    );
+
+    ctx.stroke();
+
+    ctx.setLineDash([]);
+
+    const currentLabel =
+        Number(
+            currentPrice
+        ).toFixed(2);
+
+    ctx.fillStyle =
+        "#f59e0b";
+
+    ctx.font =
+        "bold 11px Arial";
+
+    ctx.textAlign =
+        "left";
+
+    ctx.textBaseline =
+        "middle";
+
+    ctx.fillText(
+        currentLabel,
+        left +
+        chartWidth +
+        4,
+        priceY
+    );
+
+    if (position) {
+
+        const entry =
+            Number(
+                position.entry_price
+            );
+
+        if (
+            Number.isFinite(entry)
+        ) {
+
+            const entryY =
+                y(entry);
+
+            ctx.strokeStyle =
+                position.side === "buy"
+                    ? "#22c55e"
+                    : "#ef4444";
+
+            ctx.setLineDash([
+                6,
+                4
+            ]);
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                left,
+                entryY
+            );
+
+            ctx.lineTo(
+                left +
+                chartWidth,
+                entryY
+            );
+
+            ctx.stroke();
+
+            ctx.setLineDash([]);
+
+            ctx.fillStyle =
+                position.side === "buy"
+                    ? "#22c55e"
+                    : "#ef4444";
+
+            ctx.font =
+                "bold 11px Arial";
+
+            ctx.fillText(
+                "ENTRY " +
+                entry.toFixed(2),
+                left +
+                chartWidth +
+                4,
+                entryY
+            );
+
+        }
+
+    }
+
+    ctx.strokeStyle =
+        "#26384f";
+
+    ctx.lineWidth =
+        1;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        left,
+        top
+    );
+
+    ctx.lineTo(
+        left,
+        top +
+        chartHeight
+    );
+
+    ctx.lineTo(
+        left +
+        chartWidth,
+        top +
+        chartHeight
+    );
+
+    ctx.stroke();
+
+}
+
+/* =========================================================
+   P/L
+========================================================= */
+
+function calculatePnl(
+    side,
+    entry,
+    current,
+    stake
+) {
+
+    let movement;
+
+    if (
+        side === "buy"
+    ) {
+
+        movement =
+            current -
+            entry;
+
+    } else {
+
+        movement =
+            entry -
+            current;
+
+    }
+
+    let pnl =
+        movement *
+        stake *
+        0.10;
+
+    pnl =
+        Math.max(
+            -stake,
+            pnl
+        );
+
+    return Number(
+        pnl.toFixed(2)
+    );
+
+}
+
+/* =========================================================
+   POSITION POLLING
+========================================================= */
+
+function stopPositionPolling() {
+
+    if (
+        positionPollingTimer
+    ) {
+
+        clearInterval(
+            positionPollingTimer
+        );
+
+        positionPollingTimer =
+            null;
+
+    }
+
+}
+
+/* =========================================================
+   CASHOUT UI
+========================================================= */
+
+function updateCashoutUI() {
+
+    if (
+        !position ||
+        position.status !== "open" ||
+        positionClosed
+    ) {
+
+        cashoutWrap.style.display =
+            "none";
+
+        cashoutButton.disabled =
+            true;
+
+        cashoutValue.style.display =
+            "none";
+
+        return;
+
+    }
+
+    const duration =
+        Number(
+            position.duration_seconds
+        );
+
+    const openedAt =
+        new Date(
+            position.opened_at
+        ).getTime();
+
+    const elapsed =
+        Date.now() -
+        openedAt;
+
+    const elapsedSeconds =
+        Math.max(
+            0,
+            elapsed / 1000
+        );
+
+    const cashoutEligible =
+        duration > 60 &&
+        elapsedSeconds >= 60;
+
+    cashoutWrap.style.display =
+        duration > 60
+            ? "block"
+            : "none";
+
+    if (
+        duration <= 60
+    ) {
+
+        cashoutButton.disabled =
+            true;
+
+        return;
+
+    }
+
+    const stake =
+        Number(
+            position.stake_kes
+        );
+
+    const pnl =
+        calculatePnl(
+            position.side,
+            Number(
+                position.entry_price
+            ),
+            currentPrice,
+            stake
+        );
+
+    const estimatedReturn =
+        Math.max(
+            0,
+            stake + pnl
+        );
+
+    cashoutAmount.textContent =
+        "KSh " +
+        estimatedReturn.toFixed(2);
+
+    cashoutValue.style.display =
+        "block";
+
+    if (
+        cashoutEligible
+    ) {
+
+        cashoutButton.disabled =
+            cashoutInProgress;
+
+        cashoutButton.textContent =
+            cashoutInProgress
+                ? "CLOSING..."
+                : "CLOSE POSITION";
+
+        cashoutInfo.textContent =
+            "Manual position close is available.";
+
+    } else {
+
+        cashoutButton.disabled =
+            true;
+
+        const secondsRemaining =
+            Math.max(
+                0,
+                60 -
+                elapsedSeconds
+            );
+
+        cashoutButton.textContent =
+            "CLOSE POSITION";
+
+        cashoutInfo.textContent =
+            `Manual close available in ` +
+            `${secondsRemaining.toFixed(1)}s.`;
+
+    }
+
+}
+
+/* =========================================================
+   MANUAL CLOSE
+========================================================= */
+
+async function cashOutPosition() {
+
+    if (
+        !position ||
+        position.status !== "open" ||
+        positionClosed
+    ) {
+
+        return;
+
+    }
+
+    const duration =
+        Number(
+            position.duration_seconds
+        );
+
+    if (
+        duration <= 60
+    ) {
+
+        showMessage(
+            "Manual position close is only available for positions longer than 1 minute.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    const openedAt =
+        new Date(
+            position.opened_at
+        ).getTime();
+
+    const elapsedSeconds =
+        (
+            Date.now() -
+            openedAt
+        ) / 1000;
+
+    if (
+        elapsedSeconds < 60
+    ) {
+
+        showMessage(
+            "Manual position close is not available yet.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    if (
+        cashoutInProgress
+    ) {
+
+        return;
+
+    }
+
+    try {
+
+        cashoutInProgress =
+            true;
+
+        updateCashoutUI();
+
+        showMessage(
+            "Closing position..."
+        );
+
+        const data =
+            await api(
+                "/api/buy-sell/" +
+                encodeURIComponent(
+                    position.id
+                ) +
+                "/cashout",
+                {
+                    method: "POST",
+                    body:
+                        JSON.stringify({})
+                }
+            );
+
+        if (
+            !data.success ||
+            !data.trade
+        ) {
+
+            throw new Error(
+                data.message ||
+                data.error ||
+                "Position close failed."
+            );
+
+        }
+
+        position =
+            data.trade;
+
+        positionClosed =
+            true;
+
+        stopPositionPolling();
+
+        const finalPnl =
+            Number(
+                position.result_kes ??
+                position.pnl_kes ??
+                0
+            );
+
+        /* SAVE LAST RESULT */
+
+        saveLastResult(
+            position
+        );
+
+        /* ADD TO JOURNAL */
+
+        addTradeToJournal(
+            position
+        );
+
+        showMessage(
+            `✓ POSITION CLOSED MANUALLY — ` +
+            `${finalPnl >= 0 ? "+" : "-"}KSh ` +
+            `${Math.abs(finalPnl).toFixed(2)}`,
+            finalPnl >= 0
+                ? "success"
+                : "error"
+        );
+
+        updatePosition();
+
+        updateCashoutUI();
+
+        drawChart();
+
+        /*
+           Refresh everything in place.
+           There is NO window.location.reload().
+        */
+
+        await refreshAfterPositionClosed();
+
+    } catch (error) {
+
+        console.error(
+            "Cash Out error:",
+            error
+        );
+
+        showMessage(
+            error.message,
+            "error"
+        );
+
+    } finally {
+
+        cashoutInProgress =
+            false;
+
+        updateCashoutUI();
+
+    }
+
+}
+
+/* =========================================================
+   POSITION DISPLAY
+========================================================= */
+
+function updatePosition() {
+
+    if (!position) {
+
+        positionStatus.textContent =
+            "No Open Position";
+
+        positionStatus.className =
+            "position-status";
+
+        positionSide.textContent =
+            "—";
+
+        entryPriceEl.textContent =
+            "—";
+
+        positionPriceEl.textContent =
+            "—";
+
+        timeLeftEl.textContent =
+            "—";
+
+        positionTpEl.textContent =
+            "—";
+
+        positionTpTargetEl.textContent =
+            "—";
+
+        pnlValueEl.textContent =
+            "KSh 0.00";
+
+        pnlValueEl.style.color =
+            "#ffffff";
+
+        buyButton.disabled =
+            false;
+
+        sellButton.disabled =
+            false;
+
+        updateCashoutUI();
+
+        return;
+
+    }
+
+    const entry =
+        Number(
+            position.entry_price
+        );
+
+    const stake =
+        Number(
+            position.stake_kes
+        );
+
+    const multiplier =
+        Number(
+            position.take_profit_multiplier ||
+            1.5
+        );
+
+    const tpTarget =
+        stake *
+        multiplier;
+
+    /* =====================================================
+       CLOSED
+    ===================================================== */
+
+    if (
+        position.status !== "open"
+    ) {
+
+        positionClosed =
+            true;
+
+        stopPositionPolling();
+
+        const finalPnl =
+            Number(
+                position.result_kes ??
+                position.pnl_kes ??
+                0
+            );
+
+        const finalPrice =
+            Number(
+                position.exit_price ??
+                position.current_price ??
+                currentPrice
+            );
+
+        const closeReason =
+            String(
+                position.close_reason ||
+                ""
+            ).toLowerCase();
+
+        const isTakeProfit =
+            position.status === "won" &&
+            closeReason.includes(
+                "take profit"
+            );
+
+        const isCashout =
+            position.status === "cashed_out" ||
+            closeReason.includes(
+                "cashout"
+            ) ||
+            closeReason.includes(
+                "cash out"
+            );
+
+        const isLoss =
+            position.status === "loss";
+
+        if (
+            isTakeProfit
+        ) {
+
+            positionStatus.textContent =
+                "PROFIT TARGET REACHED";
+
+            positionStatus.className =
+                "position-status tp-hit";
+
+        } else if (
+            isCashout
+        ) {
+
+            positionStatus.textContent =
+                "CLOSED MANUALLY";
+
+            positionStatus.className =
+                "position-status cashout";
+
+        } else if (
+            isLoss
+        ) {
+
+            positionStatus.textContent =
+                "LOSS";
+
+            positionStatus.className =
+                "position-status loss";
+
+        } else if (
+            position.status === "won"
+        ) {
+
+            positionStatus.textContent =
+                "PROFIT";
+
+            positionStatus.className =
+                "position-status tp-hit";
+
+        } else {
+
+            positionStatus.textContent =
+                "CLOSED";
+
+            positionStatus.className =
+                "position-status";
+
+        }
+
+        positionSide.textContent =
+            String(
+                position.side || ""
+            ).toUpperCase();
+
+        entryPriceEl.textContent =
+            Number.isFinite(entry)
+                ? entry.toFixed(2)
+                : "—";
+
+        positionPriceEl.textContent =
+            Number.isFinite(finalPrice)
+                ? finalPrice.toFixed(2)
+                : "—";
+
+        timeLeftEl.textContent =
+            "0s";
+
+        positionTpEl.textContent =
+            multiplier.toFixed(1) +
+            "x";
+
+        positionTpTargetEl.textContent =
+            "+KSh " +
+            tpTarget.toFixed(2);
+
+        pnlValueEl.textContent =
+            (
+                finalPnl >= 0
+                    ? "+KSh "
+                    : "-KSh "
+            ) +
+            Math.abs(
+                finalPnl
+            ).toFixed(2);
+
+        
+        pnlValueEl.style.color =
+            finalPnl > 0
+                ? "#22c55e"
+                : finalPnl < 0
+                    ? "#ef4444"
+                    : "#ffffff";
+
+        buyButton.disabled =
+            false;
+
+        sellButton.disabled =
+            false;
+
+        updateCashoutUI();
+
+        return;
+
+    }
+
+    if (
+        positionClosed
+    ) {
+
+        return;
+
+    }
+
+    /* =====================================================
+       OPEN
+    ===================================================== */
+
+    const pnl =
+        calculatePnl(
+            position.side,
+            entry,
+            currentPrice,
+            stake
+        );
+
+    const expires =
+        new Date(
+            position.expires_at
+        ).getTime();
+
+    const remaining =
+        Math.max(
+            0,
+            expires -
+            Date.now()
+        );
+
+    positionStatus.textContent =
+        "OPEN";
+
+    positionStatus.className =
+        "position-status";
+
+    positionSide.textContent =
+        position.side.toUpperCase();
+
+    entryPriceEl.textContent =
+        entry.toFixed(2);
+
+    positionPriceEl.textContent =
+        currentPrice.toFixed(2);
+
+    timeLeftEl.textContent =
+        (
+            remaining / 1000
+        ).toFixed(1) +
+        "s";
+
+    positionTpEl.textContent =
+        multiplier.toFixed(1) +
+        "x";
+
+    positionTpTargetEl.textContent =
+        "+KSh " +
+        tpTarget.toFixed(2);
+
+    pnlValueEl.textContent =
+        (
+            pnl >= 0
+                ? "+KSh "
+                : "-KSh "
+        ) +
+        Math.abs(
+            pnl
+        ).toFixed(2);
+
+    pnlValueEl.style.color =
+        pnl > 0
+            ? "#22c55e"
+            : pnl < 0
+                ? "#ef4444"
+                : "#ffffff";
+
+    buyButton.disabled =
+        true;
+
+    sellButton.disabled =
+        true;
+
+    updateCashoutUI();
+
+}
+
+/* =========================================================
+   OPEN TRADE
+========================================================= */
+
+async function openTrade(
+    side
+) {
+
+    if (
+        position &&
+        position.status === "open" &&
+        !positionClosed
+    ) {
+
+        showMessage(
+            "A position is already open.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    positionClosed =
+        false;
+
+    stopPositionPolling();
+
+    const stake =
+        Number(
+            stakeInput.value
+        );
+
+    const duration =
+        Number(
+            durationSelect.value
+        );
+
+    const mode =
+        modeSelect.value;
+
+    const takeProfitMultiplier =
+        Number(
+            tpSelect.value
+        );
+
+    if (
+        !Number.isFinite(stake) ||
+        stake < 100
+    ) {
+
+        showMessage(
+            "Minimum stake is KSh 100.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    if (
+        !Number.isInteger(duration) ||
+        duration < 1 ||
+        duration > 3600
+    ) {
+
+        showMessage(
+            "Duration must be between 1 second and 1 hour.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    if (
+        ![
+            1.5,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+        ].includes(
+            takeProfitMultiplier
+        )
+    ) {
+
+        showMessage(
+            "Invalid Profit Target selection.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    /* SAVE CONFIGURATION BEFORE OPENING */
+
+    saveTradingSettings();
+
+    try {
+
+        buyButton.disabled =
+            true;
+
+        sellButton.disabled =
+            true;
+
+        showMessage(
+            "Opening position..."
+        );
+
+        const data =
+            await api(
+                "/api/buy-sell/open",
+                {
+                    method: "POST",
+
+                    body:
+                        JSON.stringify({
+
+                            side,
+
+                            stakeKes:
+                                stake,
+
+                            durationSeconds:
+                                duration,
+
+                            mode,
+
+                            takeProfitMultiplier
+
+                        })
+                }
+            );
+
+        if (
+            !data.success ||
+            !data.trade
+        ) {
+
+            throw new Error(
+                "Position was not created."
+            );
+
+        }
+
+               position =
+            data.trade;
+
+        positionClosed =
+            false;
+
+        /*
+        =====================================================
+        REFRESH WALLET IMMEDIATELY AFTER OPENING
+        =====================================================
+
+        The backend deducts the stake when the position
+        is created.
+
+        Refresh the wallet here so the new balance is
+        displayed immediately.
+
+        Example:
+
+        KSh 1,000
+        ↓
+        KSh 100 BUY
+        ↓
+        KSh 900
+        =====================================================
+        */
+
+        try {
+
+            await loadBuySellWallet();
+
+        } catch (walletError) {
+
+            console.error(
+                "Wallet refresh after opening failed:",
+                walletError
+            );
+
+        }
+
+        const actualMultiplier =
+            Number(
+                position.take_profit_multiplier ||
+                takeProfitMultiplier
+            );
+
+        showMessage(
+            `${side.toUpperCase()} opened at ` +
+            `${Number(position.entry_price).toFixed(2)}. ` +
+            `Duration ${formatDuration(duration)}. ` +
+            `Target ${actualMultiplier}x.` +
+            (
+                duration > 60
+                    ? " Manual position close becomes available after 1 minute."
+                    : ""
+            ),
+            "success"
+        );
+
+        updatePosition();
+
+        updateCashoutUI();
+
+        drawChart();
+
+        startPositionPolling();
+        drawChart();
+
+        startPositionPolling();
+
+    } catch (error) {
+
+        console.error(
+            "Open trade error:",
+            error
+        );
+
+        showMessage(
+            error.message,
+            "error"
+        );
+
+        buyButton.disabled =
+            false;
+
+        sellButton.disabled =
+            false;
+
+    }
+
+}
+
+/* =========================================================
+   HANDLE CLOSED POSITION
+========================================================= */
+
+function handleClosedPosition(
+    trade
+) {
+
+    position =
+        trade;
+
+    positionClosed =
+        true;
+
+    stopPositionPolling();
+
+    const finalPnl =
+        Number(
+            trade.result_kes ??
+            trade.pnl_kes ??
+            0
+        );
+
+    const status =
+        String(
+            trade.status || ""
+        ).toLowerCase();
+
+    const closeReason =
+        String(
+            trade.close_reason || ""
+        ).toLowerCase();
+
+    /*
+       SAVE THE EXACT COMPLETED TRADE
+    */
+
+    saveLastResult(
+        trade
+    );
+
+    /*
+       ADD IT TO THE JOURNAL
+    */
+
+    addTradeToJournal(
+        trade
+    );
+
+    if (
+        status === "won" &&
+        closeReason.includes(
+            "take profit"
+        )
+    ) {
+
+        showMessage(
+            `✓ PROFIT TARGET REACHED — ` +
+            `+KSh ${Math.abs(finalPnl).toFixed(2)}`,
+            "success"
+        );
+
+    } else if (
+        status === "cashed_out" ||
+        closeReason.includes(
+            "cashout"
+        ) ||
+        closeReason.includes(
+            "cash out"
+        )
+    ) {
+
+        showMessage(
+            `✓ POSITION CLOSED MANUALLY — ` +
+            `${finalPnl >= 0 ? "+" : "-"}KSh ` +
+            `${Math.abs(finalPnl).toFixed(2)}`,
+            finalPnl >= 0
+                ? "success"
+                : "error"
+        );
+
+    } else if (
+        status === "loss"
+    ) {
+
+        showMessage(
+            `POSITION CLOSED — LOSS ` +
+            `-KSh ${Math.abs(finalPnl).toFixed(2)}`,
+            "error"
+        );
+
+    } else if (
+        status === "won"
+    ) {
+
+        showMessage(
+            `POSITION CLOSED — PROFIT ` +
+            `+KSh ${finalPnl.toFixed(2)}`,
+            "success"
+        );
+
+    } else {
+
+        showMessage(
+            `POSITION CLOSED — ` +
+            `KSh ${finalPnl.toFixed(2)}`
+        );
+
+    }
+
+    updatePosition();
+
+    updateCashoutUI();
+
+    drawChart();
+
+    /*
+       Refresh after settlement without
+       reloading the entire browser page.
+    */
+
+    refreshAfterPositionClosed();
+
+}
+
+/* =========================================================
+   CHECK POSITION
+========================================================= */
+
+async function checkPosition() {
+
+    if (
+        !position ||
+        positionClosed ||
+        position.status !== "open"
+    ) {
+
+        return;
+
+    }
+
+    try {
+
+        const data =
+            await api(
+                "/api/buy-sell/" +
+                encodeURIComponent(
+                    position.id
+                )
+            );
+
+        if (
+            !data ||
+            !data.trade
+        ) {
+
+            return;
+
+        }
+
+        const trade =
+            data.trade;
+
+        position =
+            trade;
+
+        if (
+            trade.status === "open"
+        ) {
+
+            updatePosition();
+
+            return;
+
+        }
+
+        handleClosedPosition(
+            trade
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Position check error:",
+            error
+        );
+
+    }
+
+}
+
+/* =========================================================
+   START POLLING
+========================================================= */
+
+function startPositionPolling() {
+
+    stopPositionPolling();
+
+    positionPollingTimer =
+        setInterval(
+            checkPosition,
+            100
+        );
+
+}
+
+/* =========================================================
+   REFRESH MARKET
+========================================================= */
+
+async function refreshMarket() {
+
+    try {
+
+        const data =
+            await api(
+                "/api/buy-sell/market"
+            );
+
+        if (
+            data.market
+        ) {
+
+            currentPrice =
+                Number(
+                    data.market.price
+                );
+
+            updatePrice();
+
+            if (
+                position &&
+                !positionClosed
+            ) {
+
+                updatePosition();
+
+            }
+
+            drawChart();
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Price refresh error:",
+            error
+        );
+
+    }
+
+}
+
+/* =========================================================
+   REFRESH CANDLES
+========================================================= */
+
+async function refreshCandles() {
+
+    try {
+
+        const data =
+            await api(
+                "/api/buy-sell/candles"
+            );
+
+        if (
+            Array.isArray(
+                data.candles
+            )
+        ) {
+
+            candles =
+                data.candles;
+
+            drawChart();
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Candle refresh error:",
+            error
+        );
+
+    }
+
+}
+
+/* =========================================================
+   BUTTON EVENTS
+========================================================= */
+
+buyButton.addEventListener(
+    "click",
+    () => {
+
+        openTrade(
+            "buy"
+        );
+
+    }
+);
+
+sellButton.addEventListener(
+    "click",
+    () => {
+
+        openTrade(
+            "sell"
+        );
+
+    }
+);
+
+cashoutButton.addEventListener(
+    "click",
+    () => {
+
+        cashOutPosition();
+
+    }
+);
+
+/* =========================================================
+   BACK BUTTON
+========================================================= */
+
+document
+    .getElementById(
+        "backBtn"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            window.location.href =
+                "trade.html";
+
+        }
+    );
+
+/* =========================================================
+   RESTORE LAST CLOSED TRADE
+========================================================= */
+
+function restoreLastResult() {
+
+    const lastTrade =
+        loadLastResult();
+
+    if (
+        !lastTrade
+    ) {
+
+        return;
+
+    }
+
+    /*
+       Only restore a completed trade.
+       Never restore an old open trade.
+    */
+
+    if (
+        String(
+            lastTrade.status || ""
+        ).toLowerCase() ===
+        "open"
+    ) {
+
+        return;
+
+    }
+
+    position =
+        lastTrade;
+
+    positionClosed =
+        true;
+
+    updatePosition();
+
+}
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+async function initialize() {
+
+    /*
+       1. Restore saved configuration
+    */
+
+    loadTradingSettings();
+
+    loadMode();
+
+    updateTpInfo();
+
+    /*
+       2. Render journal immediately
+    */
+
+    renderJournal();
+
+    /*
+       3. Restore last completed trade
+    */
+
+    restoreLastResult();
+
+    /*
+       4. Check authentication
+    */
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .auth
+                .getUser();
+
+        if (
+            error ||
+            !data.user
+        ) {
+
+            window.location.href =
+                "login.html";
+
+            return;
+
+        }
+
+    } catch {
+
+        window.location.href =
+            "login.html";
+
+        return;
+
+    }
+
+    /*
+       5. Load wallet AFTER authentication
+    */
+
+    await loadBuySellWallet();
+
+    /*
+       6. Load market
+    */
+
+    await loadMarket();
+
+    /*
+       7. Load candles
+    */
+
+    await loadCandles();
+
+    /*
+       8. Resize chart
+    */
+
+    resizeCanvas();
+
+    /*
+       9. Keep market price updated
+    */
+
+    setInterval(
+        refreshMarket,
+        150
+    );
+
+    /*
+       10. Keep candles updated
+    */
+
+    setInterval(
+        refreshCandles,
+        500
+    );
+
+}
+
+/* =========================================================
+   START
+========================================================= */
+
+function updateBalanceFlags() {
+    const mode =
+        localStorage.getItem("kmf_account_mode") === "real"
+            ? "real"
+            : "demo";
+
+    document.querySelectorAll(
+        'img[src*="us-flag.svg"], img[src*="kenya-flag.svg"], .balance-flag, .currency-flag'
+    ).forEach(flag => {
+        if (mode === "demo") {
+            flag.style.setProperty("display", "none", "important");
+        } else {
+            flag.style.removeProperty("display");
+        }
+    });
+}
+
+updateBalanceFlags();
+initialize();
+</script>
+
+</body>
+</html>

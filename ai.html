@@ -1,0 +1,5868 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>KMFBinary AI</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background: #0b1020;
+    color: white;
+}
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    gap: 15px;
+}
+
+.header h1 {
+    margin: 0;
+}
+
+button,
+select {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+select {
+    background: #202b44;
+    color: white;
+}
+
+button {
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.back-button {
+    width: auto;
+    margin: 0;
+    background: #1b2438;
+}
+
+.deep-scan-button {
+    margin-top: 15px;
+    font-size: 17px;
+    font-weight: bold;
+    padding: 14px;
+}
+
+.card {
+    background: #121a2d;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.card h2 {
+    margin-top: 0;
+}
+
+.signal {
+    text-align: center;
+    background: #18233b;
+    padding: 25px;
+    border-radius: 10px;
+}
+
+.price {
+    font-size: 30px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.direction {
+    font-size: 30px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.confidence {
+    font-size: 20px;
+}
+
+.signal-strength {
+    margin-top: 10px;
+    font-size: 15px;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.stat {
+    background: #1a253d;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.stat span {
+    display: block;
+    margin-top: 8px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.contract-type {
+    text-align: center;
+    background: #202b44;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+.market-type-box {
+    margin-top: 15px;
+}
+
+.market-type-box label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.target-box {
+    margin-top: 15px;
+}
+
+.target-box label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.ai-components {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.component {
+    background: #1a253d;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.component-name {
+    color: #aab4ca;
+    font-size: 14px;
+}
+
+.component-value {
+    font-size: 19px;
+    font-weight: bold;
+    margin-top: 7px;
+}
+
+.progress {
+    width: 100%;
+    height: 7px;
+    background: #0d1426;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #2563eb;
+    transition: width 0.3s ease;
+}
+
+.hidden {
+    display: none;
+}
+
+.warning {
+    background: #30251a;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 12px;
+    color: #f2c46d;
+}
+
+.probability-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.probability-card {
+    background: #1a253d;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.probability-title {
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+.probability-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 7px;
+}
+
+.probability-value {
+    font-weight: bold;
+}
+
+.probability-bar {
+    height: 8px;
+    background: #0d1426;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 6px;
+}
+
+.probability-fill {
+    height: 100%;
+    width: 0%;
+    background: #2563eb;
+    transition: width 0.4s ease;
+}
+
+.scan-status {
+    background: #202b44;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.scan-result {
+    background: #18233b;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    margin-top: 15px;
+}
+
+.scan-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.scan-trade {
+    font-size: 34px;
+    font-weight: bold;
+    margin: 12px 0;
+}
+
+.scan-confidence {
+    font-size: 21px;
+}
+
+.scan-pair {
+    margin-top: 8px;
+    color: #aab4ca;
+}
+
+.scan-duration {
+    margin-top: 8px;
+    font-size: 17px;
+}
+
+.scan-reason {
+    background: #1a253d;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 12px;
+    text-align: left;
+}
+
+.tick-summary {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.tick-card {
+    background: #1a253d;
+    padding: 18px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.tick-card h3 {
+    margin-top: 0;
+}
+
+.tick-up {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.tick-down {
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.reason {
+    background: #1a253d;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 8px;
+}
+
+@media (max-width: 600px) {
+
+    .stats,
+    .ai-components,
+    .probability-grid,
+    .tick-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .header h1 {
+        font-size: 22px;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- ======================================================
+     HEADER
+====================================================== -->
+
+<div class="header">
+
+    <h1>🤖 KMFBinary AI</h1>
+
+    <button
+        class="back-button"
+        onclick="window.location.href='../dashboard.html'"
+    >
+        ← Dashboard
+    </button>
+
+</div>
+
+
+<!-- ======================================================
+     DEEP SCAN
+     COMPLETELY SEPARATE FROM NORMAL AI ANALYSIS
+====================================================== -->
+
+<div
+    class="card"
+    id="deepScanSection"
+>
+
+    <h2>🔎 Deep Scan</h2>
+
+    <div class="warning">
+
+        Deep Scan is independent from normal AI Analysis.
+        It collects a fresh 10-second market sample and compares
+        Rise/Fall, Higher/Lower, Odd/Even and Over/Under.
+
+    </div>
+
+
+    <button
+        id="deepScanButton"
+        class="deep-scan-button"
+        disabled
+    >
+        🔎 DEEP SCAN — 10 SECONDS
+    </button>
+
+
+    <div
+        id="scanStatus"
+        class="scan-status hidden"
+    >
+        Ready to scan.
+    </div>
+
+
+    <div
+        id="scanResult"
+        class="scan-result hidden"
+    >
+
+        <div class="scan-title">
+            DEEP SCAN RESULT
+        </div>
+
+
+        <div
+            id="scanTrade"
+            class="scan-trade"
+        >
+            --
+        </div>
+
+
+        <div
+            id="scanConfidence"
+            class="scan-confidence"
+        >
+            Highest probability: --%
+        </div>
+
+
+        <div
+            id="scanPair"
+            class="scan-pair"
+        >
+            Contract type: --
+        </div>
+
+
+        <div
+            id="scanDuration"
+            class="scan-duration"
+        >
+            Scan duration: 10 seconds
+        </div>
+
+
+        <div
+            id="scanReason"
+            class="scan-reason"
+        >
+            Press Deep Scan to collect fresh 10-second market data.
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================================
+     MARKET SELECTION
+====================================================== -->
+
+<div class="card">
+
+    <h2>Select Market</h2>
+
+    <select id="marketSelect">
+
+        <option value="">
+            Loading markets...
+        </option>
+
+    </select>
+
+
+    <!-- NORMAL KMF TYPE -->
+
+    <div
+        id="contractType"
+        class="contract-type"
+    >
+        Market Type: --
+    </div>
+
+
+    <!-- VOLATILITY MARKET TYPE -->
+
+    <div
+        id="marketTypeBox"
+        class="market-type-box hidden"
+    >
+
+        <label for="marketTypeSelect">
+            Volatility Market Type
+        </label>
+
+        <select id="marketTypeSelect">
+
+            <option value="">
+                Select contract type
+            </option>
+
+            <option value="RISE_FALL">
+                Rise / Fall
+            </option>
+
+            <option value="HIGHER_LOWER">
+                Higher / Lower
+            </option>
+
+            <option value="ODD_EVEN">
+                Odd / Even
+            </option>
+
+            <option value="OVER_UNDER">
+                Over / Under
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <!-- TARGET DIGIT -->
+
+    <div
+        id="targetBox"
+        class="target-box hidden"
+    >
+
+        <label for="targetDigit">
+            Target Digit
+        </label>
+
+        <select id="targetDigit"></select>
+
+    </div>
+
+
+    <div id="status">
+        Connecting to server...
+    </div>
+
+</div>
+
+
+<!-- ======================================================
+     VOLATILITY ANALYSIS
+     NORMAL AI DATA — NOT DEEP SCAN
+====================================================== -->
+
+<div
+    id="volatilityContracts"
+    class="card hidden"
+>
+
+    <h2>Volatility Market Analysis</h2>
+
+    <div class="probability-grid">
+
+
+        <!-- RISE FALL -->
+
+        <div class="probability-card">
+
+            <div class="probability-title">
+                Rise / Fall
+            </div>
+
+            <div class="probability-row">
+
+                <span>Rise</span>
+
+                <span
+                    id="riseProbability"
+                    class="probability-value"
+                >
+                    --%
+                </span>
+
+            </div>
+
+            <div class="probability-bar">
+
+                <div
+                    id="riseBar"
+                    class="probability-fill"
+                ></div>
+
+            </div>
+
+
+            <div class="probability-row">
+
+                <span>Fall</span>
+
+                <span
+                    id="fallProbability"
+                    class="probability-value"
+                >
+                    --%
+                </span>
+
+            </div>
+
+            <div class="probability-bar">
+
+                <div
+                    id="fallBar"
+                    class="probability-fill"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- HIGHER LOWER -->
+
+        <div class="probability-card">
+
+            <div class="probability-title">
+                Higher / Lower
+            </div>
+
+            <div class="probability-row">
+
+                <span>Higher</span>
+
+                <span
+                    id="higherProbability"
+                    class="probability-value"
+                >
+                    --%
+                </span>
+
+            </div>
+
+            <div class="probability-bar">
+
+                <div
+                    id="higherBar"
+                    class="probability-fill"
+                ></div>
+
+            </div>
+
+
+            <div class="probability-row">
+
+                <span>Lower</span>
+
+                <span
+                    id="lowerProbability"
+                    class="probability-value"
+                >
+                    --%
+                </span>
+
+            </div>
+
+            <div class="probability-bar">
+
+                <div
+                    id="lowerBar"
+                    class="probability-fill"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ODD EVEN -->
+
+        <div class="probability-card">
+
+            <div class="probability-title">
+                Odd / Even
+            </div>
+
+            <div class="probability-row">
+
+                <span>Odd</span>
+
+                <span
+                    id="oddProbability"
+                    class="probability-value"
+                >
+                    --%
+                </span>
+
+            </div>
+
+            <div class="probability-bar">
+
+                <div
+                    id="oddBar"
+                    class="probability-fill"
+                ></div>
+
+            </div>
+
+
+            <div class="probability-row">
+
+                <span>Even</span>
+
+                <span
+                    id="evenProbability"
+                    class="probability-value"
+                >
+                    --%
+                </span>
+
+            </div>
+
+            <div class="probability-bar">
+
+                <div
+                    id="evenBar"
+                    class="probability-fill"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- OVER UNDER -->
+
+        <div class="probability-card">
+
+            <div class="probability-title">
+                Over / Under
+            </div>
+
+            <div class="probability-row">
+
+                <span>Over</span>
+
+                <span
+                    id="overProbability"
+                    class="probability-value"
+                >
+                    --%
+                </span>
+
+            </div>
+
+            <div class="probability-bar">
+
+                <div
+                    id="overBar"
+                    class="probability-fill"
+                ></div>
+
+            </div>
+
+
+            <div class="probability-row">
+
+                <span>Under</span>
+
+                <span
+                    id="underProbability"
+                    class="probability-value"
+                >
+                    --%
+                </span>
+
+            </div>
+
+            <div class="probability-bar">
+
+                <div
+                    id="underBar"
+                    class="probability-fill"
+                ></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TICK ANALYSIS -->
+
+    <h2 style="margin-top:25px;">
+        Tick Analysis
+    </h2>
+
+    <div class="tick-summary">
+
+        <div class="tick-card">
+
+            <h3>100 Ticks</h3>
+
+            <div
+                id="tick100Up"
+                class="tick-up"
+            >
+                UP --%
+            </div>
+
+            <div
+                id="tick100Down"
+                class="tick-down"
+            >
+                DOWN --%
+            </div>
+
+        </div>
+
+
+        <div class="tick-card">
+
+            <h3>1,000 Ticks</h3>
+
+            <div
+                id="tick1000Up"
+                class="tick-up"
+            >
+                UP --%
+            </div>
+
+            <div
+                id="tick1000Down"
+                class="tick-down"
+            >
+                DOWN --%
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================================
+     MAIN AI SIGNAL
+====================================================== -->
+
+<div class="card">
+
+    <h2>AI Signal</h2>
+
+    <div class="signal">
+
+        <div>
+            Current Price
+        </div>
+
+        <div
+            id="currentPrice"
+            class="price"
+        >
+            --
+        </div>
+
+        <div
+            id="signalDirection"
+            class="direction"
+        >
+            WAIT
+        </div>
+
+        <div
+            id="confidence"
+            class="confidence"
+        >
+            Confidence: --
+        </div>
+
+        <div
+            id="signalStrength"
+            class="signal-strength"
+        >
+            Signal Strength: --
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================================
+     MARKET DATA
+====================================================== -->
+
+<div class="card">
+
+    <h2>Market Analysis</h2>
+
+    <div class="stats">
+
+        <div class="stat">
+            Price
+            <span id="price">--</span>
+        </div>
+
+        <div class="stat">
+            Previous Price
+            <span id="previousPrice">--</span>
+        </div>
+
+        <div class="stat">
+            Current Final Digit
+            <span id="finalDigit">--</span>
+        </div>
+
+        <div class="stat">
+            Samples
+            <span id="digitCount">--</span>
+        </div>
+
+        <div class="stat">
+            Momentum
+            <span id="movement">--</span>
+        </div>
+
+        <div class="stat">
+            Volatility
+            <span id="volatility">--</span>
+        </div>
+
+        <div class="stat">
+            Recent Bias
+            <span id="recentBias">--</span>
+        </div>
+
+        <div class="stat">
+            Digit Streak
+            <span id="digitStreak">--</span>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================================
+     AI COMPONENTS
+====================================================== -->
+
+<div class="card">
+
+    <h2>AI Components</h2>
+
+    <div class="ai-components">
+
+        <div class="component">
+
+            <div
+                id="frequencyLabel"
+                class="component-name"
+            >
+                Frequency / Consistency
+            </div>
+
+            <div
+                id="frequencyScore"
+                class="component-value"
+            >
+                --
+            </div>
+
+            <div class="progress">
+
+                <div
+                    id="frequencyBar"
+                    class="progress-bar"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <div class="component">
+
+            <div class="component-name">
+                Short-Term Bias
+            </div>
+
+            <div
+                id="shortScore"
+                class="component-value"
+            >
+                --
+            </div>
+
+            <div class="progress">
+
+                <div
+                    id="shortBar"
+                    class="progress-bar"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <div class="component">
+
+            <div class="component-name">
+                Long-Term Bias
+            </div>
+
+            <div
+                id="longScore"
+                class="component-value"
+            >
+                --
+            </div>
+
+            <div class="progress">
+
+                <div
+                    id="longBar"
+                    class="progress-bar"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <div class="component">
+
+            <div class="component-name">
+                Momentum
+            </div>
+
+            <div
+                id="momentumScore"
+                class="component-value"
+            >
+                --
+            </div>
+
+            <div class="progress">
+
+                <div
+                    id="momentumBar"
+                    class="progress-bar"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <div class="component">
+
+            <div class="component-name">
+                Pattern / Transition
+            </div>
+
+            <div
+                id="patternScore"
+                class="component-value"
+            >
+                --
+            </div>
+
+            <div class="progress">
+
+                <div
+                    id="patternBar"
+                    class="progress-bar"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <div class="component">
+
+            <div class="component-name">
+                Agreement
+            </div>
+
+            <div
+                id="agreementScore"
+                class="component-value"
+            >
+                --
+            </div>
+
+            <div class="progress">
+
+                <div
+                    id="agreementBar"
+                    class="progress-bar"
+                ></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================================
+     AI REASONING
+====================================================== -->
+
+<div class="card">
+
+    <h2>AI Reasoning</h2>
+
+    <div id="reasons">
+
+        <div class="reason">
+            Waiting for market data...
+        </div>
+
+    </div>
+
+</div>
+
+
+<div
+    id="aiWarning"
+    class="warning hidden"
+>
+    AI analysis is based on recent synthetic-market data.
+    It does not guarantee the next market movement or contract result.
+</div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+/* ======================================================
+   CONFIGURATION
+====================================================== */
+
+const SUPABASE_URL =
+    "https://nugufikdivanyzmghofq.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_NfsjmPephsaJrRB6vLXglw_G6yTdPTl";
+
+const API_BASE_URL =
+    "http://localhost:3000";
+
+
+window.supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+/* ======================================================
+   STATE
+====================================================== */
+
+const AI_STATE = {
+
+    prices: [],
+
+    maxHistory: 1000,
+
+    timer: null,
+
+    running: false,
+
+    currentSymbol: "",
+
+    selectedMarketName: "",
+
+    targetDigit: null,
+
+    selectedVolatilityType: "",
+
+    deepScanRunning: false,
+
+    deepScanSamples: [],
+
+    deepScanTimer: null,
+
+    deepScanSecondsLeft: 0,
+
+    deepScanResult: null
+
+};
+
+
+/* ======================================================
+   AUTH
+====================================================== */
+
+async function getAuthToken() {
+
+    const result =
+        await window.supabaseClient
+            .auth
+            .getSession();
+
+    if (
+        result.error ||
+        !result.data.session
+    ) {
+
+        return null;
+
+    }
+
+    return result.data.session.access_token;
+
+}
+
+
+/* ======================================================
+   API
+====================================================== */
+
+async function apiRequest(
+    endpoint
+) {
+
+    const token =
+        await getAuthToken();
+
+    const headers = {
+
+        "Content-Type":
+            "application/json"
+
+    };
+
+
+    if (token) {
+
+        headers["Authorization"] =
+            "Bearer " + token;
+
+    }
+
+
+    const response =
+        await fetch(
+            API_BASE_URL + endpoint,
+            {
+                method: "GET",
+                headers
+            }
+        );
+
+
+    let data;
+
+
+    try {
+
+        data =
+            await response.json();
+
+    }
+
+    catch {
+
+        throw new Error(
+            "Invalid server response."
+        );
+
+    }
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            data.error ||
+            "API request failed"
+        );
+
+    }
+
+
+    return data;
+
+}
+
+
+/* ======================================================
+   MARKETS
+====================================================== */
+
+async function getMarkets() {
+
+    const data =
+        await apiRequest(
+            "/api/markets"
+        );
+
+    return data.markets || [];
+
+}
+
+
+/* ======================================================
+   PRICES
+====================================================== */
+
+async function getPrices() {
+
+    return await apiRequest(
+        "/api/prices"
+    );
+
+}
+
+
+/* ======================================================
+   NORMALIZE
+====================================================== */
+
+function normalize(
+    value
+) {
+
+    return String(
+        value || ""
+    )
+        .toUpperCase()
+        .replace(
+            /[\s_-]+/g,
+            ""
+        );
+
+}
+
+
+/* ======================================================
+   SYNTHETIC SYMBOL
+====================================================== */
+
+function getSyntheticSymbol(
+    symbol,
+    prices = {}
+) {
+
+    const mapping = {
+
+        "KMF-RF": "KMF-15",
+
+        "KMF-HL": "KMF-25",
+
+        "KMF-OE": "KMF-50",
+
+        "KMF-OU": "KMF-100"
+
+    };
+
+
+    if (
+        mapping[symbol]
+    ) {
+
+        return mapping[symbol];
+
+    }
+
+
+    if (
+        prices[symbol]
+    ) {
+
+        return symbol;
+
+    }
+
+
+    const wanted =
+        normalize(symbol);
+
+
+    const keys =
+        Object.keys(
+            prices || {}
+        );
+
+
+    const exact =
+        keys.find(
+            key =>
+                normalize(key) ===
+                wanted
+        );
+
+
+    if (exact) {
+
+        return exact;
+
+    }
+
+
+    const volatilityMatch =
+        String(symbol)
+            .match(
+                /(?:VOLATILITY|VOL|V)[\s_-]*(10|25|50|75|100)/i
+            );
+
+
+    if (
+        volatilityMatch
+    ) {
+
+        const number =
+            volatilityMatch[1];
+
+
+        const found =
+            keys.find(
+                key => {
+
+                    const normalized =
+                        normalize(key);
+
+
+                    return (
+
+                        normalized.includes(
+                            "VOLATILITY" +
+                            number
+                        )
+
+                        ||
+
+                        normalized ===
+                            "V" + number
+
+                        ||
+
+                        normalized.includes(
+                            "V" + number
+                        )
+
+                    );
+
+                }
+            );
+
+
+        if (found) {
+
+            return found;
+
+        }
+
+    }
+
+
+    return null;
+
+}
+
+
+/* ======================================================
+   VOLATILITY DETECTION
+   CHECK BOTH SYMBOL AND MARKET NAME
+====================================================== */
+
+function isVolatilityMarket(
+    symbol,
+    marketName = ""
+) {
+
+    const value =
+        (
+            String(symbol || "") +
+            " " +
+            String(marketName || "")
+        ).toUpperCase();
+
+
+    return (
+
+        value.includes("VOLATILITY")
+
+        ||
+
+        value.includes("VOLATILITY INDEX")
+
+        ||
+
+        /\bV10\b/.test(value)
+
+        ||
+
+        /\bV25\b/.test(value)
+
+        ||
+
+        /\bV50\b/.test(value)
+
+        ||
+
+        /\bV75\b/.test(value)
+
+        ||
+
+        /\bV100\b/.test(value)
+
+        ||
+
+        /\bVOL10\b/.test(value)
+
+        ||
+
+        /\bVOL25\b/.test(value)
+
+        ||
+
+        /\bVOL50\b/.test(value)
+
+        ||
+
+        /\bVOL75\b/.test(value)
+
+        ||
+
+        /\bVOL100\b/.test(value)
+
+    );
+
+}
+
+
+/* ======================================================
+   CONTRACT TYPE
+====================================================== */
+
+function getContractType(
+    symbol,
+    marketName = ""
+) {
+
+    const raw =
+        String(symbol || "")
+            .toUpperCase();
+
+
+    if (
+        raw === "KMF-RF" ||
+        raw === "KMF-15"
+    ) {
+
+        return "RISE / FALL";
+
+    }
+
+
+    if (
+        raw === "KMF-HL" ||
+        raw === "KMF-25"
+    ) {
+
+        return "HIGHER / LOWER";
+
+    }
+
+
+    if (
+        raw === "KMF-OE" ||
+        raw === "KMF-50"
+    ) {
+
+        return "ODD / EVEN";
+
+    }
+
+
+    if (
+        raw === "KMF-OU" ||
+        raw === "KMF-100"
+    ) {
+
+        return "OVER / UNDER";
+
+    }
+
+
+    if (
+        isVolatilityMarket(
+            symbol,
+            marketName
+        )
+    ) {
+
+        return "VOLATILITY";
+
+    }
+
+
+    return "UNKNOWN";
+
+}
+
+
+/* ======================================================
+   LAST DIGIT
+====================================================== */
+
+function getLastDigit(
+    price
+) {
+
+    const number =
+        Number(price);
+
+
+    if (
+        !Number.isFinite(number)
+    ) {
+
+        return null;
+
+    }
+
+
+    return Math.abs(
+        Math.floor(
+            number * 100
+        )
+    ) % 10;
+
+}
+
+
+/* ======================================================
+   ADD PRICE
+====================================================== */
+
+function addPrice(
+    price
+) {
+
+    const numericPrice =
+        Number(price);
+
+
+    if (
+        !Number.isFinite(
+            numericPrice
+        )
+    ) {
+
+        return false;
+
+    }
+
+
+    AI_STATE.prices.push({
+
+        price:
+            numericPrice,
+
+        time:
+            Date.now(),
+
+        digit:
+            getLastDigit(
+                numericPrice
+            )
+
+    });
+
+
+    if (
+        AI_STATE.prices.length >
+        AI_STATE.maxHistory
+    ) {
+
+        AI_STATE.prices.shift();
+
+    }
+
+
+    return true;
+
+}
+
+
+/* ======================================================
+   RECENT DIGITS
+====================================================== */
+
+function getRecentDigits(
+    prices = AI_STATE.prices
+) {
+
+    return prices
+
+        .map(
+            item =>
+                item.digit
+        )
+
+        .filter(
+            digit =>
+                digit !== null
+        );
+
+}
+
+
+/* ======================================================
+   DIGIT COUNTS
+====================================================== */
+
+function countDigits(
+    digits
+) {
+
+    const counts = {
+
+        0: 0,
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+        6: 0,
+        7: 0,
+        8: 0,
+        9: 0
+
+    };
+
+
+    digits.forEach(
+        digit => {
+
+            if (
+                counts[digit] !== undefined
+            ) {
+
+                counts[digit]++;
+
+            }
+
+        }
+    );
+
+
+    return counts;
+
+}
+
+
+/* ======================================================
+   ODD / EVEN
+====================================================== */
+
+function getOddEvenProbability(
+    digits
+) {
+
+    if (
+        !digits.length
+    ) {
+
+        return {
+
+            odd: 50,
+
+            even: 50
+
+        };
+
+    }
+
+
+    let odd = 0;
+
+    let even = 0;
+
+
+    digits.forEach(
+        digit => {
+
+            if (
+                digit % 2 === 0
+            ) {
+
+                even++;
+
+            }
+
+            else {
+
+                odd++;
+
+            }
+
+        }
+    );
+
+
+    const total =
+        odd + even;
+
+
+    if (!total) {
+
+        return {
+
+            odd: 50,
+
+            even: 50
+
+        };
+
+    }
+
+
+    return {
+
+        odd:
+            (odd / total) * 100,
+
+        even:
+            (even / total) * 100
+
+    };
+
+}
+
+
+/* ======================================================
+   RISE / FALL
+====================================================== */
+
+function getDirectionProbability(
+    prices
+) {
+
+    if (
+        prices.length < 2
+    ) {
+
+        return {
+
+            rise: 50,
+
+            fall: 50
+
+        };
+
+    }
+
+
+    let rise = 0;
+
+    let fall = 0;
+
+
+    for (
+        let i = 1;
+        i < prices.length;
+        i++
+    ) {
+
+        if (
+            prices[i].price >
+            prices[i - 1].price
+        ) {
+
+            rise++;
+
+        }
+
+        else if (
+            prices[i].price <
+            prices[i - 1].price
+        ) {
+
+            fall++;
+
+        }
+
+    }
+
+
+    const total =
+        rise + fall;
+
+
+    if (!total) {
+
+        return {
+
+            rise: 50,
+
+            fall: 50
+
+        };
+
+    }
+
+
+    return {
+
+        rise:
+            (rise / total) * 100,
+
+        fall:
+            (fall / total) * 100
+
+    };
+
+}
+
+
+/* ======================================================
+   HIGHER / LOWER
+====================================================== */
+
+function getHigherLowerProbability(
+    prices
+) {
+
+    if (
+        prices.length < 2
+    ) {
+
+        return {
+
+            higher: 50,
+
+            lower: 50
+
+        };
+
+    }
+
+
+    const startingPrice =
+        prices[0].price;
+
+
+    let higher = 0;
+
+    let lower = 0;
+
+
+    for (
+        let i = 1;
+        i < prices.length;
+        i++
+    ) {
+
+        if (
+            prices[i].price >
+            startingPrice
+        ) {
+
+            higher++;
+
+        }
+
+        else if (
+            prices[i].price <
+            startingPrice
+        ) {
+
+            lower++;
+
+        }
+
+    }
+
+
+    const total =
+        higher + lower;
+
+
+    if (!total) {
+
+        return {
+
+            higher: 50,
+
+            lower: 50
+
+        };
+
+    }
+
+
+    return {
+
+        higher:
+            (higher / total) * 100,
+
+        lower:
+            (lower / total) * 100
+
+    };
+
+}
+
+
+/* ======================================================
+   OVER / UNDER
+====================================================== */
+
+function getOverUnderProbability(
+    digits,
+    target = 5
+) {
+
+    if (
+        !digits.length
+    ) {
+
+        return {
+
+            over: 50,
+
+            under: 50
+
+        };
+
+    }
+
+
+    let over = 0;
+
+    let under = 0;
+
+
+    digits.forEach(
+        digit => {
+
+            if (
+                digit > target
+            ) {
+
+                over++;
+
+            }
+
+            else if (
+                digit < target
+            ) {
+
+                under++;
+
+            }
+
+        }
+    );
+
+
+    const total =
+        over + under;
+
+
+    if (!total) {
+
+        return {
+
+            over: 50,
+
+            under: 50
+
+        };
+
+    }
+
+
+    return {
+
+        over:
+            (over / total) * 100,
+
+        under:
+            (under / total) * 100
+
+    };
+
+}
+
+
+/* ======================================================
+   TICK DIRECTION
+====================================================== */
+
+function getTickDirection(
+    prices,
+    count
+) {
+
+    const sample =
+        prices.slice(
+            -Math.min(
+                count,
+                prices.length
+            )
+        );
+
+
+    if (
+        sample.length < 2
+    ) {
+
+        return {
+
+            up: 50,
+
+            down: 50,
+
+            total:
+                sample.length
+
+        };
+
+    }
+
+
+    let up = 0;
+
+    let down = 0;
+
+
+    for (
+        let i = 1;
+        i < sample.length;
+        i++
+    ) {
+
+        if (
+            sample[i].price >
+            sample[i - 1].price
+        ) {
+
+            up++;
+
+        }
+
+        else if (
+            sample[i].price <
+            sample[i - 1].price
+        ) {
+
+            down++;
+
+        }
+
+    }
+
+
+    const total =
+        up + down;
+
+
+    if (!total) {
+
+        return {
+
+            up: 50,
+
+            down: 50,
+
+            total:
+                sample.length
+
+        };
+
+    }
+
+
+    return {
+
+        up:
+            (up / total) * 100,
+
+        down:
+            (down / total) * 100,
+
+        total:
+            sample.length
+
+    };
+
+}
+
+
+/* ======================================================
+   MOMENTUM
+====================================================== */
+
+function calculateMomentum(
+    prices,
+    count = 5
+) {
+
+    if (
+        prices.length < 2
+    ) {
+
+        return 0;
+
+    }
+
+
+    const sample =
+        prices.slice(
+            -Math.min(
+                count,
+                prices.length
+            )
+        );
+
+
+    if (
+        sample.length < 2
+    ) {
+
+        return 0;
+
+    }
+
+
+    const first =
+        sample[0].price;
+
+
+    const last =
+        sample[
+            sample.length - 1
+        ].price;
+
+
+    if (
+        first === 0
+    ) {
+
+        return 0;
+
+    }
+
+
+    return (
+        (
+            last - first
+        ) /
+        first
+    ) * 100;
+
+}
+
+
+/* ======================================================
+   VOLATILITY
+====================================================== */
+
+function calculateVolatility(
+    prices
+) {
+
+    if (
+        prices.length < 2
+    ) {
+
+        return 0;
+
+    }
+
+
+    let total = 0;
+
+
+    for (
+        let i = 1;
+        i < prices.length;
+        i++
+    ) {
+
+        total += Math.abs(
+            prices[i].price -
+            prices[i - 1].price
+        );
+
+    }
+
+
+    return total /
+        (prices.length - 1);
+
+}
+
+
+/* ======================================================
+   TREND
+====================================================== */
+
+function getTrendStrength(
+    prices,
+    count = 10
+) {
+
+    const sample =
+        prices.slice(
+            -Math.min(
+                count,
+                prices.length
+            )
+        );
+
+
+    if (
+        sample.length < 2
+    ) {
+
+        return {
+
+            direction:
+                "NEUTRAL",
+
+            strength:
+                50
+
+        };
+
+    }
+
+
+    let up = 0;
+
+    let down = 0;
+
+
+    for (
+        let i = 1;
+        i < sample.length;
+        i++
+    ) {
+
+        if (
+            sample[i].price >
+            sample[i - 1].price
+        ) {
+
+            up++;
+
+        }
+
+        else if (
+            sample[i].price <
+            sample[i - 1].price
+        ) {
+
+            down++;
+
+        }
+
+    }
+
+
+    const total =
+        up + down;
+
+
+    if (!total) {
+
+        return {
+
+            direction:
+                "NEUTRAL",
+
+            strength:
+                50
+
+        };
+
+    }
+
+
+    if (
+        up > down
+    ) {
+
+        return {
+
+            direction:
+                "UP",
+
+            strength:
+                (up / total) * 100
+
+        };
+
+    }
+
+
+    if (
+        down > up
+    ) {
+
+        return {
+
+            direction:
+                "DOWN",
+
+            strength:
+                (down / total) * 100
+
+        };
+
+    }
+
+
+    return {
+
+        direction:
+            "NEUTRAL",
+
+        strength:
+            50
+
+    };
+
+}
+
+
+/* ======================================================
+   VOLATILITY ANALYSIS
+   NORMAL AI ANALYSIS DATA
+====================================================== */
+
+function analyzeVolatilityContracts(
+    prices
+) {
+
+    const recent100 =
+        prices.slice(-100);
+
+    const recent1000 =
+        prices.slice(-1000);
+
+
+    const digits100 =
+        getRecentDigits(
+            recent100
+        );
+
+    const digits1000 =
+        getRecentDigits(
+            recent1000
+        );
+
+
+    const direction100 =
+        getTickDirection(
+            recent100,
+            100
+        );
+
+
+    const direction1000 =
+        getTickDirection(
+            recent1000,
+            1000
+        );
+
+
+    const higherLower100 =
+        getHigherLowerProbability(
+            recent100
+        );
+
+
+    const higherLower1000 =
+        getHigherLowerProbability(
+            recent1000
+        );
+
+
+    const parity100 =
+        getOddEvenProbability(
+            digits100
+        );
+
+
+    const parity1000 =
+        getOddEvenProbability(
+            digits1000
+        );
+
+
+    const overUnder100 =
+        getOverUnderProbability(
+            digits100,
+            5
+        );
+
+
+    const overUnder1000 =
+        getOverUnderProbability(
+            digits1000,
+            5
+        );
+
+
+    const rise =
+        (
+            direction100.up * 0.65
+        ) +
+        (
+            direction1000.up * 0.35
+        );
+
+
+    const fall =
+        100 - rise;
+
+
+    const higher =
+        (
+            higherLower100.higher * 0.65
+        ) +
+        (
+            higherLower1000.higher * 0.35
+        );
+
+
+    const lower =
+        100 - higher;
+
+
+    const odd =
+        (
+            parity100.odd * 0.65
+        ) +
+        (
+            parity1000.odd * 0.35
+        );
+
+
+    const even =
+        100 - odd;
+
+
+    const over =
+        (
+            overUnder100.over * 0.65
+        ) +
+        (
+            overUnder1000.over * 0.35
+        );
+
+
+    const under =
+        100 - over;
+
+
+    return {
+
+        rise,
+        fall,
+
+        higher,
+        lower,
+
+        odd,
+        even,
+
+        over,
+        under,
+
+        tick100:
+            direction100,
+
+        tick1000:
+            direction1000
+
+    };
+
+}
+
+
+/* ======================================================
+   NORMAL VOLATILITY CONTRACT ANALYSIS
+====================================================== */
+
+function analyzeSelectedVolatilityContract() {
+
+    const probabilities =
+        analyzeVolatilityContracts(
+            AI_STATE.prices
+        );
+
+
+    let signal =
+        "WAIT";
+
+
+    let confidence =
+        0;
+
+
+    let pair =
+        getSelectedVolatilityTypeName();
+
+
+    switch (
+        AI_STATE.selectedVolatilityType
+    ) {
+
+        case "RISE_FALL":
+
+            signal =
+                probabilities.rise >=
+                probabilities.fall
+                    ? "RISE"
+                    : "FALL";
+
+
+            confidence =
+                Math.max(
+                    probabilities.rise,
+                    probabilities.fall
+                );
+
+            break;
+
+
+        case "HIGHER_LOWER":
+
+            signal =
+                probabilities.higher >=
+                probabilities.lower
+                    ? "HIGHER"
+                    : "LOWER";
+
+
+            confidence =
+                Math.max(
+                    probabilities.higher,
+                    probabilities.lower
+                );
+
+            break;
+
+
+        case "ODD_EVEN":
+
+            signal =
+                probabilities.odd >=
+                probabilities.even
+                    ? "ODD"
+                    : "EVEN";
+
+
+            confidence =
+                Math.max(
+                    probabilities.odd,
+                    probabilities.even
+                );
+
+            break;
+
+
+        case "OVER_UNDER":
+
+            signal =
+                probabilities.over >=
+                probabilities.under
+                    ? "OVER"
+                    : "UNDER";
+
+
+            confidence =
+                Math.max(
+                    probabilities.over,
+                    probabilities.under
+                );
+
+            break;
+
+
+        default:
+
+            return {
+
+                signal:
+                    "WAIT",
+
+                confidence:
+                    0,
+
+                strength:
+                    "SELECT TYPE",
+
+                reasons: [
+
+                    "Select a Volatility Market Type before normal AI Analysis starts."
+
+                ],
+
+                components: {}
+
+            };
+
+    }
+
+
+    confidence =
+        Math.round(
+            Math.min(
+                99,
+                confidence
+            )
+        );
+
+
+    let strength =
+        "WEAK";
+
+
+    if (
+        confidence >= 75
+    ) {
+
+        strength =
+            "STRONG";
+
+    }
+
+    else if (
+        confidence >= 60
+    ) {
+
+        strength =
+            "MODERATE";
+
+    }
+
+
+    return {
+
+        signal,
+
+        confidence,
+
+        strength,
+
+        reasons: [
+
+            "Normal AI Analysis is using the selected " +
+            pair +
+            " contract type.",
+
+            "Current statistical reading: " +
+            signal +
+            " at " +
+            confidence +
+            "%.",
+
+            "Deep Scan is a separate 10-second fresh-data tool.",
+
+            "This is a recent-data statistical estimate, not a guarantee."
+
+        ],
+
+        components: {
+
+            frequency: {
+
+                direction:
+                    signal,
+
+                score:
+                    confidence
+
+            },
+
+            shortTerm: {
+
+                direction:
+                    signal,
+
+                score:
+                    confidence
+
+            },
+
+            longTerm: {
+
+                direction:
+                    signal,
+
+                score:
+                    confidence
+
+            },
+
+            momentum: {
+
+                direction:
+                    calculateMomentum(
+                        AI_STATE.prices
+                    ) >= 0
+                        ? "HIGHER"
+                        : "LOWER",
+
+                score:
+                    50
+
+            },
+
+            transition: {
+
+                direction:
+                    signal,
+
+                score:
+                    confidence
+
+            },
+
+            agreement: {
+
+                direction:
+                    pair,
+
+                score:
+                    confidence
+
+            }
+
+        }
+
+    };
+
+}
+
+
+/* ======================================================
+   DEEP SCAN CALCULATION
+   USES ONLY FRESH 10-SECOND SAMPLES
+====================================================== */
+
+function calculateDeepScan(
+    prices
+) {
+
+    if (
+        prices.length < 2
+    ) {
+
+        return {
+
+            trade:
+                "WAIT",
+
+            probability:
+                0,
+
+            pair:
+                "--",
+
+            duration:
+                10,
+
+            reason:
+                "The fresh 10-second scan did not collect enough data."
+
+        };
+
+    }
+
+
+    /* --------------------------------------------------
+       RISE / FALL
+    -------------------------------------------------- */
+
+    let rise = 0;
+
+    let fall = 0;
+
+
+    for (
+        let i = 1;
+        i < prices.length;
+        i++
+    ) {
+
+        if (
+            prices[i].price >
+            prices[i - 1].price
+        ) {
+
+            rise++;
+
+        }
+
+        else if (
+            prices[i].price <
+            prices[i - 1].price
+        ) {
+
+            fall++;
+
+        }
+
+    }
+
+
+    const directionTotal =
+        rise + fall;
+
+
+    const risePct =
+        directionTotal
+            ? (rise / directionTotal) * 100
+            : 50;
+
+
+    const fallPct =
+        directionTotal
+            ? (fall / directionTotal) * 100
+            : 50;
+
+
+    /* --------------------------------------------------
+       HIGHER / LOWER
+       COMPARED WITH THE FIRST FRESH SCAN PRICE
+    -------------------------------------------------- */
+
+    const startingPrice =
+        prices[0].price;
+
+
+    let higher = 0;
+
+    let lower = 0;
+
+
+    for (
+        let i = 1;
+        i < prices.length;
+        i++
+    ) {
+
+        if (
+            prices[i].price >
+            startingPrice
+        ) {
+
+            higher++;
+
+        }
+
+        else if (
+            prices[i].price <
+            startingPrice
+        ) {
+
+            lower++;
+
+        }
+
+    }
+
+
+    const higherLowerTotal =
+        higher + lower;
+
+
+    const higherPct =
+        higherLowerTotal
+            ? (higher / higherLowerTotal) * 100
+            : 50;
+
+
+    const lowerPct =
+        higherLowerTotal
+            ? (lower / higherLowerTotal) * 100
+            : 50;
+
+
+    /* --------------------------------------------------
+       ODD / EVEN
+    -------------------------------------------------- */
+
+    const digits =
+        prices
+
+            .map(
+                item =>
+                    item.digit
+            )
+
+            .filter(
+                digit =>
+                    digit !== null
+            );
+
+
+    const parity =
+        getOddEvenProbability(
+            digits
+        );
+
+
+    /* --------------------------------------------------
+       OVER / UNDER
+       TARGET 5
+    -------------------------------------------------- */
+
+    const overUnder =
+        getOverUnderProbability(
+            digits,
+            5
+        );
+
+
+    /* --------------------------------------------------
+       COMPARE ALL 8 OUTCOMES
+    -------------------------------------------------- */
+
+    const candidates = [
+
+        {
+            trade:
+                "RISE",
+
+            probability:
+                risePct,
+
+            pair:
+                "Rise / Fall"
+
+        },
+
+        {
+            trade:
+                "FALL",
+
+            probability:
+                fallPct,
+
+            pair:
+                "Rise / Fall"
+
+        },
+
+        {
+            trade:
+                "HIGHER",
+
+            probability:
+                higherPct,
+
+            pair:
+                "Higher / Lower"
+
+        },
+
+        {
+            trade:
+                "LOWER",
+
+            probability:
+                lowerPct,
+
+            pair:
+                "Higher / Lower"
+
+        },
+
+        {
+            trade:
+                "ODD",
+
+            probability:
+                parity.odd,
+
+            pair:
+                "Odd / Even"
+
+        },
+
+        {
+            trade:
+                "EVEN",
+
+            probability:
+                parity.even,
+
+            pair:
+                "Odd / Even"
+
+        },
+
+        {
+            trade:
+                "OVER",
+
+            probability:
+                overUnder.over,
+
+            pair:
+                "Over / Under"
+
+        },
+
+        {
+            trade:
+                "UNDER",
+
+            probability:
+                overUnder.under,
+
+            pair:
+                "Over / Under"
+
+        }
+
+    ];
+
+
+    candidates.sort(
+        (a, b) =>
+            b.probability -
+            a.probability
+    );
+
+
+    const best =
+        candidates[0];
+
+
+    return {
+
+        trade:
+            best.trade,
+
+        probability:
+            Math.round(
+                best.probability *
+                10
+            ) / 10,
+
+        pair:
+            best.pair,
+
+        duration:
+            10,
+
+        reason:
+            "Fresh 10-second scan compared all four contract families. " +
+            best.trade +
+            " had the highest percentage in the collected sample. " +
+            "This is a statistical estimate from recent data, not a guarantee."
+
+    };
+
+}
+
+
+/* ======================================================
+   DISPLAY PROBABILITIES
+====================================================== */
+
+function displayVolatilityProbabilities(
+    probabilities
+) {
+
+    const fields = {
+
+        rise:
+            [
+                "riseProbability",
+                "riseBar"
+            ],
+
+        fall:
+            [
+                "fallProbability",
+                "fallBar"
+            ],
+
+        higher:
+            [
+                "higherProbability",
+                "higherBar"
+            ],
+
+        lower:
+            [
+                "lowerProbability",
+                "lowerBar"
+            ],
+
+        odd:
+            [
+                "oddProbability",
+                "oddBar"
+            ],
+
+        even:
+            [
+                "evenProbability",
+                "evenBar"
+            ],
+
+        over:
+            [
+                "overProbability",
+                "overBar"
+            ],
+
+        under:
+            [
+                "underProbability",
+                "underBar"
+            ]
+
+    };
+
+
+    Object.keys(fields).forEach(
+        key => {
+
+            const value =
+                Math.round(
+                    probabilities[key]
+                );
+
+
+            const textElement =
+                document.getElementById(
+                    fields[key][0]
+                );
+
+
+            const barElement =
+                document.getElementById(
+                    fields[key][1]
+                );
+
+
+            textElement.textContent =
+                value + "%";
+
+
+            barElement.style.width =
+                value + "%";
+
+        }
+    );
+
+
+    document.getElementById(
+        "tick100Up"
+    ).textContent =
+        "UP " +
+        Math.round(
+            probabilities.tick100.up
+        ) +
+        "%";
+
+
+    document.getElementById(
+        "tick100Down"
+    ).textContent =
+        "DOWN " +
+        Math.round(
+            probabilities.tick100.down
+        ) +
+        "%";
+
+
+    document.getElementById(
+        "tick1000Up"
+    ).textContent =
+        "UP " +
+        Math.round(
+            probabilities.tick1000.up
+        ) +
+        "%";
+
+
+    document.getElementById(
+        "tick1000Down"
+    ).textContent =
+        "DOWN " +
+        Math.round(
+            probabilities.tick1000.down
+        ) +
+        "%";
+
+}
+
+
+/* ======================================================
+   UPDATE COMPONENTS
+====================================================== */
+
+function setBar(
+    id,
+    value
+) {
+
+    const element =
+        document.getElementById(id);
+
+
+    if (!element) {
+
+        return;
+
+    }
+
+
+    const safe =
+        Math.max(
+            0,
+            Math.min(
+                100,
+                Number(value) || 0
+            )
+        );
+
+
+    element.style.width =
+        safe + "%";
+
+}
+
+
+function updateComponents(
+    analysis
+) {
+
+    const components =
+        analysis.components ||
+        {};
+
+
+    const frequency =
+        components.frequency ||
+        {};
+
+    const shortTerm =
+        components.shortTerm ||
+        {};
+
+    const longTerm =
+        components.longTerm ||
+        {};
+
+    const momentum =
+        components.momentum ||
+        {};
+
+    const transition =
+        components.transition ||
+        {};
+
+    const agreement =
+        components.agreement ||
+        {};
+
+
+    document.getElementById(
+        "frequencyLabel"
+    ).textContent =
+
+        isVolatilityMarket(
+            AI_STATE.currentSymbol,
+            AI_STATE.selectedMarketName
+        )
+
+            ? "Contract Analysis"
+
+            : "Frequency / Consistency";
+
+
+    const elements = [
+
+        [
+            "frequencyScore",
+            "frequencyBar",
+            frequency
+        ],
+
+        [
+            "shortScore",
+            "shortBar",
+            shortTerm
+        ],
+
+        [
+            "longScore",
+            "longBar",
+            longTerm
+        ],
+
+        [
+            "momentumScore",
+            "momentumBar",
+            momentum
+        ],
+
+        [
+            "patternScore",
+            "patternBar",
+            transition
+        ],
+
+        [
+            "agreementScore",
+            "agreementBar",
+            agreement
+        ]
+
+    ];
+
+
+    elements.forEach(
+        item => {
+
+            const id =
+                item[0];
+
+            const bar =
+                item[1];
+
+            const component =
+                item[2];
+
+
+            document.getElementById(
+                id
+            ).textContent =
+
+                component.direction
+
+                    ? component.direction +
+                      " " +
+                      Math.round(
+                          component.score ||
+                          0
+                      ) +
+                      "%"
+
+                    : "--";
+
+
+            setBar(
+                bar,
+                component.score
+            );
+
+        }
+    );
+
+}
+
+
+/* ======================================================
+   SCREEN UPDATE
+====================================================== */
+
+function updateScreen(
+    price,
+    previousPrice,
+    analysis
+) {
+
+    const digits =
+        getRecentDigits();
+
+
+    const finalDigit =
+        getLastDigit(
+            price
+        );
+
+
+    document.getElementById(
+        "currentPrice"
+    ).textContent =
+        Number(price).toFixed(2);
+
+
+    document.getElementById(
+        "price"
+    ).textContent =
+        Number(price).toFixed(2);
+
+
+    document.getElementById(
+        "previousPrice"
+    ).textContent =
+        Number(previousPrice).toFixed(2);
+
+
+    document.getElementById(
+        "finalDigit"
+    ).textContent =
+        finalDigit;
+
+
+    document.getElementById(
+        "digitCount"
+    ).textContent =
+        AI_STATE.prices.length;
+
+
+    document.getElementById(
+        "movement"
+    ).textContent =
+        calculateMomentum(
+            AI_STATE.prices
+        ).toFixed(4) +
+        "%";
+
+
+    document.getElementById(
+        "volatility"
+    ).textContent =
+        calculateVolatility(
+            AI_STATE.prices
+        ).toFixed(2);
+
+
+    document.getElementById(
+        "recentBias"
+    ).textContent =
+
+        analysis.components &&
+        analysis.components.shortTerm
+
+            ? analysis.components
+                .shortTerm
+                .direction
+
+            : "--";
+
+
+    document.getElementById(
+        "digitStreak"
+    ).textContent =
+
+        isVolatilityMarket(
+            AI_STATE.currentSymbol,
+            AI_STATE.selectedMarketName
+        )
+
+            ? "Price trend"
+
+            : "--";
+
+
+    document.getElementById(
+        "signalDirection"
+    ).textContent =
+        analysis.signal;
+
+
+    document.getElementById(
+        "confidence"
+    ).textContent =
+        "Confidence: " +
+        analysis.confidence +
+        "%";
+
+
+    document.getElementById(
+        "signalStrength"
+    ).textContent =
+        "Signal Strength: " +
+        analysis.strength;
+
+
+    const reasons =
+        document.getElementById(
+            "reasons"
+        );
+
+
+    reasons.innerHTML =
+        "";
+
+
+    analysis.reasons.forEach(
+        reason => {
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+
+            div.className =
+                "reason";
+
+
+            div.textContent =
+                "• " + reason;
+
+
+            reasons.appendChild(
+                div
+            );
+
+        }
+    );
+
+
+    updateComponents(
+        analysis
+    );
+
+
+    if (
+        isVolatilityMarket(
+            AI_STATE.currentSymbol,
+            AI_STATE.selectedMarketName
+        )
+    ) {
+
+        document.getElementById(
+            "status"
+        ).textContent =
+            "Volatility " +
+            getSelectedVolatilityTypeName() +
+            " running — " +
+            AI_STATE.prices.length +
+            " samples collected.";
+
+    }
+
+    else {
+
+        document.getElementById(
+            "status"
+        ).textContent =
+            "KMF AI monitoring — " +
+            digits.length +
+            " final digits.";
+
+    }
+
+}
+
+
+/* ======================================================
+   KMF ANALYSIS
+====================================================== */
+
+function analyzeKMF(
+    symbol,
+    digits
+) {
+
+    if (
+        digits.length < 10
+    ) {
+
+        return {
+
+            signal:
+                "WAIT",
+
+            confidence:
+                0,
+
+            strength:
+                "INSUFFICIENT DATA",
+
+            reasons: [
+
+                "Collecting final-digit data."
+
+            ],
+
+            components: {}
+
+        };
+
+    }
+
+
+    const recent =
+        digits.slice(-10);
+
+
+    let signal =
+        "WAIT";
+
+
+    let confidence =
+        50;
+
+
+    if (
+        symbol === "KMF-OE" ||
+        symbol === "KMF-50"
+    ) {
+
+        const odd =
+            recent.filter(
+                d =>
+                    d % 2 !== 0
+            ).length;
+
+
+        const even =
+            recent.length -
+            odd;
+
+
+        if (
+            odd > even
+        ) {
+
+            signal =
+                "ODD";
+
+
+            confidence =
+                (
+                    odd /
+                    recent.length
+                ) * 100;
+
+        }
+
+        else if (
+            even > odd
+        ) {
+
+            signal =
+                "EVEN";
+
+
+            confidence =
+                (
+                    even /
+                    recent.length
+                ) * 100;
+
+        }
+
+    }
+
+    else {
+
+        const target =
+            AI_STATE.targetDigit;
+
+
+        if (
+            target === null
+        ) {
+
+            return {
+
+                signal:
+                    "WAIT",
+
+                confidence:
+                    0,
+
+                strength:
+                    "WAIT",
+
+                reasons: [
+
+                    "Select a target digit."
+
+                ],
+
+                components: {}
+
+            };
+
+        }
+
+
+        let above =
+            0;
+
+        let below =
+            0;
+
+
+        recent.forEach(
+            digit => {
+
+                if (
+                    digit > target
+                ) {
+
+                    above++;
+
+                }
+
+                else if (
+                    digit < target
+                ) {
+
+                    below++;
+
+                }
+
+            }
+        );
+
+
+        const total =
+            above + below;
+
+
+        if (
+            above > below &&
+            total > 0
+        ) {
+
+            if (
+                symbol === "KMF-OU" ||
+                symbol === "KMF-100"
+            ) {
+
+                signal =
+                    "OVER";
+
+            }
+
+            else if (
+                symbol === "KMF-HL" ||
+                symbol === "KMF-25"
+            ) {
+
+                signal =
+                    "HIGHER";
+
+            }
+
+            else {
+
+                signal =
+                    "RISE";
+
+            }
+
+
+            confidence =
+                (
+                    above /
+                    total
+                ) * 100;
+
+        }
+
+        else if (
+            below > above &&
+            total > 0
+        ) {
+
+            if (
+                symbol === "KMF-OU" ||
+                symbol === "KMF-100"
+            ) {
+
+                signal =
+                    "UNDER";
+
+            }
+
+            else if (
+                symbol === "KMF-HL" ||
+                symbol === "KMF-25"
+            ) {
+
+                signal =
+                    "LOWER";
+
+            }
+
+            else {
+
+                signal =
+                    "FALL";
+
+            }
+
+
+            confidence =
+                (
+                    below /
+                    total
+                ) * 100;
+
+        }
+
+    }
+
+
+    confidence =
+        Math.round(
+            Math.min(
+                99,
+                confidence
+            )
+        );
+
+
+    let strength =
+        "WEAK";
+
+
+    if (
+        confidence >= 75
+    ) {
+
+        strength =
+            "STRONG";
+
+    }
+
+    else if (
+        confidence >= 60
+    ) {
+
+        strength =
+            "MODERATE";
+
+    }
+
+
+    return {
+
+        signal,
+
+        confidence,
+
+        strength,
+
+        reasons: [
+
+            "Analyzing " +
+            recent.length +
+            " recent final digits.",
+
+            "Current signal: " +
+            signal +
+            " (" +
+            confidence +
+            "%).",
+
+            "This is a recent-data statistical model."
+
+        ],
+
+        components: {
+
+            frequency: {
+
+                direction:
+                    signal,
+
+                score:
+                    confidence
+
+            },
+
+            shortTerm: {
+
+                direction:
+                    signal,
+
+                score:
+                    confidence
+
+            },
+
+            longTerm: {
+
+                direction:
+                    signal,
+
+                score:
+                    confidence
+
+            },
+
+            momentum: {
+
+                direction:
+                    calculateMomentum(
+                        AI_STATE.prices
+                    ) >= 0
+                        ? "HIGHER"
+                        : "LOWER",
+
+                score:
+                    50
+
+            },
+
+            transition: {
+
+                direction:
+                    signal,
+
+                score:
+                    confidence
+
+            },
+
+            agreement: {
+
+                direction:
+                    signal,
+
+                score:
+                    confidence
+
+            }
+
+        }
+
+    };
+
+}
+
+
+/* ======================================================
+   MAIN ANALYSIS
+====================================================== */
+
+function analyzeMarket(
+    symbol
+) {
+
+    const volatility =
+        isVolatilityMarket(
+            symbol,
+            AI_STATE.selectedMarketName
+        );
+
+
+    if (
+        volatility
+    ) {
+
+        if (
+            !AI_STATE.selectedVolatilityType
+        ) {
+
+            return {
+
+                signal:
+                    "WAIT",
+
+                confidence:
+                    0,
+
+                strength:
+                    "SELECT TYPE",
+
+                reasons: [
+
+                    "Select a Volatility Market Type to begin normal AI Analysis."
+
+                ],
+
+                components: {}
+
+            };
+
+        }
+
+
+        return analyzeSelectedVolatilityContract();
+
+    }
+
+
+    return analyzeKMF(
+        symbol,
+        getRecentDigits()
+    );
+
+}
+
+
+/* ======================================================
+   UPDATE AI
+====================================================== */
+
+async function updateAI() {
+
+    try {
+
+        const marketSelect =
+            document.getElementById(
+                "marketSelect"
+            );
+
+
+        const symbol =
+            marketSelect.value;
+
+
+        if (!symbol) {
+
+            return;
+
+        }
+
+
+        const selectedOption =
+            marketSelect.options[
+                marketSelect.selectedIndex
+            ];
+
+
+        if (selectedOption) {
+
+            AI_STATE.selectedMarketName =
+                selectedOption.dataset.marketName ||
+                selectedOption.textContent ||
+                "";
+
+        }
+
+
+        const volatility =
+            isVolatilityMarket(
+                symbol,
+                AI_STATE.selectedMarketName
+            );
+
+
+        /*
+           Do not run normal AI analysis
+           on a volatility market until
+           the user selects a contract type.
+        */
+
+        if (
+            volatility &&
+            !AI_STATE.selectedVolatilityType
+        ) {
+
+            document.getElementById(
+                "status"
+            ).textContent =
+                "Select a Volatility Market Type to begin AI Analysis.";
+
+
+            return;
+
+        }
+
+
+        const data =
+            await getPrices();
+
+
+        const syntheticSymbol =
+            getSyntheticSymbol(
+                symbol,
+                data.prices
+            );
+
+
+        if (!syntheticSymbol) {
+
+            throw new Error(
+                "Synthetic market mapping not found for " +
+                symbol
+            );
+
+        }
+
+
+        const market =
+            data.prices[
+                syntheticSymbol
+            ];
+
+
+        if (!market) {
+
+            throw new Error(
+                "Price not found for " +
+                syntheticSymbol
+            );
+
+        }
+
+
+        const price =
+            Number(
+                market.price
+            );
+
+
+        const previousPrice =
+            Number(
+                market.previousPrice
+            );
+
+
+        if (
+            !Number.isFinite(price)
+        ) {
+
+            throw new Error(
+                "Invalid market price."
+            );
+
+        }
+
+
+        const last =
+            AI_STATE.prices.length
+
+                ? AI_STATE.prices[
+                    AI_STATE.prices.length - 1
+                  ].price
+
+                : null;
+
+
+        if (
+            last !== price
+        ) {
+
+            addPrice(
+                price
+            );
+
+        }
+
+
+        const analysis =
+            analyzeMarket(
+                symbol
+            );
+
+
+        updateScreen(
+            price,
+
+            Number.isFinite(
+                previousPrice
+            )
+                ? previousPrice
+                : price,
+
+            analysis
+        );
+
+
+        const volatilityPanel =
+            document.getElementById(
+                "volatilityContracts"
+            );
+
+
+        const deepScanButton =
+            document.getElementById(
+                "deepScanButton"
+            );
+
+
+        if (
+            volatility
+        ) {
+
+            volatilityPanel.classList.remove(
+                "hidden"
+            );
+
+
+            const probabilities =
+                analyzeVolatilityContracts(
+                    AI_STATE.prices
+                );
+
+
+            displayVolatilityProbabilities(
+                probabilities
+            );
+
+
+            /*
+               Deep Scan is available only
+               for volatility markets.
+            */
+
+            deepScanButton.disabled =
+                AI_STATE.deepScanRunning;
+
+
+        }
+
+        else {
+
+            volatilityPanel.classList.add(
+                "hidden"
+            );
+
+
+            deepScanButton.disabled =
+                true;
+
+        }
+
+
+        document.getElementById(
+            "aiWarning"
+        ).classList.remove(
+            "hidden"
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "KMFBinary AI error:",
+            error
+        );
+
+
+        document.getElementById(
+            "status"
+        ).textContent =
+            "AI error: " +
+            error.message;
+
+    }
+
+}
+
+
+/* ======================================================
+   DISPLAY DEEP SCAN
+====================================================== */
+
+function displayDeepScan(
+    result
+) {
+
+    document.getElementById(
+        "scanResult"
+    ).classList.remove(
+        "hidden"
+    );
+
+
+    document.getElementById(
+        "scanTrade"
+    ).textContent =
+        result.trade;
+
+
+    document.getElementById(
+        "scanConfidence"
+    ).textContent =
+        "Highest probability: " +
+        result.probability +
+        "%";
+
+
+    document.getElementById(
+        "scanPair"
+    ).textContent =
+        "Contract type: " +
+        result.pair;
+
+
+    document.getElementById(
+        "scanDuration"
+    ).textContent =
+        "Scan duration: 10 seconds";
+
+
+    document.getElementById(
+        "scanReason"
+    ).textContent =
+        result.reason;
+
+}
+
+
+/* ======================================================
+   DEEP SCAN
+   EXACTLY 10 SECONDS
+====================================================== */
+
+function startDeepScan() {
+
+    if (
+        AI_STATE.deepScanRunning
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        !isVolatilityMarket(
+            AI_STATE.currentSymbol,
+            AI_STATE.selectedMarketName
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    AI_STATE.deepScanRunning =
+        true;
+
+
+    AI_STATE.deepScanSamples =
+        [];
+
+
+    AI_STATE.deepScanSecondsLeft =
+        10;
+
+
+    const button =
+        document.getElementById(
+            "deepScanButton"
+        );
+
+
+    const status =
+        document.getElementById(
+            "scanStatus"
+        );
+
+
+    button.disabled =
+        true;
+
+
+    button.textContent =
+        "🔎 SCANNING...";
+
+
+    status.classList.remove(
+        "hidden"
+    );
+
+
+    status.textContent =
+        "SCANNING — 10 seconds remaining";
+
+
+    document.getElementById(
+        "scanResult"
+    ).classList.remove(
+        "hidden"
+    );
+
+
+    document.getElementById(
+        "scanTrade"
+    ).textContent =
+        "SCANNING";
+
+
+    document.getElementById(
+        "scanConfidence"
+    ).textContent =
+        "Collecting fresh market data...";
+
+
+    document.getElementById(
+        "scanPair"
+    ).textContent =
+        "Comparing all 4 contract families";
+
+
+    document.getElementById(
+        "scanDuration"
+    ).textContent =
+        "Scan duration: 10 seconds";
+
+
+    document.getElementById(
+        "scanReason"
+    ).textContent =
+        "Deep Scan is collecting a fresh 10-second market sample.";
+
+
+    /*
+       Immediate first sample.
+    */
+
+    collectScanSample();
+
+
+    AI_STATE.deepScanTimer =
+        setInterval(
+            function() {
+
+                AI_STATE.deepScanSecondsLeft--;
+
+
+                if (
+                    AI_STATE.deepScanSecondsLeft > 0
+                ) {
+
+                    status.textContent =
+                        "SCANNING — " +
+                        AI_STATE.deepScanSecondsLeft +
+                        " seconds remaining";
+
+
+                    collectScanSample();
+
+
+                    return;
+
+                }
+
+
+                finishDeepScan();
+
+            },
+            1000
+        );
+
+}
+
+
+/* ======================================================
+   COLLECT FRESH DEEP SCAN SAMPLE
+====================================================== */
+
+async function collectScanSample() {
+
+    if (
+        !AI_STATE.deepScanRunning
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const data =
+            await getPrices();
+
+
+        const syntheticSymbol =
+            getSyntheticSymbol(
+                AI_STATE.currentSymbol,
+                data.prices
+            );
+
+
+        if (!syntheticSymbol) {
+
+            return;
+
+        }
+
+
+        const market =
+            data.prices[
+                syntheticSymbol
+            ];
+
+
+        if (!market) {
+
+            return;
+
+        }
+
+
+        const price =
+            Number(
+                market.price
+            );
+
+
+        if (
+            !Number.isFinite(price)
+        ) {
+
+            return;
+
+        }
+
+
+        const last =
+            AI_STATE.deepScanSamples.length
+
+                ? AI_STATE.deepScanSamples[
+                    AI_STATE.deepScanSamples.length - 1
+                  ].price
+
+                : null;
+
+
+        /*
+           Do not add identical prices.
+        */
+
+        if (
+            last === price
+        ) {
+
+            return;
+
+        }
+
+
+        AI_STATE.deepScanSamples.push({
+
+            price,
+
+            time:
+                Date.now(),
+
+            digit:
+                getLastDigit(
+                    price
+                )
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Deep Scan sample error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ======================================================
+   FINISH DEEP SCAN
+====================================================== */
+
+function finishDeepScan() {
+
+    if (
+        !AI_STATE.deepScanRunning
+    ) {
+
+        return;
+
+    }
+
+
+    clearInterval(
+        AI_STATE.deepScanTimer
+    );
+
+
+    AI_STATE.deepScanTimer =
+        null;
+
+
+    AI_STATE.deepScanRunning =
+        false;
+
+
+    const samples =
+        AI_STATE.deepScanSamples.slice();
+
+
+    const status =
+        document.getElementById(
+            "scanStatus"
+        );
+
+
+    status.textContent =
+        "SCAN COMPLETE — ANALYZING FRESH DATA";
+
+
+    /*
+       Need at least two different
+       price samples.
+    */
+
+    if (
+        samples.length < 2
+    ) {
+
+        document.getElementById(
+            "scanTrade"
+        ).textContent =
+            "WAIT";
+
+
+        document.getElementById(
+            "scanConfidence"
+        ).textContent =
+            "Not enough fresh price movement";
+
+
+        document.getElementById(
+            "scanPair"
+        ).textContent =
+            "Contract type: --";
+
+
+        document.getElementById(
+            "scanDuration"
+        ).textContent =
+            "Scan duration: 10 seconds";
+
+
+        document.getElementById(
+            "scanReason"
+        ).textContent =
+            "The 10-second scan did not collect enough different price samples.";
+
+
+        status.textContent =
+            "SCAN COMPLETE — INSUFFICIENT DATA";
+
+
+        const button =
+            document.getElementById(
+                "deepScanButton"
+            );
+
+
+        button.disabled =
+            false;
+
+
+        button.textContent =
+            "🔎 DEEP SCAN — 10 SECONDS";
+
+
+        return;
+
+    }
+
+
+    const result =
+        calculateDeepScan(
+            samples
+        );
+
+
+    AI_STATE.deepScanResult =
+        result;
+
+
+    displayDeepScan(
+        result
+    );
+
+
+    /*
+       IMPORTANT:
+       Deep Scan does NOT modify
+       the main AI Signal.
+    */
+
+
+    status.textContent =
+        "SCAN COMPLETE — " +
+        samples.length +
+        " fresh samples analyzed";
+
+
+    const button =
+        document.getElementById(
+            "deepScanButton"
+        );
+
+
+    button.disabled =
+        false;
+
+
+    button.textContent =
+        "🔎 DEEP SCAN — 10 SECONDS";
+
+}
+
+
+/* ======================================================
+   RESET
+====================================================== */
+
+function resetAI() {
+
+    AI_STATE.prices =
+        [];
+
+
+    AI_STATE.deepScanSamples =
+        [];
+
+
+    AI_STATE.deepScanResult =
+        null;
+
+
+    if (
+        AI_STATE.deepScanTimer
+    ) {
+
+        clearInterval(
+            AI_STATE.deepScanTimer
+        );
+
+    }
+
+
+    AI_STATE.deepScanTimer =
+        null;
+
+
+    AI_STATE.deepScanRunning =
+        false;
+
+
+    document.getElementById(
+        "signalDirection"
+    ).textContent =
+        "WAIT";
+
+
+    document.getElementById(
+        "confidence"
+    ).textContent =
+        "Confidence: --";
+
+
+    document.getElementById(
+        "signalStrength"
+    ).textContent =
+        "Signal Strength: --";
+
+
+    document.getElementById(
+        "currentPrice"
+    ).textContent =
+        "--";
+
+
+    document.getElementById(
+        "price"
+    ).textContent =
+        "--";
+
+
+    document.getElementById(
+        "previousPrice"
+    ).textContent =
+        "--";
+
+
+    document.getElementById(
+        "finalDigit"
+    ).textContent =
+        "--";
+
+
+    document.getElementById(
+        "digitCount"
+    ).textContent =
+        "0";
+
+
+    document.getElementById(
+        "movement"
+    ).textContent =
+        "--";
+
+
+    document.getElementById(
+        "volatility"
+    ).textContent =
+        "--";
+
+
+    document.getElementById(
+        "recentBias"
+    ).textContent =
+        "--";
+
+
+    document.getElementById(
+        "digitStreak"
+    ).textContent =
+        "--";
+
+
+    document.getElementById(
+        "reasons"
+    ).innerHTML =
+        '<div class="reason">Collecting new market data...</div>';
+
+
+    document.getElementById(
+        "scanResult"
+    ).classList.add(
+        "hidden"
+    );
+
+
+    document.getElementById(
+        "scanStatus"
+    ).classList.add(
+        "hidden"
+    );
+
+
+    const button =
+        document.getElementById(
+            "deepScanButton"
+        );
+
+
+    button.textContent =
+        "🔎 DEEP SCAN — 10 SECONDS";
+
+
+    [
+        "frequencyBar",
+        "shortBar",
+        "longBar",
+        "momentumBar",
+        "patternBar",
+        "agreementBar"
+
+    ].forEach(
+        id =>
+            setBar(
+                id,
+                0
+            )
+    );
+
+
+    [
+        "frequencyScore",
+        "shortScore",
+        "longScore",
+        "momentumScore",
+        "patternScore",
+        "agreementScore"
+
+    ].forEach(
+        id => {
+
+            document.getElementById(
+                id
+            ).textContent =
+                "--";
+
+        }
+    );
+
+
+    [
+        "riseProbability",
+        "fallProbability",
+        "higherProbability",
+        "lowerProbability",
+        "oddProbability",
+        "evenProbability",
+        "overProbability",
+        "underProbability"
+
+    ].forEach(
+        id => {
+
+            document.getElementById(
+                id
+            ).textContent =
+                "--%";
+
+        }
+    );
+
+
+    [
+        "riseBar",
+        "fallBar",
+        "higherBar",
+        "lowerBar",
+        "oddBar",
+        "evenBar",
+        "overBar",
+        "underBar"
+
+    ].forEach(
+        id =>
+            setBar(
+                id,
+                0
+            )
+    );
+
+
+    document.getElementById(
+        "tick100Up"
+    ).textContent =
+        "UP --%";
+
+
+    document.getElementById(
+        "tick100Down"
+    ).textContent =
+        "DOWN --%";
+
+
+    document.getElementById(
+        "tick1000Up"
+    ).textContent =
+        "UP --%";
+
+
+    document.getElementById(
+        "tick1000Down"
+    ).textContent =
+        "DOWN --%";
+
+}
+
+
+/* ======================================================
+   TARGET SELECTOR
+====================================================== */
+
+function updateTargetSelector() {
+
+    const symbol =
+        document.getElementById(
+            "marketSelect"
+        ).value;
+
+
+    const targetBox =
+        document.getElementById(
+            "targetBox"
+        );
+
+
+    const targetSelect =
+        document.getElementById(
+            "targetDigit"
+        );
+
+
+    targetSelect.innerHTML =
+        "";
+
+
+    if (
+        symbol === "KMF-OE" ||
+        symbol === "KMF-50"
+    ) {
+
+        targetBox.classList.add(
+            "hidden"
+        );
+
+
+        AI_STATE.targetDigit =
+            null;
+
+
+        return;
+
+    }
+
+
+    if (
+        symbol === "KMF-RF" ||
+        symbol === "KMF-HL" ||
+        symbol === "KMF-15" ||
+        symbol === "KMF-25"
+    ) {
+
+        for (
+            let i = 0;
+            i <= 9;
+            i++
+        ) {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                i;
+
+
+            option.textContent =
+                "Target " + i;
+
+
+            targetSelect.appendChild(
+                option
+            );
+
+        }
+
+
+        targetBox.classList.remove(
+            "hidden"
+        );
+
+
+        AI_STATE.targetDigit =
+            5;
+
+
+        targetSelect.value =
+            "5";
+
+
+        return;
+
+    }
+
+
+    if (
+        symbol === "KMF-OU" ||
+        symbol === "KMF-100"
+    ) {
+
+        for (
+            let i = 1;
+            i <= 8;
+            i++
+        ) {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                i;
+
+
+            option.textContent =
+                "Target " + i;
+
+
+            targetSelect.appendChild(
+                option
+            );
+
+        }
+
+
+        targetBox.classList.remove(
+            "hidden"
+        );
+
+
+        AI_STATE.targetDigit =
+            5;
+
+
+        targetSelect.value =
+            "5";
+
+
+        return;
+
+    }
+
+
+    targetBox.classList.add(
+        "hidden"
+    );
+
+
+    AI_STATE.targetDigit =
+        null;
+
+}
+
+
+/* ======================================================
+   UPDATE VOLATILITY UI
+====================================================== */
+
+function updateVolatilityUI() {
+
+    const symbol =
+        AI_STATE.currentSymbol;
+
+
+    const marketName =
+        AI_STATE.selectedMarketName;
+
+
+    const volatility =
+        isVolatilityMarket(
+            symbol,
+            marketName
+        );
+
+
+    const typeBox =
+        document.getElementById(
+            "marketTypeBox"
+        );
+
+
+    const panel =
+        document.getElementById(
+            "volatilityContracts"
+        );
+
+
+    const button =
+        document.getElementById(
+            "deepScanButton"
+        );
+
+
+    const contractType =
+        document.getElementById(
+            "contractType"
+        );
+
+
+    if (
+        volatility
+    ) {
+
+        typeBox.classList.remove(
+            "hidden"
+        );
+
+
+        /*
+           Do not show normal volatility
+           analysis until a type is selected.
+        */
+
+        if (
+            !AI_STATE.selectedVolatilityType
+        ) {
+
+            contractType.textContent =
+                "Market Type: SELECT TYPE";
+
+
+            panel.classList.add(
+                "hidden"
+            );
+
+
+            button.disabled =
+                true;
+
+
+            document.getElementById(
+                "status"
+            ).textContent =
+                "Select a Volatility Market Type to begin AI Analysis.";
+
+
+            return;
+
+        }
+
+
+        panel.classList.remove(
+            "hidden"
+        );
+
+
+        button.disabled =
+            AI_STATE.deepScanRunning;
+
+
+        contractType.textContent =
+            "Market Type: " +
+            getSelectedVolatilityTypeName();
+
+
+        return;
+
+    }
+
+
+    typeBox.classList.add(
+        "hidden"
+    );
+
+
+    panel.classList.add(
+        "hidden"
+    );
+
+
+    button.disabled =
+        true;
+
+
+    contractType.textContent =
+        "Market Type: " +
+        getContractType(
+            symbol,
+            marketName
+        );
+
+}
+
+
+/* ======================================================
+   SELECTED VOLATILITY TYPE
+====================================================== */
+
+function getSelectedVolatilityTypeName() {
+
+    const value =
+        AI_STATE.selectedVolatilityType;
+
+
+    if (
+        value === "RISE_FALL"
+    ) {
+
+        return "RISE / FALL";
+
+    }
+
+
+    if (
+        value === "HIGHER_LOWER"
+    ) {
+
+        return "HIGHER / LOWER";
+
+    }
+
+
+    if (
+        value === "ODD_EVEN"
+    ) {
+
+        return "ODD / EVEN";
+
+    }
+
+
+    if (
+        value === "OVER_UNDER"
+    ) {
+
+        return "OVER / UNDER";
+
+    }
+
+
+    return "--";
+
+}
+
+
+/* ======================================================
+   LOAD MARKETS
+====================================================== */
+
+async function loadMarkets() {
+
+    try {
+
+        document.getElementById(
+            "status"
+        ).textContent =
+            "Connecting to KMFBinary server...";
+
+
+        const session =
+            await window.supabaseClient
+                .auth
+                .getSession();
+
+
+        if (
+            session.error ||
+            !session.data.session
+        ) {
+
+            window.location.replace(
+                "../login.html"
+            );
+
+
+            return;
+
+        }
+
+
+        const markets =
+            await getMarkets();
+
+
+        const select =
+            document.getElementById(
+                "marketSelect"
+            );
+
+
+        select.innerHTML =
+            "";
+
+
+        if (
+            !markets.length
+        ) {
+
+            select.innerHTML =
+                '<option value="">No markets available</option>';
+
+
+            document.getElementById(
+                "status"
+            ).textContent =
+                "No active markets.";
+
+
+            return;
+
+        }
+
+
+        markets.forEach(
+            market => {
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                option.value =
+                    market.symbol;
+
+
+                option.textContent =
+                    market.market_name ||
+                    market.symbol;
+
+
+                /*
+                   Store the real market name
+                   so volatility detection can
+                   check both symbol and name.
+                */
+
+                option.dataset.marketName =
+                    market.market_name ||
+                    "";
+
+
+                select.appendChild(
+                    option
+                );
+
+            }
+        );
+
+
+        AI_STATE.currentSymbol =
+            select.value;
+
+
+        const selectedOption =
+            select.options[
+                select.selectedIndex
+            ];
+
+
+        AI_STATE.selectedMarketName =
+            selectedOption
+                ? selectedOption.dataset.marketName || ""
+                : "";
+
+
+        /*
+           Start with no volatility
+           contract selected.
+        */
+
+        AI_STATE.selectedVolatilityType =
+            "";
+
+
+        document.getElementById(
+            "marketTypeSelect"
+        ).value =
+            "";
+
+
+        updateTargetSelector();
+
+
+        updateVolatilityUI();
+
+
+        const volatility =
+            isVolatilityMarket(
+                AI_STATE.currentSymbol,
+                AI_STATE.selectedMarketName
+            );
+
+
+        if (
+            volatility
+        ) {
+
+            document.getElementById(
+                "status"
+            ).textContent =
+                "Volatility market selected. Choose Market Type to begin AI Analysis.";
+
+        }
+
+        else {
+
+            document.getElementById(
+                "status"
+            ).textContent =
+                "Markets loaded. Starting AI...";
+
+        }
+
+
+        startAIEngine();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "LOAD MARKETS ERROR:",
+            error
+        );
+
+
+        document.getElementById(
+            "marketSelect"
+        ).innerHTML =
+            '<option value="">Failed to load markets</option>';
+
+
+        document.getElementById(
+            "status"
+        ).textContent =
+            error.message;
+
+    }
+
+}
+
+
+/* ======================================================
+   MARKET CHANGE
+====================================================== */
+
+document.getElementById(
+    "marketSelect"
+).addEventListener(
+    "change",
+    function() {
+
+        if (
+            AI_STATE.deepScanRunning
+        ) {
+
+            return;
+
+        }
+
+
+        resetAI();
+
+
+        AI_STATE.currentSymbol =
+            this.value;
+
+
+        const selectedOption =
+            this.options[
+                this.selectedIndex
+            ];
+
+
+        AI_STATE.selectedMarketName =
+            selectedOption
+                ? selectedOption.dataset.marketName || ""
+                : "";
+
+
+        /*
+           User must select the
+           volatility contract type again
+           when changing markets.
+        */
+
+        AI_STATE.selectedVolatilityType =
+            "";
+
+
+        document.getElementById(
+            "marketTypeSelect"
+        ).value =
+            "";
+
+
+        updateTargetSelector();
+
+
+        updateVolatilityUI();
+
+
+        if (
+            isVolatilityMarket(
+                AI_STATE.currentSymbol,
+                AI_STATE.selectedMarketName
+            )
+        ) {
+
+            document.getElementById(
+                "status"
+            ).textContent =
+                "Volatility market selected. Select Market Type to begin AI Analysis.";
+
+
+            return;
+
+        }
+
+
+        updateAI();
+
+    }
+);
+
+
+/* ======================================================
+   VOLATILITY MARKET TYPE CHANGE
+====================================================== */
+
+document.getElementById(
+    "marketTypeSelect"
+).addEventListener(
+    "change",
+    function() {
+
+        AI_STATE.selectedVolatilityType =
+            this.value;
+
+
+        resetAI();
+
+
+        AI_STATE.currentSymbol =
+            document.getElementById(
+                "marketSelect"
+            ).value;
+
+
+        const marketSelect =
+            document.getElementById(
+                "marketSelect"
+            );
+
+
+        const selectedOption =
+            marketSelect.options[
+                marketSelect.selectedIndex
+            ];
+
+
+        AI_STATE.selectedMarketName =
+            selectedOption
+                ? selectedOption.dataset.marketName || ""
+                : "";
+
+
+        updateVolatilityUI();
+
+
+        if (
+            this.value
+        ) {
+
+            document.getElementById(
+                "contractType"
+            ).textContent =
+                "Market Type: " +
+                getSelectedVolatilityTypeName();
+
+
+            document.getElementById(
+                "status"
+            ).textContent =
+                "Volatility " +
+                getSelectedVolatilityTypeName() +
+                " selected. Starting AI Analysis...";
+
+
+            updateAI();
+
+        }
+
+    }
+);
+
+
+/* ======================================================
+   TARGET CHANGE
+====================================================== */
+
+document.getElementById(
+    "targetDigit"
+).addEventListener(
+    "change",
+    function() {
+
+        AI_STATE.targetDigit =
+            Number(
+                this.value
+            );
+
+
+        updateAI();
+
+    }
+);
+
+
+/* ======================================================
+   DEEP SCAN BUTTON
+====================================================== */
+
+document.getElementById(
+    "deepScanButton"
+).addEventListener(
+    "click",
+    function() {
+
+        startDeepScan();
+
+    }
+);
+
+
+/* ======================================================
+   START ENGINE
+====================================================== */
+
+function startAIEngine() {
+
+    if (
+        AI_STATE.running
+    ) {
+
+        return;
+
+    }
+
+
+    AI_STATE.running =
+        true;
+
+
+    updateAI();
+
+
+    AI_STATE.timer =
+        setInterval(
+            updateAI,
+            1000
+        );
+
+}
+
+
+/* ======================================================
+   PAGE START
+====================================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        loadMarkets();
+
+    }
+);
+
+</script>
+
+</body>
+
+</html>

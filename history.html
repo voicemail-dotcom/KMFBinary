@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>KMFBinary - Trade History</title>
+
+    <style>
+
+        :root {
+            --bg: #0b0f14;
+            --panel: #111821;
+            --panel2: #17212c;
+            --border: #24303c;
+            --text: #f1f5f9;
+            --muted: #8b98a7;
+            --green: #22c55e;
+            --red: #ef4444;
+            --blue: #60a5fa;
+            --yellow: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 25px;
+        }
+
+        /* ==========================================
+           TOP BAR
+           ========================================== */
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .nav {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: var(--muted);
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .nav a:hover {
+            background: var(--panel2);
+            color: var(--text);
+        }
+
+        /* ==========================================
+           PANEL
+           ========================================== */
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* ==========================================
+           PAGE HEADER
+           ========================================== */
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .account-badge {
+            padding: 8px 13px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .account-badge.demo {
+            background: rgba(96, 165, 250, 0.15);
+            color: var(--blue);
+        }
+
+        .account-badge.live {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--green);
+        }
+
+        /* ==========================================
+           STATS
+           ========================================== */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            background: var(--panel2);
+            border: 1px solid var(--border);
+            padding: 18px;
+            border-radius: 8px;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .win {
+            color: var(--green);
+            font-weight: bold;
+        }
+
+        .loss {
+            color: var(--red);
+            font-weight: bold;
+        }
+
+        /* ==========================================
+           TABLE
+           ========================================== */
+
+        .history-table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        th,
+        td {
+            padding: 13px 10px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+            font-size: 13px;
+        }
+
+        th {
+            color: var(--muted);
+            font-weight: normal;
+        }
+
+        td {
+            vertical-align: middle;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        .status.won {
+            color: var(--green);
+        }
+
+        .status.lost {
+            color: var(--red);
+        }
+
+        .status.pending {
+            color: var(--yellow);
+        }
+
+        .status.cancelled {
+            color: var(--muted);
+        }
+
+        .mode {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .mode.demo {
+            color: var(--blue);
+        }
+
+        .mode.real {
+            color: var(--green);
+        }
+
+        .profit-positive {
+            color: var(--green);
+            font-weight: bold;
+        }
+
+        .profit-negative {
+            color: var(--red);
+            font-weight: bold;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: var(--muted);
+        }
+
+        /* ==========================================
+           REFRESH
+           ========================================== */
+
+        .refresh-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 12px;
+        }
+
+        .refresh-button {
+            background: var(--panel2);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 8px 13px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .refresh-button:hover {
+            background: #202c38;
+        }
+
+        /* ==========================================
+           ERROR
+           ========================================== */
+
+        .error-message {
+            display: none;
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            color: #fca5a5;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        /* ==========================================
+           MOBILE
+           ========================================== */
+
+        @media (max-width: 850px) {
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 700px) {
+
+            .container {
+                padding: 15px;
+            }
+
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .nav {
+                width: 100%;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- ==========================================
+         TOP BAR
+         ========================================== -->
+
+    <div class="topbar">
+
+        <div class="logo">
+            KMF<span style="color:#22c55e;">Binary</span>
+        </div>
+
+
+        <div class="nav">
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+            <a href="markets.html">
+                Markets
+            </a>
+
+            <a href="trade.html">
+                Trade
+            </a>
+
+            <a href="history.html">
+                History
+            </a>
+
+            <a href="wallet.html">
+                Wallet
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+         MAIN PANEL
+         ========================================== -->
+
+    <div class="panel">
+
+
+        <!-- PAGE HEADER -->
+
+        <div class="page-header">
+
+            <h1>
+                Trade History
+            </h1>
+
+
+            <div
+                id="accountBadge"
+                class="account-badge demo"
+            >
+                DEMO ACCOUNT
+            </div>
+
+        </div>
+
+
+        <!-- ERROR -->
+
+        <div
+            id="errorMessage"
+            class="error-message"
+        ></div>
+
+
+        <!-- ======================================
+             STATS
+             ====================================== -->
+
+        <div class="stats">
+
+
+            <div class="stat">
+
+                <div class="stat-label">
+                    Total Trades
+                </div>
+
+                <div
+                    id="totalTrades"
+                    class="stat-value"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div class="stat-label">
+                    Wins
+                </div>
+
+                <div
+                    id="totalWins"
+                    class="stat-value win"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div class="stat-label">
+                    Losses
+                </div>
+
+                <div
+                    id="totalLosses"
+                    class="stat-value loss"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div class="stat-label">
+                    Net Profit
+                </div>
+
+                <div
+                    id="totalProfit"
+                    class="stat-value"
+                >
+                    $0.00
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ======================================
+             REFRESH
+             ====================================== -->
+
+        <div class="refresh-row">
+
+            <button
+                id="refreshButton"
+                class="refresh-button"
+                type="button"
+            >
+                ↻ Refresh
+            </button>
+
+        </div>
+
+
+        <!-- ======================================
+             HISTORY TABLE
+             ====================================== -->
+
+        <div class="history-table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Time
+                        </th>
+
+                        <th>
+                            Account
+                        </th>
+
+                        <th>
+                            Market
+                        </th>
+
+                        <th>
+                            Contract
+                        </th>
+
+                        <th>
+                            Action
+                        </th>
+
+                        <th>
+                            Stake
+                        </th>
+
+                        <th>
+                            Entry
+                        </th>
+
+                        <th>
+                            Exit
+                        </th>
+
+                        <th>
+                            Result
+                        </th>
+
+                        <th>
+                            Profit
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="historyTableBody">
+
+                    <tr>
+
+                        <td
+                            colspan="10"
+                            class="empty"
+                        >
+                            Loading history...
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ==========================================
+     SUPABASE
+     ========================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<!-- ==========================================
+     API
+     ========================================== -->
+
+<script src="js/api.js"></script>
+
+
+<script>
+
+"use strict";
+
+
+/* ==========================================
+   DOM ELEMENTS
+   ========================================== */
+
+const tableBody =
+    document.getElementById(
+        "historyTableBody"
+    );
+
+const totalTrades =
+    document.getElementById(
+        "totalTrades"
+    );
+
+const totalWins =
+    document.getElementById(
+        "totalWins"
+    );
+
+const totalLosses =
+    document.getElementById(
+        "totalLosses"
+    );
+
+const totalProfit =
+    document.getElementById(
+        "totalProfit"
+    );
+
+const accountBadge =
+    document.getElementById(
+        "accountBadge"
+    );
+
+const errorMessage =
+    document.getElementById(
+        "errorMessage"
+    );
+
+const refreshButton =
+    document.getElementById(
+        "refreshButton"
+    );
+
+
+/* ==========================================
+   ACCOUNT MODE
+   ========================================== */
+
+function getSelectedAccount() {
+
+    const mode =
+        String(
+            localStorage.getItem(
+                "kmf_account_mode"
+            ) || "demo"
+        )
+        .trim()
+        .toLowerCase();
+
+
+    return mode === "real"
+        ? "real"
+        : "demo";
+
+}
+
+
+/* ==========================================
+   ACCOUNT DISPLAY
+   ========================================== */
+
+function updateAccountDisplay() {
+
+    const mode =
+        getSelectedAccount();
+
+
+    if (!accountBadge) {
+        return;
+    }
+
+
+    if (mode === "real") {
+
+        accountBadge.textContent =
+            "LIVE ACCOUNT";
+
+        accountBadge.className =
+            "account-badge live";
+
+    } else {
+
+        accountBadge.textContent =
+            "DEMO ACCOUNT";
+
+        accountBadge.className =
+            "account-badge demo";
+
+    }
+
+}
+
+
+/* ==========================================
+   SHOW ERROR
+   ========================================== */
+
+function showError(message) {
+
+    if (!errorMessage) {
+        return;
+    }
+
+
+    errorMessage.textContent =
+        message || "Unable to load trade history.";
+
+
+    errorMessage.style.display =
+        "block";
+
+}
+
+
+/* ==========================================
+   HIDE ERROR
+   ========================================== */
+
+function hideError() {
+
+    if (!errorMessage) {
+        return;
+    }
+
+
+    errorMessage.style.display =
+        "none";
+
+}
+
+
+/* ==========================================
+   FORMAT MONEY
+   ========================================== */
+
+function formatMoney(value) {
+
+    const number =
+        Number(value);
+
+
+    if (!Number.isFinite(number)) {
+
+        return "$0.00";
+
+    }
+
+
+    return "$" +
+        number.toFixed(2);
+
+}
+
+
+/* ==========================================
+   FORMAT PRICE
+   ========================================== */
+
+function formatPrice(value) {
+
+    const number =
+        Number(value);
+
+
+    if (!Number.isFinite(number)) {
+
+        return "-";
+
+    }
+
+
+    return number.toFixed(2);
+
+}
+
+
+/* ==========================================
+   FORMAT DATE
+   ========================================== */
+
+function formatDate(value) {
+
+    if (!value) {
+
+        return "-";
+
+    }
+
+
+    const date =
+        new Date(value);
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return "-";
+
+    }
+
+
+    return date.toLocaleString();
+
+}
+
+
+/* ==========================================
+   ESCAPE HTML
+   ========================================== */
+
+function escapeHTML(value) {
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* ==========================================
+   NORMALIZE RESULT
+   ========================================== */
+
+function normalizeResult(trade) {
+
+    const result =
+        String(
+            trade.result ||
+            trade.status ||
+            ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+    if (
+        result === "won" ||
+        result === "win"
+    ) {
+
+        return "WON";
+
+    }
+
+
+    if (
+        result === "lost" ||
+        result === "loss"
+    ) {
+
+        return "LOST";
+
+    }
+
+
+    if (
+        result === "cancelled" ||
+        result === "canceled"
+    ) {
+
+        return "CANCELLED";
+
+    }
+
+
+    return "PENDING";
+
+}
+
+
+/* ==========================================
+   NORMALIZE PROFIT
+   ========================================== */
+
+function getTradeProfit(trade) {
+
+    if (
+        trade.profit !== undefined &&
+        trade.profit !== null
+    ) {
+
+        const profit =
+            Number(trade.profit);
+
+
+        if (
+            Number.isFinite(profit)
+        ) {
+
+            return profit;
+
+        }
+
+    }
+
+
+    const result =
+        normalizeResult(trade);
+
+
+    const stake =
+        Number(trade.stake);
+
+
+    if (
+        !Number.isFinite(stake)
+    ) {
+
+        return 0;
+
+    }
+
+
+    if (result === "LOST") {
+
+        return -stake;
+
+    }
+
+
+    return 0;
+
+}
+
+
+/* ==========================================
+   FILTER ACCOUNT
+   ========================================== */
+
+function filterBySelectedAccount(
+    trades
+) {
+
+    const selectedAccount =
+        getSelectedAccount();
+
+
+    return trades.filter(
+        trade => {
+
+            const mode =
+                String(
+                    trade.mode ||
+                    "demo"
+                )
+                .trim()
+                .toLowerCase();
+
+
+            return mode === selectedAccount;
+
+        }
+    );
+
+}
+
+
+/* ==========================================
+   LOAD HISTORY
+   ========================================== */
+
+async function loadHistory() {
+
+    hideError();
+
+
+    tableBody.innerHTML = `
+
+        <tr>
+
+            <td
+                colspan="10"
+                class="empty"
+            >
+                Loading history...
+
+            </td>
+
+        </tr>
+
+    `;
+
+
+    try {
+
+        const authenticated =
+            await isAuthenticated();
+
+
+        if (!authenticated) {
+
+            window.location.replace(
+                "login.html"
+            );
+
+            return;
+
+        }
+
+
+        updateAccountDisplay();
+
+
+        const trades =
+            await getTrades();
+
+
+        if (
+            !Array.isArray(trades)
+        ) {
+
+            throw new Error(
+                "Invalid trade history response."
+            );
+
+        }
+
+
+        /*
+         * The backend already scopes
+         * /api/trades to the authenticated
+         * user.
+         *
+         * We additionally filter by the
+         * currently selected Demo/Live
+         * account.
+         */
+
+        const selectedTrades =
+            filterBySelectedAccount(
+                trades
+            );
+
+
+        renderHistory(
+            selectedTrades
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "History loading error:",
+            error
+        );
+
+
+        tableBody.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="10"
+                    class="empty"
+                >
+                    Unable to load trade history.
+
+                </td>
+
+            </tr>
+
+        `;
+
+
+        showError(
+            error.message ||
+            "Unable to load trade history."
+        );
+
+    }
+
+}
+
+
+/* ==========================================
+   RENDER HISTORY
+   ========================================== */
+
+function renderHistory(
+    trades
+) {
+
+    totalTrades.textContent =
+        trades.length;
+
+
+    let wins = 0;
+
+    let losses = 0;
+
+    let profit = 0;
+
+
+    trades.forEach(
+        trade => {
+
+            const result =
+                normalizeResult(
+                    trade
+                );
+
+
+            if (
+                result === "WON"
+            ) {
+
+                wins++;
+
+            }
+
+
+            if (
+                result === "LOST"
+            ) {
+
+                losses++;
+
+            }
+
+
+            profit +=
+                getTradeProfit(
+                    trade
+                );
+
+        }
+    );
+
+
+    totalWins.textContent =
+        wins;
+
+
+    totalLosses.textContent =
+        losses;
+
+
+    totalProfit.textContent =
+        formatMoney(
+            profit
+        );
+
+
+    totalProfit.className =
+        "stat-value " +
+        (
+            profit > 0
+                ? "profit-positive"
+                : profit < 0
+                    ? "profit-negative"
+                    : ""
+        );
+
+
+    if (
+        trades.length === 0
+    ) {
+
+        tableBody.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="10"
+                    class="empty"
+                >
+                    No trades for this account yet.
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    tableBody.innerHTML = "";
+
+
+    /*
+     * Newest first.
+     */
+
+    const sortedTrades =
+        trades
+            .slice()
+            .sort(
+                (
+                    a,
+                    b
+                ) => {
+
+                    const dateA =
+                        new Date(
+                            a.created_at ||
+                            a.createdAt ||
+                            0
+                        )
+                        .getTime();
+
+
+                    const dateB =
+                        new Date(
+                            b.created_at ||
+                            b.createdAt ||
+                            0
+                        )
+                        .getTime();
+
+
+                    return dateB - dateA;
+
+                }
+            );
+
+
+    sortedTrades.forEach(
+        trade => {
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            const result =
+                normalizeResult(
+                    trade
+                );
+
+
+            const tradeMode =
+                String(
+                    trade.mode ||
+                    "demo"
+                )
+                .trim()
+                .toLowerCase();
+
+
+            const market =
+                trade.market_symbol ||
+                trade.marketSymbol ||
+                trade.symbol ||
+                trade.market_id ||
+                "-";
+
+
+            const contract =
+                trade.contract_type ||
+                trade.contractType ||
+                "-";
+
+
+            const action =
+                trade.action ||
+                trade.direction ||
+                "-";
+
+
+            const stake =
+                Number(
+                    trade.stake
+                );
+
+
+            const entry =
+                trade.entry_price ??
+                trade.entryPrice ??
+                "-";
+
+
+            const exit =
+                trade.exit_price ??
+                trade.exitPrice ??
+                trade.final_price ??
+                trade.finalPrice ??
+                "-";
+
+
+            const profit =
+                getTradeProfit(
+                    trade
+                );
+
+
+            let resultClass =
+                "pending";
+
+
+            if (
+                result === "WON"
+            ) {
+
+                resultClass =
+                    "won";
+
+            }
+
+
+            if (
+                result === "LOST"
+            ) {
+
+                resultClass =
+                    "lost";
+
+            }
+
+
+            if (
+                result === "CANCELLED"
+            ) {
+
+                resultClass =
+                    "cancelled";
+
+            }
+
+
+            let profitClass = "";
+
+
+            if (
+                profit > 0
+            ) {
+
+                profitClass =
+                    "profit-positive";
+
+            }
+
+
+            if (
+                profit < 0
+            ) {
+
+                profitClass =
+                    "profit-negative";
+
+            }
+
+
+            const accountClass =
+                tradeMode === "real"
+                    ? "real"
+                    : "demo";
+
+
+            const accountText =
+                tradeMode === "real"
+                    ? "LIVE"
+                    : "DEMO";
+
+
+            row.innerHTML = `
+
+                <td>
+                    ${escapeHTML(
+                        formatDate(
+                            trade.created_at ||
+                            trade.createdAt ||
+                            trade.timestamp
+                        )
+                    )}
+                </td>
+
+
+                <td>
+
+                    <span
+                        class="mode ${accountClass}"
+                    >
+                        ${accountText}
+                    </span>
+
+                </td>
+
+
+                <td>
+                    ${escapeHTML(
+                        String(market)
+                    )}
+                </td>
+
+
+                <td>
+                    ${escapeHTML(
+                        String(contract)
+                    )}
+                </td>
+
+
+                <td>
+                    ${escapeHTML(
+                        String(action)
+                    )}
+                </td>
+
+
+                <td>
+                    ${formatMoney(
+                        Number.isFinite(stake)
+                            ? stake
+                            : 0
+                    )}
+                </td>
+
+
+                <td>
+                    ${escapeHTML(
+                        formatPrice(entry)
+                    )}
+                </td>
+
+
+                <td>
+                    ${escapeHTML(
+                        formatPrice(exit)
+                    )}
+                </td>
+
+
+                <td
+                    class="status ${resultClass}"
+                >
+                    ${escapeHTML(
+                        result
+                    )}
+                </td>
+
+
+                <td
+                    class="${profitClass}"
+                >
+                    ${formatMoney(
+                        profit
+                    )}
+                </td>
+
+            `;
+
+
+            tableBody.appendChild(
+                row
+            );
+
+        }
+    );
+
+}
+
+
+/* ==========================================
+   REFRESH BUTTON
+   ========================================== */
+
+refreshButton.addEventListener(
+    "click",
+    function () {
+
+        loadHistory();
+
+    }
+);
+
+
+/* ==========================================
+   ACCOUNT CHANGE
+   ========================================== */
+
+window.addEventListener(
+    "storage",
+    function (event) {
+
+        if (
+            event.key ===
+            "kmf_account_mode"
+        ) {
+
+            updateAccountDisplay();
+
+            loadHistory();
+
+        }
+
+    }
+);
+
+
+/* ==========================================
+   START
+   ========================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        updateAccountDisplay();
+
+        loadHistory();
+
+    }
+);
+
+</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,8929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Trade - KMFBinary</title>
+
+    <link rel="stylesheet" href="css/global.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #07100d;
+            color: #e8f5ef;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .trade-page {
+            width: 100%;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .trade-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding: 18px 20px;
+            background: #0c1713;
+            border: 1px solid #1d3028;
+            border-radius: 14px;
+        }
+
+        .trade-header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .trade-header p {
+            margin: 5px 0 0;
+            color: #8ca59b;
+            font-size: 13px;
+        }
+
+        .trade-market-price {
+            text-align: right;
+        }
+
+        .trade-market-price span {
+            display: block;
+            color: #7f9990;
+            font-size: 12px;
+        }
+
+        .trade-market-price strong {
+            display: block;
+            margin-top: 4px;
+            font-size: 25px;
+            color: #42e38b;
+        }
+.trade-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(320px, 1fr);
+    gap: 18px;
+    align-items: start;
+    width: 100%;
+    min-width: 0;
+}
+
+.trade-grid > .analysis-column {
+    grid-column: 1;
+    min-width: 0;
+    width: 100%;
+}
+
+.trade-grid > .panel {
+    grid-column: 2;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.analysis-column {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-width: 0;
+}
+
+.trade-grid > .panel {
+    min-width: 0;
+    width: 100%;
+}
+.trade-grid .field,
+.trade-grid .selected-info,
+.trade-grid select,
+.trade-grid input,
+.trade-grid button {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.trade-grid select,
+.trade-grid input {
+    width: 100%;
+}
+        .panel {
+            background: #0c1713;
+            border: 1px solid #1d3028;
+            border-radius: 14px;
+            padding: 18px;
+        }
+
+        .panel h2 {
+            margin: 0 0 16px;
+            font-size: 17px;
+        }
+
+        .field {
+            margin-bottom: 15px;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 7px;
+            color: #9bb0a8;
+            font-size: 13px;
+        }
+
+        select,
+        input {
+            width: 100%;
+            min-height: 42px;
+            padding: 10px 12px;
+            border: 1px solid #294239;
+            border-radius: 8px;
+            background: #08120f;
+            color: #fff;
+            outline: none;
+        }
+
+        select:focus,
+        input:focus {
+            border-color: #32d77c;
+        }
+
+        .contract-description {
+            margin-top: 8px;
+            padding: 10px;
+            border-radius: 8px;
+            background: #08120f;
+            color: #8fa69d;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+/* ==========================
+   QUICK TRADE RESULT
+=========================== */
+
+.result-panel {
+    margin-top: 12px;
+    padding: 14px;
+    border: 1px solid #294239;
+    background: #091510;
+}
+
+.result-panel h2 {
+    margin: 0 0 12px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.result-panel .result-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.result-panel .result-item {
+    padding: 10px;
+    background: #07100d;
+    border: 1px solid #1d3028;
+    border-radius: 8px;
+}
+
+.result-panel .result-item span {
+    display: block;
+    margin-bottom: 4px;
+    color: #718b81;
+    font-size: 10px;
+}
+
+.result-panel .result-item strong {
+    display: block;
+    color: #fff;
+    font-size: 13px;
+}
+
+.result-status-large {
+    font-size: 18px !important;
+    font-weight: 800 !important;
+}
+
+.result-waiting {
+    margin-top: 10px;
+    padding: 9px 10px;
+    border-radius: 7px;
+    background: #181608;
+    border: 1px solid #514719;
+    color: #ffc857;
+    font-size: 12px;
+    text-align: center;
+}
+
+.status-won {
+    color: #42e38b !important;
+}
+
+.status-lost {
+    color: #ff6e79 !important;
+}
+
+.status-pending {
+    color: #ffc857 !important;
+}
+
+.status-cancelled {
+    color: #a8b5af !important;
+}
+
+@media (max-width: 900px) {
+    .result-panel .result-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .result-panel .result-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .result-panel {
+        padding: 12px;
+    }
+}
+        /* ==========================
+           DIGITS
+        ========================== */
+
+        .digit-buttons {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 7px;
+        }
+
+        .digit-btn {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            border: 1px solid #294239;
+            background: #101e19;
+            color: #fff;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .digit-btn:hover {
+            border-color: #42e38b;
+        }
+
+        .digit-btn.active {
+            background: #1d9d5b;
+            border-color: #42e38b;
+        }
+
+        /* ==========================
+           DIRECTION BUTTONS
+        ========================== */
+
+        .direction-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .direction-btn {
+            flex: 1;
+            min-height: 40px;
+            border: 1px solid #294239;
+            border-radius: 8px;
+            background: #101e19;
+            color: #dcebe5;
+            cursor: pointer;
+        }
+
+        .direction-btn.active {
+            background: #155d39;
+            border-color: #42e38b;
+        }
+
+        /* ==========================
+           TRADE BUTTONS
+        ========================== */
+
+        .trade-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .trade-btn {
+            min-height: 52px;
+            border: 0;
+            border-radius: 9px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .trade-btn.rise,
+        .trade-btn.higher,
+        .trade-btn.over,
+        .trade-btn.even,
+        .trade-btn.touch,
+        .trade-btn.accumulate,
+        .trade-btn.matches {
+            background: #15844b;
+        }
+
+        .trade-btn.fall,
+        .trade-btn.lower,
+        .trade-btn.under,
+        .trade-btn.odd,
+        .trade-btn.no-touch,
+        .trade-btn.differs {
+            background: #a13a42;
+        }
+
+        .trade-btn:disabled,
+        .direction-btn:disabled,
+        .digit-btn:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+        /* ==========================
+           ENTRY / PAYOUT TABLE
+        ========================== */
+
+        .trade-info-panel {
+            margin-top: 12px;
+            padding: 12px;
+            border: 1px solid #1d3028;
+            border-radius: 10px;
+            background: #08120f;
+        }
+
+        .trade-info-title {
+            margin-bottom: 9px;
+            color: #8ca59b;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .7px;
+        }
+
+        .trade-info-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .trade-info-table th,
+        .trade-info-table td {
+            padding: 9px 7px;
+            text-align: left;
+            border-bottom: 1px solid #172b23;
+            font-size: 12px;
+        }
+
+        .trade-info-table th {
+            color: #718b81;
+            font-weight: 500;
+        }
+
+        .trade-info-table td {
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .trade-info-table tr:last-child th,
+        .trade-info-table tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .payout-value {
+            color: #42e38b !important;
+        }
+
+        /* ==========================
+           SELECTED INFO
+        ========================== */
+
+        .selected-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .info-box {
+            padding: 12px;
+            border-radius: 8px;
+            background: #08120f;
+            border: 1px solid #1d3028;
+        }
+
+        .info-label {
+            color: #718b81;
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* ==========================
+           MESSAGE
+        ========================== */
+
+        .message {
+            display: none;
+            margin-bottom: 15px;
+            padding: 11px 13px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.error {
+            background: #35171b;
+            border: 1px solid #7e3038;
+            color: #ffb8bd;
+        }
+
+        .message.success {
+            background: #10321f;
+            border: 1px solid #23794a;
+            color: #a9f4c6;
+        }
+
+        /* ==========================
+           SUMMARY / RESULT
+        ========================== */
+
+        .summary-panel,
+        .result-panel {
+            margin-top: 18px;
+        }
+
+        .summary-grid,
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .summary-item,
+        .result-item {
+            background: #08120f;
+            border: 1px solid #1d3028;
+            border-radius: 8px;
+            padding: 11px;
+        }
+
+        .summary-item span,
+        .result-item span {
+            display: block;
+            color: #718b81;
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+
+        .summary-item strong,
+        .result-item strong {
+            font-size: 13px;
+        }
+
+        .status-won {
+            color: #42e38b !important;
+        }
+
+        .status-lost {
+            color: #ff6e79 !important;
+        }
+
+        .status-pending {
+            color: #ffc857 !important;
+        }
+
+        /* ==========================
+           CANDLESTICK CHART
+        ========================== */
+.chart-panel {
+    margin-top: 0;
+}
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+
+        .chart-header h2 {
+            margin: 0;
+        }
+
+        .chart-info {
+            color: #718b81;
+            font-size: 11px;
+            text-align: right;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 430px;
+            overflow: hidden;
+            border: 1px solid #1d3028;
+            border-radius: 10px;
+            background: #07100d;
+        }
+
+        #marketChart {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .chart-loading,
+        .chart-error,
+        .chart-empty {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+            color: #819a90;
+            font-size: 13px;
+            pointer-events: none;
+        }
+
+        .chart-error {
+            color: #ff9299;
+        }
+
+        .chart-empty {
+            color: #819a90;
+        }
+
+        .chart-footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 8px;
+            color: #60786f;
+            font-size: 11px;
+        }
+
+        /* ==========================
+           STATISTICS
+        ========================== */
+
+        .statistics-panel {
+            margin-top: 18px;
+        }
+
+        .statistics-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .statistics-header h2 {
+            margin: 0;
+        }
+
+        .statistics-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .statistics-controls label {
+            color: #8ca59b;
+            font-size: 12px;
+        }
+
+        .statistics-controls select {
+            width: auto;
+            min-width: 90px;
+            min-height: 36px;
+        }
+
+        .statistics-note {
+            padding: 10px 12px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background: #08120f;
+            color: #819a90;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .statistics-overview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .statistics-box {
+            padding: 13px;
+            border-radius: 9px;
+            border: 1px solid #1d3028;
+            background: #08120f;
+        }
+
+        .statistics-box-label {
+            color: #718b81;
+            font-size: 11px;
+            margin-bottom: 7px;
+        }
+
+        .statistics-box-value {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .odd-even-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .odd-even-box {
+            padding: 14px;
+            border: 1px solid #1d3028;
+            border-radius: 9px;
+            background: #08120f;
+        }
+
+        .odd-even-title {
+            color: #80988e;
+            font-size: 12px;
+        }
+
+        .odd-even-value {
+            margin-top: 6px;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .digit-frequency-title {
+            margin-bottom: 12px;
+            color: #8ca59b;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .7px;
+        }
+
+        .digit-frequency-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .digit-frequency-row {
+            display: grid;
+            grid-template-columns: 36px 1fr 65px;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .statistics-digit {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #14231d;
+            border: 1px solid #294239;
+            font-weight: 700;
+        }
+
+        .statistics-digit.most {
+            background: #17653c;
+            border-color: #42e38b;
+            color: #fff;
+        }
+
+        .statistics-digit.least {
+            background: #7f2933;
+            border-color: #ff6570;
+            color: #fff;
+        }
+
+        .statistics-bar-container {
+            height: 13px;
+            overflow: hidden;
+            border-radius: 20px;
+            background: #15241f;
+        }
+
+        .statistics-bar {
+            height: 100%;
+            min-width: 0;
+            border-radius: 20px;
+            background: #368e67;
+            transition: width .3s ease;
+        }
+
+        .statistics-bar.most {
+            background: #42e38b;
+        }
+
+        .statistics-bar.least {
+            background: #d64c58;
+        }
+
+        .statistics-percentage {
+            text-align: right;
+            color: #d7e5df;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .statistics-loading,
+        .statistics-error,
+        .statistics-empty {
+            padding: 25px;
+            text-align: center;
+            color: #819a90;
+            border: 1px dashed #294239;
+            border-radius: 9px;
+        }
+
+        .statistics-error {
+            color: #ff9299;
+        }
+
+        .statistics-updated {
+            margin-top: 12px;
+            text-align: right;
+            color: #60786f;
+            font-size: 11px;
+        }
+
+        /* ==========================
+           MOBILE
+        ========================== */
+
+@media (max-width: 900px) {
+    .trade-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-grid,
+    .result-grid,
+    .statistics-overview {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .chart-container {
+        height: 360px;
+    }
+
+   
+}
+        @media (max-width: 900px) {
+            .trade-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid,
+            .result-grid,
+            .statistics-overview {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .chart-container {
+                height: 360px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .trade-page {
+                padding: 10px;
+            }
+
+            .trade-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .trade-market-price {
+                text-align: left;
+            }
+
+            .digit-buttons {
+                grid-template-columns: repeat(5, 1fr);
+            }
+
+            .summary-grid,
+            .result-grid,
+            .statistics-overview {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .statistics-header,
+            .chart-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .chart-info {
+                text-align: left;
+            }
+
+            .chart-container {
+                height: 300px;
+            }
+
+            .chart-footer {
+                flex-direction: column;
+            }
+        }
+      /* =========================================================
+   WALLET CARD - MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .account-balance-card {
+        padding: 17px;
+        border-radius: 14px;
+    }
+
+    .primary-balance .balance-value {
+        font-size: 25px;
+    }
+.primary-balance .balance-flag {
+    width: 28px;
+    height: 19px;
+
+    object-fit: cover;
+
+    border-radius: 3px;
+
+    display: block;
+
+    flex-shrink: 0;
+}
+    .secondary-balance {
+        margin-left: 31px;
+        font-size: 12px;
+    }
+
+    .balance-actions {
+        gap: 8px;
+    }
+
+    .balance-action {
+        padding: 9px 10px;
+    }
+}  
+.account-switcher {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+
+    margin-bottom: 9px;
+    padding: 3px;
+
+    background: #0a100d;
+    border: 1px solid #26362f;
+
+    border-radius: 9px;
+}
+
+.account-switch-btn {
+    min-width: 58px;
+
+    border: none;
+    background: transparent;
+
+    color: #718078;
+
+    padding: 6px 12px;
+
+    border-radius: 7px;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.15s ease;
+}
+
+.account-switch-btn:hover {
+    color: #d7e0dc;
+}
+
+.account-switch-btn:active {
+    transform: scale(0.97);
+}
+
+.account-switch-btn.active {
+    background: #22c55e;
+    color: #07100b;
+}
+/* Currency flag images */
+.balance-flag {
+    width: 28px;
+    height: 19px;
+    object-fit: cover;
+    border-radius: 3px;
+    display: block;
+    flex-shrink: 0;
+}
+
+.balance-flag-small {
+    width: 20px;
+    height: 14px;
+    object-fit: cover;
+    border-radius: 2px;
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0 4px;
+}
+.trade-setup-balance {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 12px;
+    padding: 10px 12px;
+
+    background: #111b17;
+    border: 1px solid #26362f;
+    border-radius: 9px;
+}
+
+.trade-setup-balance-label {
+    color: #7f9289;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.trade-setup-balance-value {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.trade-setup-flag {
+    width: 20px;
+    height: 14px;
+
+    object-fit: cover;
+    border-radius: 2px;
+
+    display: block;
+    flex-shrink: 0;
+}
+/* =========================================================
+   KMFBINARY TRADE HEADER + BALANCE
+========================================================= */
+
+.trade-header {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) auto auto;
+    align-items: center;
+    gap: 28px;
+    width: 100%;
+    margin-bottom: 22px;
+}
+
+.trade-header-title {
+    min-width: 0;
+}
+
+.trade-header-title h1 {
+    margin: 0 0 6px;
+}
+
+.trade-header-title p {
+    margin: 0;
+}
+
+/* =========================================================
+   TOP BALANCE CARD
+========================================================= */
+
+.account-balance-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    padding: 10px 14px;
+    background: #0d1512;
+    border: 1px solid #26362f;
+    border-radius: 12px;
+    box-shadow: none;
+    min-width: 390px;
+}
+
+/* =========================================================
+   USD / KES BALANCES
+========================================================= */
+
+.trade-balance-currencies {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+.trade-balance-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 105px;
+}
+
+.trade-balance-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #9aa9a2;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+}
+
+.trade-balance-item .balance-value {
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.trade-balance-item .balance-flag {
+    width: 25px;
+    height: 17px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 3px;
+    display: block;
+    flex-shrink: 0;
+}
+
+/* =========================================================
+   ACCOUNT BUTTONS
+========================================================= */
+
+.trade-account-controls {
+    display: flex;
+    align-items: center;
+}
+
+.account-switcher {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    margin: 0;
+    padding: 3px;
+    background: #0a100d;
+    border: 1px solid #26362f;
+    border-radius: 9px;
+}
+
+.account-switch-btn {
+    min-width: 92px;
+    border: none;
+    background: transparent;
+    color: #718078;
+    padding: 7px 10px;
+    border-radius: 7px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.15s ease;
+}
+
+.account-switch-btn:hover {
+    color: #d7e0dc;
+}
+
+.account-switch-btn:active {
+    transform: scale(0.97);
+}
+
+.account-switch-btn.active {
+    background: #22c55e;
+    color: #07100b;
+}
+
+/* =========================================================
+   HIDE OLD RELOAD / MODE DISPLAY
+========================================================= */
+
+#refreshTradeBalance,
+.balance-refresh,
+#tradeAccountMode,
+.account-mode-badge {
+    display: none !important;
+}
+
+/* =========================================================
+   OLD BALANCE ELEMENTS - NO LONGER USED IN TOP CARD
+========================================================= */
+
+.account-balance-top,
+.balance-heading-row,
+.balance-actions,
+.balance-action,
+.primary-balance,
+.secondary-balance,
+.balance-divider {
+    display: none;
+}
+
+/* =========================================================
+   MARKET PRICE
+========================================================= */
+
+.trade-market-price {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    min-width: 135px;
+    text-align: right;
+}
+
+.trade-market-price span {
+    color: #8b9b94;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.trade-market-price strong {
+    margin-top: 3px;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .trade-header {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .account-balance-card {
+        width: 100%;
+        min-width: 0;
+        justify-content: space-between;
+        box-sizing: border-box;
+    }
+
+    .trade-market-price {
+        align-items: flex-start;
+        text-align: left;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .trade-header {
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .account-balance-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 12px;
+        border-radius: 12px;
+    }
+
+    .trade-balance-currencies {
+        width: 100%;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .trade-balance-item {
+        min-width: 0;
+    }
+
+    .trade-balance-item .balance-value {
+        font-size: 14px;
+    }
+
+    .trade-balance-label {
+        font-size: 10px;
+    }
+
+    .trade-balance-item .balance-flag {
+        width: 25px;
+        height: 17px;
+    }
+
+    .trade-account-controls {
+        width: 100%;
+    }
+
+    .account-switcher {
+        width: 100%;
+    }
+
+    .account-switch-btn {
+        flex: 1;
+        min-width: 0;
+        font-size: 10px;
+    }
+
+    .trade-market-price {
+        min-width: 0;
+    }
+
+}
+.bottom-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    width: 100%;
+    min-width: 0;
+}
+
+.bottom-info-grid > .panel {
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+    .bottom-info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+/* =========================================================
+   CIRCULAR MARKET STATISTICS
+========================================================= */
+
+.circular-statistics-section {
+    margin-top: 18px;
+}
+
+.circular-statistics-title {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #8fa99f;
+    margin-bottom: 12px;
+}
+
+.circular-statistics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.circular-stat-card {
+    background: #0b1712;
+    border: 1px solid #183229;
+    border-radius: 14px;
+    padding: 14px;
+    min-width: 0;
+}
+
+.circular-stat-card-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #8fa99f;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+    margin-bottom: 12px;
+}
+
+.circular-stat-pair {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 10px;
+}
+
+.circular-stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+}
+
+.circular-stat-circle {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        radial-gradient(
+            circle at center,
+            #0b1712 58%,
+            transparent 59%
+        ),
+        conic-gradient(
+            #42e38b var(--percentage),
+            #162a22 0
+        );
+
+    border: 1px solid #25483a;
+    box-shadow: 0 0 0 2px #0b1712;
+}
+
+.circular-stat-circle span {
+    font-size: 14px;
+    font-weight: 800;
+    color: #e8f5ef;
+}
+
+.circular-stat-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #9bb1a8;
+}
+
+.circular-stat-value {
+    font-size: 11px;
+    color: #42e38b;
+    font-weight: 700;
+}
+
+.circular-digit-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+}
+
+.circular-digit-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.circular-digit-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        radial-gradient(
+            circle at center,
+            #0b1712 58%,
+            transparent 59%
+        ),
+        conic-gradient(
+            #42e38b var(--percentage),
+            #162a22 0
+        );
+
+    border: 1px solid #25483a;
+}
+
+.circular-digit-circle span {
+    font-size: 13px;
+    font-weight: 800;
+    color: #e8f5ef;
+}
+
+.circular-digit-value {
+    font-size: 9px;
+    color: #9bb1a8;
+}
+
+.circular-digit-item.most .circular-digit-circle {
+    border-color: #42e38b;
+}
+
+.circular-digit-item.least .circular-digit-circle {
+    border-color: #56665f;
+}
+.circular-digit-item.current .circular-digit-circle {
+    border-color: #ffffff;
+    box-shadow:
+        0 0 0 3px #42e38b,
+        0 0 14px rgba(66, 227, 139, 0.55);
+    transform: scale(1.08);
+}
+
+.circular-digit-item.current .circular-digit-circle span {
+    color: #ffffff;
+}
+.circular-stat-loading,
+.circular-stat-error,
+.circular-stat-empty {
+    padding: 20px;
+    text-align: center;
+    color: #829a91;
+    font-size: 12px;
+}
+
+@media (max-width: 700px) {
+
+    .circular-statistics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .circular-digit-grid {
+        gap: 8px;
+    }
+
+    .circular-digit-circle {
+        width: 42px;
+        height: 42px;
+    }
+}
+/* Hide currency flags in Demo Account */
+body.demo-account .currency-flag {
+    display: none !important;
+}
+
+/* Keep currency flags visible in Live Account */
+body.live-account .currency-flag {
+    display: inline-block !important;
+}
+    </style>
+</head>
+
+<body>
+
+<div class="trade-page">
+
+    <div id="message" class="message"></div>
+
+  <header class="trade-header">
+
+    <!-- LEFT: TRADE TITLE -->
+    <div class="trade-header-title">
+        <h1>KMFBinary Trade</h1>
+        <p>Trade synthetic markets using real-time synthetic ticks.</p>
+    </div>
+
+    <!-- MIDDLE: ACCOUNT BALANCES -->
+    <div class="account-balance-card">
+
+        <div class="trade-balance-currencies">
+
+            <!-- USD -->
+            <div class="trade-balance-item">
+
+                <div class="trade-balance-label">
+                    <img
+                        src="images/us-flag.svg"
+                        alt="USD"
+                        class="balance-flag currency-flag"
+                    >
+                    <span>USD</span>
+                </div>
+
+                <strong
+                    id="tradeBalanceUsd"
+                    class="balance-value"
+                >
+                    $0.00
+                </strong>
+
+            </div>
+
+            <!-- KES -->
+            <div class="trade-balance-item">
+
+                <div class="trade-balance-label">
+                    <img
+                        src="images/kenya-flag.svg"
+                        alt="KES"
+                       class="balance-flag currency-flag"
+                    >
+                    <span>KES</span>
+                </div>
+
+                <strong
+                    id="tradeBalanceKes"
+                    class="balance-value"
+                >
+                    KSh 0.00
+                </strong>
+
+            </div>
+
+        </div>
+
+        <!-- ACCOUNT SWITCHER -->
+        <div class="trade-account-controls">
+
+            <div class="account-switcher">
+
+                <button
+                    id="tradeDemoAccountButton"
+                    type="button"
+                    class="account-switch-btn"
+                    data-account-mode="demo"
+                >
+                    Demo Account
+                </button>
+
+                <button
+                    id="tradeLiveAccountButton"
+                    type="button"
+                    class="account-switch-btn"
+                    data-account-mode="real"
+                >
+                    Live Account
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- Kept for existing JavaScript compatibility -->
+        <div
+            id="tradeAccountMode"
+            class="account-mode-badge"
+            aria-hidden="true"
+        >
+            Demo Account
+        </div>
+
+        <!-- Kept for existing JavaScript compatibility, but hidden -->
+        <button
+            id="refreshTradeBalance"
+            type="button"
+            class="balance-refresh"
+            title="Refresh balance"
+            aria-hidden="true"
+            tabindex="-1"
+        >
+            ↻
+        </button>
+
+    </div>
+
+    <!-- RIGHT: MARKET PRICE -->
+    <div class="trade-market-price">
+
+        <span id="marketName">
+            Loading market...
+        </span>
+
+        <strong id="livePrice">
+            —
+        </strong>
+
+    </div>
+
+</header>
+
+<div class="trade-grid">
+
+    <!-- ==========================
+         LEFT SIDE: ANALYSIS
+    =========================== -->
+    <div class="analysis-column">
+
+        <!-- ==========================
+             MARKET
+        =========================== -->
+        <div class="panel">
+
+            <h2>Market</h2>
+
+            <div class="field">
+
+                <label for="marketSelect">
+                    Select Market
+                </label>
+
+                <select id="marketSelect">
+                    <option value="">Loading markets...</option>
+                </select>
+
+            </div>
+
+            <div class="selected-info">
+
+                <div class="info-box">
+
+                    <div class="info-label">
+                        Contract
+                    </div>
+
+                    <div class="info-value" id="contractType">
+                        Rise / Fall
+                    </div>
+
+                </div>
+
+                <div class="info-box">
+
+                    <div class="info-label">
+                        Price
+                    </div>
+
+                    <div class="info-value" id="contractPrice">
+                        —
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ==========================
+             CANDLESTICK CHART
+        =========================== -->
+
+        <div id="chartPanel" class="panel chart-panel">
+
+            <div class="chart-header">
+
+                <h2>Candlestick Chart</h2>
+
+                <div class="chart-info">
+                    1-minute candles · Existing synthetic tick history
+                </div>
+
+            </div>
+
+            <div class="chart-container">
+
+                <canvas id="marketChart"></canvas>
+
+                <div id="chartLoading" class="chart-loading">
+                    Loading chart...
+                </div>
+
+                <div
+                    id="chartError"
+                    class="chart-error"
+                    style="display:none;"
+                ></div>
+
+                <div
+                    id="chartEmpty"
+                    class="chart-empty"
+                    style="display:none;"
+                >
+                    No market history available.
+                </div>
+
+            </div>
+
+            <div class="chart-footer">
+
+                <span id="chartMarketLabel">
+                    Market: —
+                </span>
+
+                <span id="chartUpdated">
+                    —
+                </span>
+
+            </div>
+
+             </div>
+
+
+        <!-- ==========================
+             MARKET STATISTICS
+             REPLACES DIGIT FREQUENCY SPACE
+        =========================== -->
+
+        <div
+            id="digitFrequencyPanel"
+
+        <div
+            id="digitFrequencyPanel"
+            class="panel statistics-panel"
+            style="display:none;"
+        >
+    <div class="statistics-header">
+
+        <h2>
+            Market Statistics
+        </h2>
+
+        <div class="statistics-controls">
+
+            <label for="statisticsTickSelect">
+                Last ticks
+            </label>
+
+            <select id="statisticsTickSelect">
+
+                <option value="100">
+                    100
+                </option>
+
+                <option value="300">
+                    300
+                </option>
+
+                <option value="500">
+                    500
+                </option>
+
+                <option value="1000">
+                    1000
+                </option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+    <div class="statistics-note">
+        Statistics are calculated from the selected market's
+        actual recent synthetic tick history. Historical frequency
+        describes the selected sample only and does not guarantee
+        or predict the next digit.
+    </div>
+
+    <div
+        id="statisticsContent"
+        class="large-statistics-content"
+    >
+
+        <div class="statistics-loading">
+            Loading market statistics...
+        </div>
+
+    </div>
+
+    <div
+        id="statisticsUpdated"
+        class="statistics-updated"
+    ></div>
+
+</div>
+      <div
+        id="statisticsUpdated"
+        class="statistics-updated"
+    ></div>
+
+</div>
+
+<!-- ==========================
+     RIGHT SIDE: TRADE SETUP
+=========================== -->
+
+<div class="panel">
+
+    <h2>Trade Setup</h2>
+        <div class="field">
+
+            <label for="contractSelect">
+                Contract Type
+            </label>
+
+            <select id="contractSelect">
+
+                <option value="rise_fall">
+                    Rise / Fall
+                </option>
+
+                <option value="higher_lower">
+                    Higher / Lower
+                </option>
+
+                <option value="over_under">
+                    Over / Under
+                </option>
+
+                <option value="odd_even">
+                    Odd / Even
+                </option>
+
+                <option value="matches_differs">
+                    Matches / Differs
+                </option>
+
+                <option value="touch_no_touch">
+                    Touch / No Touch
+                </option>
+
+                <option value="accumulator">
+                    Accumulator
+                </option>
+
+            </select>
+
+            <div
+                id="contractDescription"
+                class="contract-description"
+            >
+                Predict whether the final price will be above or below
+                the entry price.
+            </div>
+
+        </div>
+
+
+        <!-- AVAILABLE BALANCE -->
+
+        <!-- STAKE -->
+
+        <div class="field">
+
+            <label for="stakeInput">
+                Stake (🇺🇸 USD)
+            </label>
+
+            <input
+                id="stakeInput"
+                type="number"
+                min="0.35"
+                step="0.01"
+                value="0.35"
+            >
+
+        </div>
+
+
+        <!-- DURATION -->
+
+        <div class="field">
+
+                <label for="durationInput">
+                    Duration
+                </label>
+
+                <input
+                    id="durationInput"
+                    type="number"
+                    min="1"
+                    step="1"
+                    value="10"
+                >
+
+            </div>
+
+            <!-- DURATION UNIT -->
+
+            <div class="field">
+
+                <label for="durationUnitInput">
+                    Duration Unit
+                </label>
+
+                <select id="durationUnitInput">
+
+                    <option value="s">
+                        Seconds
+                    </option>
+
+                    <option value="t">
+                        Ticks
+                    </option>
+
+                </select>
+
+            </div>
+
+            <!-- ==========================
+                 DIGIT CONTRACTS
+            =========================== -->
+
+            <div
+                id="digitSection"
+                class="field"
+                style="display:none;"
+            >
+
+                <label>
+                    Select Target Digit
+                </label>
+
+                <div class="digit-buttons">
+
+                    <button
+                        class="digit-btn"
+                        data-digit="0"
+                        type="button"
+                    >
+                        0
+                    </button>
+
+                    <button
+                        class="digit-btn"
+                        data-digit="1"
+                        type="button"
+                    >
+                        1
+                    </button>
+
+                    <button
+                        class="digit-btn"
+                        data-digit="2"
+                        type="button"
+                    >
+                        2
+                    </button>
+
+                    <button
+                        class="digit-btn"
+                        data-digit="3"
+                        type="button"
+                    >
+                        3
+                    </button>
+
+                    <button
+                        class="digit-btn"
+                        data-digit="4"
+                        type="button"
+                    >
+                        4
+                    </button>
+
+                    <button
+                        class="digit-btn"
+                        data-digit="5"
+                        type="button"
+                    >
+                        5
+                    </button>
+
+                    <button
+                        class="digit-btn"
+                        data-digit="6"
+                        type="button"
+                    >
+                        6
+                    </button>
+
+                    <button
+                        class="digit-btn"
+                        data-digit="7"
+                        type="button"
+                    >
+                        7
+                    </button>
+
+                    <button
+                        class="digit-btn"
+                        data-digit="8"
+                        type="button"
+                    >
+                        8
+                    </button>
+
+                    <button
+                        class="digit-btn"
+                        data-digit="9"
+                        type="button"
+                    >
+                        9
+                    </button>
+
+                </div>
+
+                <div
+                    id="digitInfo"
+                    class="contract-description"
+                    style="margin-top:10px;"
+                >
+                    Select a digit when required.
+                </div>
+
+            </div>
+
+            <!-- ==========================
+                 HIGHER / LOWER
+            =========================== -->
+
+            <div
+                id="higherLowerSection"
+                class="field"
+                style="display:none;"
+            >
+
+                <label for="higherLowerBarrierInput">
+                    Price Barrier
+                </label>
+
+                <input
+                    id="higherLowerBarrierInput"
+                    type="number"
+                    step="0.01"
+                    placeholder="Enter price barrier"
+                >
+
+            </div>
+
+            <!-- ==========================
+                 TOUCH / NO TOUCH
+            =========================== -->
+
+            <div
+                id="touchSection"
+                class="field"
+                style="display:none;"
+            >
+
+                <label for="barrierInput">
+                    Barrier Price
+                </label>
+
+                <input
+                    id="barrierInput"
+                    type="number"
+                    step="0.01"
+                    placeholder="Enter barrier"
+                >
+
+                <div style="margin-top:10px;">
+
+                    <label>
+                        Barrier Direction
+                    </label>
+
+                    <div class="direction-buttons">
+
+                        <button
+                            id="barrierAboveButton"
+                            class="direction-btn active"
+                            type="button"
+                        >
+                            Above
+                        </button>
+
+                        <button
+                            id="barrierBelowButton"
+                            class="direction-btn"
+                            type="button"
+                        >
+                            Below
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ==========================
+                 ACCUMULATOR
+            =========================== -->
+
+            <div
+                id="accumulatorSection"
+                class="field"
+                style="display:none;"
+            >
+
+                             <label for="accumulatorGrowthInput">
+                    Growth Rate
+                </label>
+
+                <select id="accumulatorGrowthInput">
+
+                    <option value="0.01">
+                        1%
+                    </option>
+
+                    <option value="0.02">
+                        2%
+                    </option>
+
+                    <option value="0.03">
+                        3%
+                    </option>
+
+                    <option value="0.04">
+                        4%
+                    </option>
+
+                    <option value="0.05">
+                        5%
+                    </option>
+
+                </select>
+
+
+                <!-- ==========================
+                     ACCUMULATOR BOUNDARIES
+                =========================== -->
+
+                <div
+                    id="accumulatorBoundaryDisplay"
+                    style="
+                        margin-top:15px;
+                        padding:12px;
+                        border-radius:8px;
+                        background:rgba(255,255,255,0.04);
+                    "
+                >
+
+                    <div
+                        style="
+                            display:flex;
+                            justify-content:space-between;
+                            margin-bottom:6px;
+                        "
+                    >
+                        <span>
+                            Upper Boundary
+                        </span>
+
+                        <strong id="accumulatorUpperBoundaryDisplay">
+                            —
+                        </strong>
+                    </div>
+
+
+                    <div
+                        style="
+                            display:flex;
+                            justify-content:space-between;
+                            margin-bottom:6px;
+                        "
+                    >
+                        <span>
+                            Entry Price
+                        </span>
+
+                        <strong id="accumulatorEntryPriceDisplay">
+                            —
+                        </strong>
+                    </div>
+
+
+                    <div
+                        style="
+                            display:flex;
+                            justify-content:space-between;
+                        "
+                    >
+                        <span>
+                            Lower Boundary
+                        </span>
+
+                        <strong id="accumulatorLowerBoundaryDisplay">
+                            —
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <div style="margin-top:10px;">
+
+                    <label>
+                        Direction
+                    </label>
+
+                    <div class="direction-buttons">
+
+                        <button
+                            id="accumulatorAboveButton"
+                            class="direction-btn active"
+                            type="button"
+                        >
+                            Above
+                        </button>
+
+                        <button
+                            id="accumulatorBelowButton"
+                            class="direction-btn"
+                            type="button"
+                        >
+                            Below
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ==========================
+                 ACTION BUTTONS
+            =========================== -->
+            <!-- ==========================
+                 ACTION BUTTONS
+            =========================== -->
+
+            <div class="trade-buttons">
+
+                <button
+                    id="tradeButton1"
+                    class="trade-btn rise"
+                    type="button"
+                >
+                    ↑ Rise
+                </button>
+
+                <button
+                    id="tradeButton2"
+                    class="trade-btn fall"
+                    type="button"
+                >
+                    ↓ Fall
+                </button>
+
+            </div>
+<!-- ==========================
+     QUICK TRADE RESULT
+=========================== -->
+
+<div
+    id="resultBox"
+    class="panel result-panel"
+    style="display:none;"
+>
+    <h2 id="resultTitle">
+        Trade Result
+    </h2>
+
+    <div class="result-grid">
+
+        <div class="result-item">
+            <span>Status</span>
+            <strong id="resultStatus">—</strong>
+        </div>
+
+        <div class="result-item">
+            <span>Entry Price</span>
+            <strong id="resultEntry">—</strong>
+        </div>
+
+        <div class="result-item">
+            <span>Exit Price</span>
+            <strong id="resultExit">—</strong>
+        </div>
+
+        <div class="result-item">
+            <span>Final Digit</span>
+            <strong id="resultDigit">—</strong>
+        </div>
+
+        <div class="result-item">
+            <span>Target</span>
+            <strong id="resultTarget">—</strong>
+        </div>
+
+        <div class="result-item">
+            <span>Barrier</span>
+            <strong id="resultBarrier">—</strong>
+        </div>
+
+        <div class="result-item">
+            <span>Entry Tick</span>
+            <strong id="resultEntryTick">—</strong>
+        </div>
+
+        <div class="result-item">
+            <span>Exit Tick</span>
+            <strong id="resultExitTick">—</strong>
+        </div>
+
+        <div class="result-item">
+            <span>Payout</span>
+            <strong id="resultPayout">$0.00</strong>
+        </div>
+
+        <div class="result-item">
+            <span>Profit</span>
+            <strong id="resultProfit">$0.00</strong>
+        </div>
+
+    </div>
+</div>
+            <!-- ==========================
+                 ENTRY / PAYOUT
+                 DIRECTLY BELOW CONTROLS
+            =========================== -->
+
+            <div class="trade-info-panel">
+
+                <div class="trade-info-title">
+                    TRADE INFORMATION
+                </div>
+
+                <table class="trade-info-table">
+
+                    <tbody>
+
+                        <tr>
+                            <th>Entry Price</th>
+                            <td id="tradeInfoEntry">—</td>
+                        </tr>
+
+                        <tr>
+                            <th>Target / Barrier</th>
+                            <td id="tradeInfoTarget">—</td>
+                        </tr>
+
+                        <tr>
+                            <th>Selected Digit</th>
+                            <td id="tradeInfoDigit">—</td>
+                        </tr>
+
+                        <tr>
+                            <th>Potential Payout</th>
+                            <td
+                                id="tradeInfoPayout"
+                                class="payout-value"
+                            >
+                                —
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+   <div class="bottom-info-grid">
+
+   
+
+    <!-- ==========================
+         TRADE SUMMARY
+    =========================== -->
+
+    <div class="panel summary-panel">
+
+        <h2>
+            Trade Summary
+        </h2>
+
+        <div class="summary-grid">
+
+            <div class="summary-item">
+                <span>Market</span>
+                <strong id="summaryMarket">—</strong>
+            </div>
+
+            <div class="summary-item">
+                <span>Contract</span>
+                <strong id="summaryContract">—</strong>
+            </div>
+
+            <div class="summary-item">
+                <span>Action</span>
+                <strong id="summaryAction">—</strong>
+            </div>
+
+            <div class="summary-item">
+                <span>Stake</span>
+                <strong id="summaryStake">$0.00</strong>
+            </div>
+
+            <div class="summary-item">
+                <span>Entry</span>
+                <strong id="summaryEntry">—</strong>
+            </div>
+
+            <div class="summary-item">
+                <span>Target</span>
+                <strong id="summaryTarget">—</strong>
+            </div>
+
+            <div class="summary-item">
+                <span>Duration</span>
+                <strong id="summaryDuration">—</strong>
+            </div>
+
+            <div class="summary-item">
+                <span>Entry Tick</span>
+                <strong id="summaryEntryTick">—</strong>
+            </div>
+
+            <div class="summary-item">
+                <span>Exit Tick</span>
+                <strong id="summaryExitTick">—</strong>
+            </div>
+
+            <div class="summary-item">
+                <span>Status</span>
+                <strong id="summaryStatus">—</strong>
+            </div>
+
+        </div>
+
+       </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/api.js"></script>
+<script src="js/trading-engine.js"></script>
+
+<script>
+/* =========================================================
+   STATE
+========================================================= */
+
+let supabaseClient = null;
+let selectedMarket = null;
+let selectedDigit = null;
+let selectedBarrierDirection = "above";
+let selectedAccumulatorDirection = "above";
+let currentPrice = null;
+let currentTrade = null;
+let selectedContractType = "rise_fall";
+let pollingTimer = null;
+let statisticsRefreshTimer = null;
+let chartRefreshTimer = null;
+let chartResizeTimer = null;
+let chartCandles = [];
+let tradeWallet = null;
+let tradeWalletRefreshTimer = null;
+
+const DEFAULT_USD_KES_RATE = 135;
+
+
+/* =========================================================
+   DOM
+========================================================= */
+
+const messageEl =
+    document.getElementById("message");
+
+const marketSelect =
+    document.getElementById("marketSelect");
+
+const marketName =
+    document.getElementById("marketName");
+
+const livePrice =
+    document.getElementById("livePrice");
+
+const contractSelect =
+    document.getElementById("contractSelect");
+
+const contractTypeEl =
+    document.getElementById("contractType");
+
+const contractPrice =
+    document.getElementById("contractPrice");
+
+const contractDescription =
+    document.getElementById("contractDescription");
+
+const stakeInput =
+    document.getElementById("stakeInput");
+
+const durationInput =
+    document.getElementById("durationInput");
+
+const durationUnitInput =
+    document.getElementById("durationUnitInput");
+
+const digitInfo =
+    document.getElementById("digitInfo");
+
+const higherLowerSection =
+    document.getElementById("higherLowerSection");
+
+const higherLowerBarrierInput =
+    document.getElementById(
+        "higherLowerBarrierInput"
+    );
+
+const touchSection =
+    document.getElementById("touchSection");
+
+const barrierInput =
+    document.getElementById("barrierInput");
+
+const barrierAboveButton =
+    document.getElementById(
+        "barrierAboveButton"
+    );
+
+const barrierBelowButton =
+    document.getElementById(
+        "barrierBelowButton"
+    );
+
+const accumulatorSection =
+    document.getElementById(
+        "accumulatorSection"
+    );
+
+const accumulatorGrowthInput =
+    document.getElementById(
+        "accumulatorGrowthInput"
+    );
+
+const accumulatorBarrierInput =
+    document.getElementById(
+        "accumulatorBarrierInput"
+    );
+
+const accumulatorAboveButton =
+    document.getElementById(
+        "accumulatorAboveButton"
+    );
+
+const accumulatorBelowButton =
+    document.getElementById(
+        "accumulatorBelowButton"
+    );
+
+const tradeButton1 =
+    document.getElementById(
+        "tradeButton1"
+    );
+
+const tradeButton2 =
+    document.getElementById(
+        "tradeButton2"
+    );
+
+const tradeInfoEntry =
+    document.getElementById(
+        "tradeInfoEntry"
+    );
+
+const tradeInfoTarget =
+    document.getElementById(
+        "tradeInfoTarget"
+    );
+
+const tradeInfoDigit =
+    document.getElementById(
+        "tradeInfoDigit"
+    );
+
+const tradeInfoPayout =
+    document.getElementById(
+        "tradeInfoPayout"
+    );
+
+const chartPanel =
+    document.getElementById(
+        "chartPanel"
+    );
+
+const statisticsTickSelect =
+    document.getElementById(
+        "statisticsTickSelect"
+    );
+
+const statisticsContent =
+    document.getElementById(
+        "statisticsContent"
+    );
+
+   const digitFrequencyPanel =
+    document.getElementById("digitFrequencyPanel");
+
+const digitFrequencyContent =
+    document.getElementById("digitFrequencyContent");
+
+const digitFrequencyUpdated =
+    document.getElementById("digitFrequencyUpdated"); 
+const statisticsUpdated =
+    document.getElementById(
+        "statisticsUpdated"
+    );
+
+const marketChart =
+    document.getElementById(
+        "marketChart"
+    );
+
+const chartContainer =
+    document.querySelector(
+        ".chart-container"
+    );
+
+const chartLoading =
+    document.getElementById(
+        "chartLoading"
+    );
+
+const chartError =
+    document.getElementById(
+        "chartError"
+    );
+
+const chartEmpty =
+    document.getElementById(
+        "chartEmpty"
+    );
+
+const chartMarketLabel =
+    document.getElementById(
+        "chartMarketLabel"
+    );
+
+const chartUpdated =
+    document.getElementById(
+        "chartUpdated"
+    );
+
+
+/* =========================================================
+   SUPABASE
+========================================================= */
+
+async function initSupabase() {
+
+    if (
+        typeof window.supabase ===
+        "undefined"
+    ) {
+
+        throw new Error(
+            "Supabase library could not be loaded."
+        );
+    }
+
+    const supabaseUrl =
+        "https://nugufikdivanyzmghofq.supabase.co";
+
+    const supabaseAnonKey =
+        "sb_publishable_NfsjmPephsaJrRB6vLXglw_G6yTdPTl";
+
+    supabaseClient =
+        window.supabase.createClient(
+            supabaseUrl,
+            supabaseAnonKey
+        );
+
+    return supabaseClient;
+}
+
+/* =========================================================
+   MARKET MAPPING
+========================================================= */
+
+const syntheticMarketMap = {
+
+    /* -------------------------------------------------------
+       KMF CONTRACT MARKETS
+       These convert to their underlying synthetic market.
+    ------------------------------------------------------- */
+
+    "KMF-RF": "KMF-15",
+    "KMF-HL": "KMF-25",
+    "KMF-OE": "KMF-50",
+    "KMF-OU": "KMF-100",
+
+    /* -------------------------------------------------------
+       KMF SYNTHETIC MARKETS
+       Stay exactly as selected.
+    ------------------------------------------------------- */
+
+    "KMF-15": "KMF-15",
+    "KMF-25": "KMF-25",
+    "KMF-50": "KMF-50",
+    "KMF-100": "KMF-100",
+
+    /* -------------------------------------------------------
+       VOLATILITY MARKETS
+       Stay exactly as selected.
+    ------------------------------------------------------- */
+
+    "VOL-10": "VOL-10",
+    "VOL-25": "VOL-25",
+    "VOL-50": "VOL-50",
+    "VOL-75": "VOL-75",
+    "VOL-100": "VOL-100",
+
+    "VOL-10-1S": "VOL-10-1S",
+    "VOL-25-1S": "VOL-25-1S",
+    "VOL-50-1S": "VOL-50-1S",
+    "VOL-75-1S": "VOL-75-1S",
+    "VOL-100-1S": "VOL-100-1S"
+};
+
+
+/* =========================================================
+   CHECK VOLATILITY MARKET
+========================================================= */
+
+function isVOLMarket(market) {
+
+    if (!market) {
+        return false;
+    }
+
+    let symbol = "";
+
+    if (typeof market === "string") {
+
+        symbol = market;
+
+    } else {
+
+        symbol =
+            market.symbol ||
+            market.market_symbol ||
+            market.id ||
+            "";
+    }
+
+    symbol =
+        String(symbol)
+            .trim()
+            .toUpperCase();
+
+    return (
+        symbol === "VOL-10" ||
+        symbol === "VOL-25" ||
+        symbol === "VOL-50" ||
+        symbol === "VOL-75" ||
+        symbol === "VOL-100" ||
+        symbol === "VOL-10-1S" ||
+        symbol === "VOL-25-1S" ||
+        symbol === "VOL-50-1S" ||
+        symbol === "VOL-75-1S" ||
+        symbol === "VOL-100-1S"
+    );
+}
+
+
+/* =========================================================
+   GET SYNTHETIC SYMBOL
+   KEEP SELECTED MARKET EXACTLY AS SELECTED
+========================================================= */
+
+function getSyntheticSymbol(market) {
+
+    if (!market) {
+        return null;
+    }
+
+    let symbol = "";
+
+    if (typeof market === "string") {
+
+        symbol = market;
+
+    } else {
+
+        symbol =
+            market.symbol ||
+            market.market_symbol ||
+            market.id ||
+            "";
+    }
+
+    symbol =
+        String(symbol)
+            .trim()
+            .toUpperCase();
+
+    if (!symbol) {
+        return null;
+    }
+
+    /*
+     * Use the central market map.
+     *
+     * KMF contract markets:
+     * KMF-RF  -> KMF-15
+     * KMF-HL  -> KMF-25
+     * KMF-OE  -> KMF-50
+     * KMF-OU  -> KMF-100
+     *
+     * KMF synthetic markets remain unchanged.
+     *
+     * VOL markets remain unchanged.
+     */
+
+    return (
+        syntheticMarketMap[symbol] ||
+        symbol
+    );
+}
+
+
+/* =========================================================
+   CONTRACT HELPERS
+========================================================= */
+
+function formatContractType(type) {
+
+    const map = {
+
+        rise_fall:
+            "Rise / Fall",
+
+        higher_lower:
+            "Higher / Lower",
+
+        over_under:
+            "Over / Under",
+
+        odd_even:
+            "Odd / Even",
+
+        matches:
+            "Matches",
+
+        differs:
+            "Differs",
+
+        matches_differs:
+            "Matches / Differs",
+
+        touch_no_touch:
+            "Touch / No Touch",
+
+        accumulator:
+            "Accumulator"
+    };
+
+    return (
+        map[type] ||
+        type ||
+        "—"
+    );
+}
+
+
+function getContractDescription(type) {
+
+    const descriptions = {
+
+        rise_fall:
+            "Predict whether the final price will be above or below the entry price.",
+
+        higher_lower:
+            "Predict whether the final price will be higher or lower than your selected price barrier.",
+
+        over_under:
+            "Select a target digit from 1 to 8, then predict whether the final digit will be over or under it.",
+
+        odd_even:
+            "Predict whether the final digit will be odd or even.",
+
+        matches:
+            "Select a target digit, then predict that the final digit will match it.",
+
+        differs:
+            "Select a target digit, then predict that the final digit will differ from it.",
+
+        matches_differs:
+            "Select a target digit, then choose Matches or Differs.",
+
+        touch_no_touch:
+            "Predict whether the selected price barrier will be touched during the contract.",
+
+        accumulator:
+            "Accumulate payout while price remains within the selected knockout distance."
+    };
+
+    return (
+        descriptions[type] ||
+        "Select a contract type."
+    );
+}
+/* =========================================================
+   CONTRACT HELPERS
+========================================================= */
+
+function formatContractType(type) {
+
+    const map = {
+
+        rise_fall:
+            "Rise / Fall",
+
+        higher_lower:
+            "Higher / Lower",
+
+        over_under:
+            "Over / Under",
+
+        odd_even:
+            "Odd / Even",
+
+        matches:
+            "Matches",
+
+        differs:
+            "Differs",
+
+        matches_differs:
+            "Matches / Differs",
+
+        touch_no_touch:
+            "Touch / No Touch",
+
+        accumulator:
+            "Accumulator"
+    };
+
+    return (
+        map[type] ||
+        type ||
+        "—"
+    );
+}
+
+
+function getContractDescription(type) {
+
+    const descriptions = {
+
+        rise_fall:
+            "Predict whether the final price will be above or below the entry price.",
+
+        higher_lower:
+            "Predict whether the final price will be higher or lower than your selected price barrier.",
+
+        over_under:
+            "Select a target digit from 1 to 8, then predict whether the final digit will be over or under it.",
+
+        odd_even:
+            "Predict whether the final digit will be odd or even.",
+
+        matches:
+            "Select a target digit, then predict that the final digit will match it.",
+
+        differs:
+            "Select a target digit, then predict that the final digit will differ from it.",
+
+        matches_differs:
+            "Select a target digit, then choose Matches or Differs.",
+
+        touch_no_touch:
+            "Predict whether the selected price barrier will be touched during the contract.",
+
+        accumulator:
+            "Accumulate payout while price remains within the selected knockout distance."
+    };
+
+    return (
+        descriptions[type] ||
+        "Select a contract type."
+    );
+}
+
+
+/* =========================================================
+   CHART VISIBILITY
+========================================================= */
+
+function shouldShowChart(type) {
+
+    return [
+        "rise_fall",
+        "higher_lower",
+        "touch_no_touch",
+        "accumulator"
+    ].includes(type);
+}
+
+
+function updateChartVisibility() {
+
+    if (!chartPanel) {
+        return;
+    }
+
+    const visible =
+        shouldShowChart(
+            selectedContractType
+        );
+
+    chartPanel.style.display =
+        visible
+            ? "block"
+            : "none";
+
+    if (!visible) {
+        chartLoading.style.display = "none";
+        chartError.style.display = "none";
+        chartEmpty.style.display = "none";
+    }
+}
+
+
+/* =========================================================
+   MESSAGES
+========================================================= */
+function getTradeAccountMode() {
+    const mode =
+        localStorage.getItem("kmf_account_mode") || "demo";
+
+    return mode === "real" ? "real" : "demo";
+}
+
+function formatTradeKES(value) {
+    const number = Number(value) || 0;
+
+    return (
+        "KSh " +
+        number.toLocaleString("en-KE", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        })
+    );
+}
+
+function formatTradeUSD(value) {
+    const number = Number(value) || 0;
+
+    return (
+        "$" +
+        number.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        })
+    );
+}
+
+function updateTradeAccountDisplay(wallet) {
+    if (!wallet) {
+        return;
+    }
+
+    const mode = getTradeAccountMode();
+
+    const usdBalance =
+        mode === "real"
+            ? Number(wallet.balance || 0)
+            : Number(wallet.demo_balance || 0);
+
+    const rate =
+        Number(
+            wallet.usd_kes_rate ??
+            wallet.usdKesRate ??
+            wallet.exchange_rate ??
+            wallet.exchangeRate
+        ) || DEFAULT_USD_KES_RATE;
+
+    const kesBalance = usdBalance * rate;
+
+    const modeElement =
+        document.getElementById("tradeAccountMode");
+
+    const kesElement =
+        document.getElementById("tradeBalanceKes");
+
+    const usdElement =
+        document.getElementById("tradeBalanceUsd");
+
+    if (modeElement) {
+        modeElement.textContent =
+            mode === "real"
+                ? "Live Account"
+                : "Demo Account";
+    }
+
+    if (kesElement) {
+        kesElement.textContent =
+            formatTradeKES(kesBalance);
+    }
+
+    if (usdElement) {
+        usdElement.textContent =
+            formatTradeUSD(usdBalance);
+    }
+}
+
+
+async function loadTradeWallet(options = {}) {
+    const silent = options.silent === true;
+
+    try {
+        let result;
+
+        if (typeof apiRequest === "function") {
+            result = await apiRequest("/api/wallet");
+        } else {
+            const response = await fetch(
+                "http://localhost:3000/api/wallet"
+            );
+
+            if (!response.ok) {
+                throw new Error(
+                    "Failed to load wallet."
+                );
+            }
+
+            result = await response.json();
+        }
+
+        const wallet =
+            result?.wallet ||
+            result?.data?.wallet ||
+            result?.data ||
+            result;
+
+        tradeWallet = wallet;
+
+        updateTradeAccountDisplay(wallet);
+
+        return wallet;
+
+    } catch (error) {
+        console.error(
+            "Trade wallet loading error:",
+            error
+        );
+
+        if (!silent) {
+            showMessage(
+                error.message ||
+                "Unable to load wallet balance."
+            );
+        }
+
+        return null;
+    }
+}
+function showMessage(
+    message,
+    type = "error"
+) {
+
+    messageEl.textContent =
+        message || "";
+
+    messageEl.className =
+        "message show " +
+        type;
+}
+
+
+function clearMessage() {
+
+    messageEl.textContent =
+        "";
+
+    messageEl.className =
+        "message";
+}
+
+
+/* =========================================================
+   CONTRACT SELECTOR
+========================================================= */
+
+function marketAllowsContract(
+    market,
+    contractType
+) {
+
+    if (!market) {
+        return true;
+    }
+
+    if (isVOLMarket(market)) {
+        return true;
+    }
+
+    if (!market.contract_type) {
+        return true;
+    }
+
+    const allowed =
+        String(
+            market.contract_type
+        )
+            .split(",")
+            .map(
+                value =>
+                    value
+                        .trim()
+                        .toLowerCase()
+            )
+            .filter(Boolean);
+
+    if (!allowed.length) {
+        return true;
+    }
+
+    if (
+        contractType ===
+        "matches_differs"
+    ) {
+
+        return (
+            allowed.includes("matches") ||
+            allowed.includes("differs") ||
+            allowed.includes("matches_differs")
+        );
+    }
+
+    return allowed.includes(
+        contractType
+    );
+}
+/* =========================================================
+   UPDATE CONTRACT SELECTOR
+   KMF AND VOL MARKETS
+========================================================= */
+function updateContractSelector() {
+
+    if (!contractSelect) {
+        return;
+    }
+
+    const marketSymbol = String(
+        selectedMarket?.symbol ||
+        selectedMarket?.market_symbol ||
+        selectedMarket?.id ||
+        ""
+    ).toUpperCase();
+
+    /*
+     * All contracts currently available
+     * in the KMFBinary Trade interface.
+     */
+    const allContracts = [
+        "rise_fall",
+        "higher_lower",
+        "over_under",
+        "odd_even",
+        "matches_differs",
+        "touch_no_touch",
+        "accumulator"
+    ];
+
+    /*
+     * IMPORTANT:
+     *
+     * Do NOT force VOL markets to Rise/Fall.
+     *
+     * The selected market and selected
+     * contract are separate things.
+     *
+     * Example:
+     *
+     * VOL-25 + Higher/Lower
+     * VOL-25 + Odd/Even
+     * VOL-25 + Over/Under
+     * etc.
+     */
+
+    const options =
+        Array.from(
+            contractSelect.options
+        );
+
+    options.forEach(
+        option => {
+
+            const value =
+                String(
+                    option.value || ""
+                )
+                    .trim()
+                    .toLowerCase();
+
+            option.disabled =
+                !allContracts.includes(
+                    value
+                );
+        }
+    );
+
+    /*
+     * Read the contract coming from
+     * Markets page.
+     *
+     * This is only the initial contract.
+     *
+     * It does NOT lock the selector.
+     */
+    const storedContract =
+        localStorage.getItem(
+            "selectedContractType"
+        ) ||
+        localStorage.getItem(
+            "kmf_trade_contract_type"
+        );
+
+    /*
+     * If Markets supplied a valid
+     * contract, use it.
+     */
+    if (
+        storedContract &&
+        allContracts.includes(
+            String(
+                storedContract
+            )
+                .trim()
+                .toLowerCase()
+        )
+    ) {
+
+        selectedContractType =
+            String(
+                storedContract
+            )
+                .trim()
+                .toLowerCase();
+    }
+
+    /*
+     * If no valid contract was supplied,
+     * keep the current valid contract.
+     */
+    if (
+        !allContracts.includes(
+            selectedContractType
+        )
+    ) {
+
+        selectedContractType =
+            "rise_fall";
+    }
+
+    /*
+     * Set the selector to the selected
+     * contract.
+     */
+    contractSelect.value =
+        selectedContractType;
+
+    /*
+     * Update the visible contract label.
+     */
+    if (contractTypeEl) {
+
+        contractTypeEl.textContent =
+            formatContractType(
+                selectedContractType
+            );
+    }
+
+    /*
+     * Update the contract description.
+     */
+    if (contractDescription) {
+
+        contractDescription.textContent =
+            getContractDescription(
+                selectedContractType
+            );
+    }
+
+    /*
+     * Confirm that the exact market
+     * remains selected.
+     *
+     * This is only a safety check.
+     * It does NOT change the market.
+     */
+    if (
+        marketSymbol &&
+        selectedMarket
+    ) {
+
+        const exactSymbol =
+            String(
+                selectedMarket.symbol ||
+                ""
+            ).toUpperCase();
+
+        if (
+            exactSymbol !==
+            marketSymbol
+        ) {
+
+            console.warn(
+                "Market alignment warning:",
+                exactSymbol,
+                marketSymbol
+            );
+        }
+    }
+}
+contractSelect.addEventListener(
+    "change",
+    () => {
+
+        selectedContractType =
+            contractSelect.value;
+
+        localStorage.setItem(
+            "selectedContractType",
+            selectedContractType
+        );
+
+        if (selectedMarket) {
+
+            localStorage.setItem(
+                "kmf_trade_market_symbol",
+                selectedMarket.symbol
+            );
+        }
+
+        updateContractInterface();
+
+        updateTradeButtons(
+            selectedContractType
+        );
+
+        if (contractTypeEl) {
+
+            contractTypeEl.textContent =
+                formatContractType(
+                    selectedContractType
+                );
+        }
+
+        if (contractDescription) {
+
+            contractDescription.textContent =
+                getContractDescription(
+                    selectedContractType
+                );
+        }
+
+        updateTradeInformation();
+
+        updateAnalysisDisplay();
+
+        /*
+         * Reload chart/statistics according
+         * to the newly selected contract.
+         */
+        if (
+            selectedMarket &&
+            shouldShowChart(
+                selectedContractType
+            )
+        ) {
+
+            loadMarketChart();
+
+        } else {
+
+            updateAnalysisDisplay();
+        }
+    }
+);
+/* =========================================================
+   DIGIT BUTTONS
+========================================================= */
+
+document
+    .querySelectorAll(
+        ".digit-btn"
+    )
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    selectedDigit =
+                        Number(
+                            button.dataset.digit
+                        );
+
+                    document
+                        .querySelectorAll(
+                            ".digit-btn"
+                        )
+                        .forEach(
+                            item =>
+                                item.classList.remove(
+                                    "active"
+                                )
+                        );
+
+                    button.classList.add(
+                        "active"
+                    );
+
+                    updateDigitInfo();
+
+                    updateTradeButtons(
+                        selectedContractType
+                    );
+
+                    updateTradeInformation();
+                    if (selectedMarket) {
+    loadMarketStatistics({
+        silent: true
+    });
+}
+                }
+            );
+        }
+    );
+
+
+/* =========================================================
+   BARRIER BUTTONS
+========================================================= */
+
+barrierAboveButton.addEventListener(
+    "click",
+    () => {
+
+        selectedBarrierDirection =
+            "above";
+
+        barrierAboveButton.classList.add(
+            "active"
+        );
+
+        barrierBelowButton.classList.remove(
+            "active"
+        );
+
+        updateTradeInformation();
+    }
+);
+
+
+barrierBelowButton.addEventListener(
+    "click",
+    () => {
+
+        selectedBarrierDirection =
+            "below";
+
+        barrierBelowButton.classList.add(
+            "active"
+        );
+
+        barrierAboveButton.classList.remove(
+            "active"
+        );
+
+        updateTradeInformation();
+    }
+);
+
+
+/* =========================================================
+   ACCUMULATOR DIRECTION
+========================================================= */
+
+accumulatorAboveButton.addEventListener(
+    "click",
+    () => {
+
+        selectedAccumulatorDirection =
+            "above";
+
+        accumulatorAboveButton.classList.add(
+            "active"
+        );
+
+        accumulatorBelowButton.classList.remove(
+            "active"
+        );
+
+        updateTradeInformation();
+    }
+);
+
+
+accumulatorBelowButton.addEventListener(
+    "click",
+    () => {
+
+        selectedAccumulatorDirection =
+            "below";
+
+        accumulatorBelowButton.classList.add(
+            "active"
+        );
+
+        accumulatorAboveButton.classList.remove(
+            "active"
+        );
+
+        updateTradeInformation();
+    }
+);
+
+
+/* =========================================================
+   INPUT REFRESH
+========================================================= */
+
+[
+    stakeInput,
+    durationInput,
+    higherLowerBarrierInput,
+    barrierInput,
+    accumulatorGrowthInput,
+    accumulatorBarrierInput
+]
+    .forEach(
+        element => {
+
+            if (!element) {
+                return;
+            }
+
+            element.addEventListener(
+                "input",
+                updateTradeInformation
+            );
+
+            element.addEventListener(
+                "change",
+                updateTradeInformation
+            );
+        }
+    );
+
+
+/* =========================================================
+   DURATION UNIT
+========================================================= */
+
+durationUnitInput.addEventListener(
+    "change",
+    () => {
+
+        updateContractInterface();
+
+        updateTradeButtons(
+            selectedContractType
+        );
+
+        updateTradeInformation();
+    }
+);
+
+/* =========================================================
+   ANALYSIS DISPLAY
+   CHART vs DIGIT FREQUENCY
+========================================================= */
+function updateAnalysisDisplay() {
+
+    const chartPanel =
+        document.getElementById("chartPanel");
+
+    const digitFrequencyPanel =
+        document.getElementById("digitFrequencyPanel");
+
+    if (!chartPanel || !digitFrequencyPanel) {
+        return;
+    }
+
+    const digitContracts = [
+        "odd_even",
+        "over_under",
+        "matches_differs"
+    ];
+
+    if (digitContracts.includes(selectedContractType)) {
+
+        chartPanel.style.display = "none";
+        digitFrequencyPanel.style.display = "block";
+
+    } else {
+
+        chartPanel.style.display = "block";
+        digitFrequencyPanel.style.display = "none";
+    }
+}
+
+/* =========================================================
+   CONTRACT INTERFACE
+========================================================= */
+
+function updateContractInterface() {
+
+    const type =
+        selectedContractType;
+
+    /*
+     * Over/Under and Matches/Differs
+     * require a target digit.
+     *
+     * Odd/Even does NOT require
+     * selecting a target digit.
+     */
+
+    const digitRequired =
+        [
+            "over_under",
+            "matches_differs"
+        ].includes(type);
+
+    const digitSection =
+        document.getElementById(
+            "digitSection"
+        );
+
+    digitSection.style.display =
+        digitRequired
+            ? "block"
+            : "none";
+
+    higherLowerSection.style.display =
+        type === "higher_lower"
+            ? "block"
+            : "none";
+
+    touchSection.style.display =
+        type === "touch_no_touch"
+            ? "block"
+            : "none";
+
+    accumulatorSection.style.display =
+        type === "accumulator"
+            ? "block"
+            : "none";
+
+    if (
+        type === "higher_lower" &&
+        currentPrice !== null &&
+        !higherLowerBarrierInput.value
+    ) {
+
+        higherLowerBarrierInput.value =
+            Number(
+                currentPrice
+            ).toFixed(2);
+    }
+
+    if (
+        type === "touch_no_touch" &&
+        currentPrice !== null &&
+        !barrierInput.value
+    ) {
+
+        barrierInput.value =
+            Number(
+                currentPrice
+            ).toFixed(2);
+    }
+
+   updateDigitInfo();
+
+updateAnalysisDisplay();
+
+updateTradeInformation();
+}
+
+
+function updateDigitInfo() {
+
+    if (
+        selectedContractType ===
+        "odd_even"
+    ) {
+
+        digitInfo.textContent =
+            "No target digit is required for Odd / Even.";
+
+        return;
+    }
+
+    if (
+        selectedDigit === null
+    ) {
+
+        digitInfo.textContent =
+            "Select a target digit when required.";
+
+        return;
+    }
+
+    if (
+        selectedContractType ===
+        "over_under"
+    ) {
+
+        digitInfo.textContent =
+            "Selected target digit: " +
+            selectedDigit +
+            " · Valid Over/Under digits are 1–8.";
+
+        return;
+    }
+
+    digitInfo.textContent =
+        "Selected target digit: " +
+        selectedDigit;
+}
+
+
+function updateHigherLowerBarrier() {
+
+    if (
+        currentPrice === null
+    ) {
+
+        return;
+    }
+
+    if (
+        selectedContractType ===
+        "higher_lower"
+    ) {
+
+        const value =
+            Number(
+                higherLowerBarrierInput.value
+            );
+
+        if (
+            !Number.isFinite(value) ||
+            value <= 0
+        ) {
+
+            higherLowerBarrierInput.value =
+                Number(
+                    currentPrice
+                ).toFixed(2);
+        }
+    }
+
+    updateTradeInformation();
+}
+
+
+/* =========================================================
+   PAYOUT / ENTRY INFORMATION
+========================================================= */
+
+function getMarketPayout() {
+
+    if (!selectedMarket) {
+        return null;
+    }
+
+    const possibleValues = [
+
+        selectedMarket.payout,
+
+        selectedMarket.payout_percentage,
+
+        selectedMarket.payoutPercent,
+
+        selectedMarket.return_percentage,
+
+        selectedMarket.profit_percentage,
+
+        selectedMarket.profitPercent,
+
+        selectedMarket.contract_payout
+
+    ];
+
+    for (
+        const value of possibleValues
+    ) {
+
+        const number =
+            Number(value);
+
+        if (
+            Number.isFinite(number) &&
+            number > 0
+        ) {
+
+            return number;
+        }
+    }
+
+    return null;
+}
+
+
+function updateTradeInformation() {
+
+    if (!tradeInfoEntry) {
+        return;
+    }
+
+    tradeInfoEntry.textContent =
+        currentPrice !== null
+            ? formatPrice(currentPrice)
+            : "—";
+
+    if (
+        [
+            "over_under",
+            "matches_differs"
+        ].includes(
+            selectedContractType
+        )
+    ) {
+
+        tradeInfoDigit.textContent =
+            selectedDigit !== null
+                ? String(selectedDigit)
+                : "Select digit";
+    }
+
+    else {
+
+        tradeInfoDigit.textContent =
+            "—";
+    }
+
+    let targetText =
+        "—";
+
+    if (
+        selectedContractType ===
+        "higher_lower"
+    ) {
+
+        targetText =
+            higherLowerBarrierInput.value
+                ? formatPrice(
+                    higherLowerBarrierInput.value
+                )
+                : "Enter barrier";
+    }
+
+    else if (
+        selectedContractType ===
+        "over_under"
+    ) {
+
+        targetText =
+            selectedDigit !== null
+                ? String(selectedDigit)
+                : "Select digit";
+    }
+
+    else if (
+        selectedContractType ===
+        "matches_differs"
+    ) {
+
+        targetText =
+            selectedDigit !== null
+                ? String(selectedDigit)
+                : "Select digit";
+    }
+
+    else if (
+        selectedContractType ===
+        "touch_no_touch"
+    ) {
+
+        targetText =
+            barrierInput.value
+                ? formatPrice(
+                    barrierInput.value
+                ) +
+                " (" +
+                selectedBarrierDirection +
+                ")"
+                : "Enter barrier";
+    }
+else if (
+    selectedContractType ===
+    "accumulator"
+) {
+
+    const entryPrice =
+        currentPrice !== null
+            ? Number(currentPrice)
+            : null;
+
+    if (
+        Number.isFinite(entryPrice) &&
+        entryPrice > 0
+    ) {
+
+        const knockoutPercent = 0.02;
+
+        const distance =
+            entryPrice *
+            knockoutPercent;
+
+        const lowerBoundary =
+            entryPrice -
+            distance;
+
+        const upperBoundary =
+            entryPrice +
+            distance;
+
+        targetText =
+            "Upper " +
+            formatPrice(upperBoundary) +
+            " / Lower " +
+            formatPrice(lowerBoundary);
+    }
+
+    else {
+
+        targetText =
+            "Waiting for price";
+    }
+}
+    tradeInfoTarget.textContent =
+        targetText;
+
+    const payout =
+        getMarketPayout();
+
+    if (payout !== null) {
+
+        tradeInfoPayout.textContent =
+            payout +
+            (
+                payout <= 100
+                    ? "%"
+                    : ""
+            );
+    }
+
+    else {
+
+        /*
+         * Do not invent a payout.
+         * If the backend/market response
+         * does not provide one, show —
+         * until a real payout is available.
+         */
+
+        tradeInfoPayout.textContent =
+            "—";
+    }
+}
+
+
+/* =========================================================
+   TRADE BUTTONS
+========================================================= */
+
+function updateTradeButtons(type) {
+
+    tradeButton1.onclick = null;
+    tradeButton2.onclick = null;
+
+    tradeButton1.className =
+        "trade-btn";
+
+    tradeButton2.className =
+        "trade-btn";
+
+    if (
+        type === "rise_fall"
+    ) {
+
+        tradeButton1.textContent =
+            "↑ Rise";
+
+        tradeButton1.classList.add(
+            "rise"
+        );
+
+        tradeButton1.onclick =
+            () =>
+                handleTrade("rise");
+
+        tradeButton2.textContent =
+            "↓ Fall";
+
+        tradeButton2.classList.add(
+            "fall"
+        );
+
+        tradeButton2.onclick =
+            () =>
+                handleTrade("fall");
+    }
+
+    else if (
+        type === "higher_lower"
+    ) {
+
+        tradeButton1.textContent =
+            "↑ Higher";
+
+        tradeButton1.classList.add(
+            "higher"
+        );
+
+        tradeButton1.onclick =
+            () =>
+                handleTrade("higher");
+
+        tradeButton2.textContent =
+            "↓ Lower";
+
+        tradeButton2.classList.add(
+            "lower"
+        );
+
+        tradeButton2.onclick =
+            () =>
+                handleTrade("lower");
+    }
+
+    else if (
+        type === "over_under"
+    ) {
+
+        tradeButton1.textContent =
+            "↑ Over";
+
+        tradeButton1.classList.add(
+            "over"
+        );
+
+        tradeButton1.onclick =
+            () =>
+                handleTrade("over");
+
+        tradeButton2.textContent =
+            "↓ Under";
+
+        tradeButton2.classList.add(
+            "under"
+        );
+
+        tradeButton2.onclick =
+            () =>
+                handleTrade("under");
+    }
+
+    else if (
+        type === "odd_even"
+    ) {
+
+        tradeButton1.textContent =
+            "Even";
+
+        tradeButton1.classList.add(
+            "even"
+        );
+
+        tradeButton1.onclick =
+            () =>
+                handleTrade("even");
+
+        tradeButton2.textContent =
+            "Odd";
+
+        tradeButton2.classList.add(
+            "odd"
+        );
+
+        tradeButton2.onclick =
+            () =>
+                handleTrade("odd");
+    }
+
+    else if (
+        type === "matches_differs"
+    ) {
+
+        /*
+         * ONE contract selector:
+         *
+         * Matches / Differs
+         *
+         * The two buttons select the
+         * actual backend action.
+         */
+
+        tradeButton1.textContent =
+            "Matches";
+
+        tradeButton1.classList.add(
+            "matches"
+        );
+
+        tradeButton1.onclick =
+            () =>
+                handleTrade("matches");
+
+        tradeButton2.textContent =
+            "Differs";
+
+        tradeButton2.classList.add(
+            "differs"
+        );
+
+        tradeButton2.onclick =
+            () =>
+                handleTrade("differs");
+    }
+
+    else if (
+        type === "touch_no_touch"
+    ) {
+
+        tradeButton1.textContent =
+            "Touch";
+
+        tradeButton1.classList.add(
+            "touch"
+        );
+
+        tradeButton1.onclick =
+            () =>
+                handleTrade("touch");
+
+        tradeButton2.textContent =
+            "No Touch";
+
+        tradeButton2.classList.add(
+            "no-touch"
+        );
+
+        tradeButton2.onclick =
+            () =>
+                handleTrade("no_touch");
+    }
+
+    else if (
+        type === "accumulator"
+    ) {
+
+        tradeButton1.textContent =
+            "Accumulate Above";
+
+        tradeButton1.classList.add(
+            "accumulate"
+        );
+
+        tradeButton1.onclick =
+            () =>
+                handleTrade(
+                    "accumulate",
+                    "above"
+                );
+
+        tradeButton2.textContent =
+            "Accumulate Below";
+
+        tradeButton2.classList.add(
+            "accumulate"
+        );
+
+        tradeButton2.onclick =
+            () =>
+                handleTrade(
+                    "accumulate",
+                    "below"
+                );
+    }
+}
+
+
+/* =========================================================
+   DISABLE BUTTONS
+========================================================= */
+/* =========================================================
+   DISABLE BUTTONS
+========================================================= */
+
+function setButtonsDisabled(
+    disabled
+) {
+
+    if (tradeButton1) {
+        tradeButton1.disabled =
+            disabled;
+    }
+
+    if (tradeButton2) {
+        tradeButton2.disabled =
+            disabled;
+    }
+
+    if (barrierAboveButton) {
+        barrierAboveButton.disabled =
+            disabled;
+    }
+
+    if (barrierBelowButton) {
+        barrierBelowButton.disabled =
+            disabled;
+    }
+
+    if (accumulatorAboveButton) {
+        accumulatorAboveButton.disabled =
+            disabled;
+    }
+
+    if (accumulatorBelowButton) {
+        accumulatorBelowButton.disabled =
+            disabled;
+    }
+
+    document
+        .querySelectorAll(
+            ".digit-btn"
+        )
+        .forEach(
+            button => {
+
+                button.disabled =
+                    disabled;
+            }
+        );
+
+    if (contractSelect) {
+        contractSelect.disabled =
+            disabled;
+    }
+
+    if (marketSelect) {
+        marketSelect.disabled =
+            disabled;
+    }
+
+    if (durationInput) {
+        durationInput.disabled =
+            disabled;
+    }
+
+    if (durationUnitInput) {
+        durationUnitInput.disabled =
+            disabled;
+    }
+
+    if (stakeInput) {
+        stakeInput.disabled =
+            disabled;
+    }
+
+    if (higherLowerBarrierInput) {
+        higherLowerBarrierInput.disabled =
+            disabled;
+    }
+
+    if (barrierInput) {
+        barrierInput.disabled =
+            disabled;
+    }
+
+    if (accumulatorGrowthInput) {
+        accumulatorGrowthInput.disabled =
+            disabled;
+    }
+
+    /*
+     * accumulatorBarrierInput was removed.
+     * Accumulator boundaries are calculated
+     * automatically from the entry price.
+     */
+}
+/* =========================================================
+   HANDLE TRADE
+========================================================= */
+
+async function handleTrade(
+    action,
+    explicitAccumulatorDirection = null
+) {
+
+    clearMessage();
+
+    if (!selectedMarket) {
+
+        showMessage(
+            "Please select a market."
+        );
+
+        return;
+    }
+
+    const contractType =
+        selectedContractType;
+
+    const stake =
+        Number(
+            stakeInput.value
+        );
+
+    const duration =
+        Number(
+            durationInput.value
+        );
+
+    const durationUnit =
+        String(
+            durationUnitInput.value ||
+            "s"
+        )
+            .trim()
+            .toLowerCase();
+
+    if (
+        !Number.isFinite(stake) ||
+        stake < 0.35
+    ) {
+
+        showMessage(
+            "Minimum stake is $0.35."
+        );
+
+        return;
+    }
+
+    if (
+        !Number.isInteger(duration) ||
+        duration <= 0
+    ) {
+
+        showMessage(
+            "Duration must be a positive whole number."
+        );
+
+        return;
+    }
+
+    if (
+        durationUnit !== "s" &&
+        durationUnit !== "t"
+    ) {
+
+        showMessage(
+            "Duration must be seconds or ticks."
+        );
+
+        return;
+    }
+
+    /*
+     * All digit contracts use ticks.
+     */
+
+    if (
+        (
+            contractType ===
+                "matches_differs" ||
+            contractType ===
+                "over_under" ||
+            contractType ===
+                "odd_even"
+        ) &&
+        durationUnit !== "t"
+    ) {
+
+        showMessage(
+            "This digit contract requires tick duration."
+        );
+
+        return;
+    }
+
+    let targetDigit = null;
+
+    /*
+     * Over/Under and Matches/Differs
+     * need a target digit.
+     */
+
+    if (
+        contractType ===
+            "over_under" ||
+        contractType ===
+            "matches_differs"
+    ) {
+
+        if (
+            selectedDigit === null
+        ) {
+
+            showMessage(
+                "Please select a target digit."
+            );
+
+            return;
+        }
+
+        targetDigit =
+            selectedDigit;
+    }
+
+    /*
+     * Odd/Even does not use
+     * a target digit.
+     */
+
+    if (
+        contractType ===
+        "over_under"
+    ) {
+
+        if (
+            selectedDigit < 1 ||
+            selectedDigit > 8
+        ) {
+
+            showMessage(
+                "Over/Under target digit must be between 1 and 8."
+            );
+
+            return;
+        }
+    }
+
+    let higherLowerBarrier = null;
+
+    if (
+        contractType ===
+        "higher_lower"
+    ) {
+
+        higherLowerBarrier =
+            Number(
+                higherLowerBarrierInput.value
+            );
+
+        if (
+            !Number.isFinite(
+                higherLowerBarrier
+            ) ||
+            higherLowerBarrier <= 0
+        ) {
+
+            showMessage(
+                "Please enter a valid price barrier."
+            );
+
+            return;
+        }
+
+        higherLowerBarrier =
+            Number(
+                higherLowerBarrier.toFixed(2)
+            );
+    }
+
+    let barrierPrice = null;
+    let barrierDirection = null;
+
+    if (
+        contractType ===
+        "touch_no_touch"
+    ) {
+
+        barrierPrice =
+            Number(
+                barrierInput.value
+            );
+
+        barrierDirection =
+            selectedBarrierDirection;
+
+        if (
+            !Number.isFinite(
+                barrierPrice
+            ) ||
+            barrierPrice <= 0
+        ) {
+
+            showMessage(
+                "Please enter a valid barrier price."
+            );
+
+            return;
+        }
+
+        barrierPrice =
+            Number(
+                barrierPrice.toFixed(2)
+            );
+    }
+
+    let accumulatorBarrier = null;
+    let accumulatorGrowth = null;
+    let accumulatorDirection = null;
+
+    if (
+        contractType ===
+        "accumulator"
+    ) {
+
+        accumulatorGrowth =
+            Number(
+                accumulatorGrowthInput.value
+            );
+
+        if (
+            !Number.isFinite(
+                accumulatorGrowth
+            ) ||
+            accumulatorGrowth <= 0
+        ) {
+
+            showMessage(
+                "Please select a valid accumulator growth rate."
+            );
+
+            return;
+        }
+        // Accumulator knockout boundaries are now
+        // calculated automatically by the backend
+        // from the entry price and knockout percentage.
+
+        accumulatorBarrier = null;
+     
+
+        accumulatorDirection =
+            explicitAccumulatorDirection ||
+            selectedAccumulatorDirection;
+    }
+
+    /*
+     * IMPORTANT:
+     *
+     * The UI uses:
+     *     matches_differs
+     *
+     * But the backend already uses:
+     *     matches
+     *     differs
+     *
+     * Therefore, send the actual
+     * selected action as the backend
+     * contract type.
+     */
+
+    let backendContractType =
+        contractType;
+
+    if (
+        contractType ===
+        "matches_differs"
+    ) {
+
+        backendContractType =
+            action === "matches"
+                ? "matches"
+                : action === "differs"
+                    ? "differs"
+                    : null;
+
+        if (!backendContractType) {
+
+            showMessage(
+                "Please choose Matches or Differs."
+            );
+
+            return;
+        }
+    }
+
+    setButtonsDisabled(true);
+
+    try {
+
+        if (
+            typeof submitKMFTrade !==
+            "function"
+        ) {
+
+            throw new Error(
+                "submitKMFTrade() was not found. Check trading-engine.js."
+            );
+        }
+
+        const tradeMarket = {
+            ...selectedMarket,
+            contract_type:
+                backendContractType
+        };
+
+        console.log(
+            "========== FRONTEND TRADE =========="
+        );
+
+        console.log(
+            "Market:",
+            selectedMarket.symbol
+        );
+
+        console.log(
+            "UI Contract:",
+            contractType
+        );
+
+        console.log(
+            "Backend Contract:",
+            backendContractType
+        );
+
+        console.log(
+            "Action:",
+            action
+        );
+
+        console.log(
+            "Stake:",
+            stake
+        );
+
+        console.log(
+            "Duration:",
+            duration
+        );
+
+        console.log(
+            "Duration Unit:",
+            durationUnit
+        );
+
+        console.log(
+            "Target Digit:",
+            targetDigit
+        );
+
+        console.log(
+            "Higher/Lower Barrier:",
+            higherLowerBarrier
+        );
+
+        console.log(
+            "Touch Barrier:",
+            barrierPrice
+        );
+
+        console.log(
+            "Barrier Direction:",
+            barrierDirection
+        );
+
+        console.log(
+            "Accumulator Growth:",
+            accumulatorGrowth
+        );
+
+        console.log(
+            "Accumulator Barrier:",
+            accumulatorBarrier
+        );
+
+        console.log(
+            "Accumulator Direction:",
+            accumulatorDirection
+        );
+
+        console.log(
+            "===================================="
+        );
+
+        const result =
+            await submitKMFTrade({
+
+                market:
+                    tradeMarket,
+
+                contractType:
+                    backendContractType,
+
+                action:
+                    action,
+
+                stake:
+                    stake,
+
+                duration:
+                    duration,
+
+                durationUnit:
+                    durationUnit,
+
+                targetDigit:
+                    targetDigit,
+
+                barrierPrice:
+                    contractType ===
+                        "higher_lower"
+                        ? higherLowerBarrier
+                        : barrierPrice,
+
+                barrierDirection:
+                    barrierDirection,
+
+                accumulatorBarrier:
+                    accumulatorBarrier,
+
+                accumulatorGrowth:
+                    accumulatorGrowth,
+
+                accumulatorDirection:
+                    accumulatorDirection,
+
+                mode:
+                    localStorage.getItem(
+                        "kmf_account_mode"
+                    ) || "demo"
+            });
+
+        if (
+            result &&
+            result.trade
+        ) {
+
+            currentTrade =
+                result.trade;
+        }
+
+        else if (
+            result &&
+            result.data &&
+            result.data.trade
+        ) {
+
+            currentTrade =
+                result.data.trade;
+        }
+
+        else if (result) {
+
+            currentTrade =
+                result;
+        }
+if (currentTrade) {
+
+    updateSummary(
+        currentTrade
+    );
+
+    await loadTradeWallet({
+        silent: true
+    });
+
+    /*
+     * Show the result card immediately.
+     * The trade will initially display
+     * as PENDING.
+     */
+    showTradeResult(
+        currentTrade
+    );
+    showMessage(
+        "Trade placed successfully.",
+        "success"
+    );
+
+    /*
+     * Keep checking the backend until
+     * the trade becomes WON or LOST.
+     */
+    startTradePolling(
+        currentTrade.id
+    );
+}
+        else {
+
+            showMessage(
+                "Trade was submitted, but no trade record was returned."
+            );
+        }
+
+    }
+    catch (error) {
+
+        console.error(
+            "Trade error:",
+            error
+        );
+
+        showMessage(
+            error.message ||
+            "Trade failed."
+        );
+    }
+    finally {
+
+        setButtonsDisabled(
+            false
+        );
+    }
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+function updateSummary(
+    trade
+) {
+
+    if (!trade) {
+        return;
+    }
+
+    document.getElementById(
+        "summaryMarket"
+    ).textContent =
+        trade.symbol ||
+        selectedMarket?.symbol ||
+        "—";
+
+    document.getElementById(
+        "summaryContract"
+    ).textContent =
+        formatContractType(
+            trade.contract_type ||
+            selectedContractType
+        );
+
+    document.getElementById(
+        "summaryAction"
+    ).textContent =
+        formatAction(
+            trade.action
+        );
+
+    document.getElementById(
+        "summaryStake"
+    ).textContent =
+        "$" +
+        Number(
+            trade.stake || 0
+        ).toFixed(2);
+
+    document.getElementById(
+        "summaryEntry"
+    ).textContent =
+        formatPrice(
+            trade.entry_price
+        );
+
+    let target = "—";
+
+    const tradeContract =
+        trade.contract_type ||
+        selectedContractType;
+
+    if (
+        tradeContract ===
+        "higher_lower"
+    ) {
+
+        target =
+            formatPrice(
+                trade.target_price
+            );
+    }
+
+    else if (
+        tradeContract ===
+        "touch_no_touch"
+    ) {
+
+        target =
+            formatPrice(
+                trade.target_price
+            ) +
+            " (" +
+            (
+                trade.barrier_direction ||
+                "above"
+            ) +
+            ")";
+    }
+
+    else if (
+        tradeContract ===
+        "accumulator"
+    ) {
+
+        target =
+            (
+                trade.accumulator_barrier
+                    ? formatPrice(
+                        trade.accumulator_barrier
+                    )
+                    : "—"
+            ) +
+            " (" +
+            (
+                trade.accumulator_direction ||
+                "above"
+            ) +
+            ")";
+    }
+
+    else if (
+        trade.target_digit !== null &&
+        trade.target_digit !== undefined
+    ) {
+
+        target =
+            String(
+                trade.target_digit
+            );
+    }
+
+    document.getElementById(
+        "summaryTarget"
+    ).textContent =
+        target;
+
+    const tradeDuration =
+        trade.duration !== null &&
+        trade.duration !== undefined
+            ? trade.duration
+            : null;
+
+    const tradeDurationUnit =
+        trade.duration_unit ||
+        null;
+
+    document.getElementById(
+        "summaryDuration"
+    ).textContent =
+        tradeDuration !== null
+            ? tradeDuration +
+              " " +
+              (
+                  tradeDurationUnit ===
+                  "t"
+                      ? "ticks"
+                      : "seconds"
+              )
+            : "—";
+
+    document.getElementById(
+        "summaryEntryTick"
+    ).textContent =
+        trade.entry_tick !== null &&
+        trade.entry_tick !== undefined
+            ? trade.entry_tick
+            : "—";
+
+    document.getElementById(
+        "summaryExitTick"
+    ).textContent =
+        trade.exit_tick !== null &&
+        trade.exit_tick !== undefined
+            ? trade.exit_tick
+            : "—";
+
+    document.getElementById(
+        "summaryStatus"
+    ).textContent =
+        trade.status ||
+        "pending";
+}
+
+
+/* =========================================================
+   ACTION FORMAT
+========================================================= */
+
+function formatAction(
+    action
+) {
+
+    const map = {
+
+        rise:
+            "↑ Rise",
+
+        fall:
+            "↓ Fall",
+
+        higher:
+            "↑ Higher",
+
+        lower:
+            "↓ Lower",
+
+        over:
+            "↑ Over",
+
+        under:
+            "↓ Under",
+
+        even:
+            "Even",
+
+        odd:
+            "Odd",
+
+        matches:
+            "Matches",
+
+        differs:
+            "Differs",
+
+        touch:
+            "Touch",
+
+        no_touch:
+            "No Touch",
+
+        accumulate:
+            "Accumulate"
+    };
+
+    return (
+        map[action] ||
+        action ||
+        "—"
+    );
+}
+
+
+/* =========================================================
+   PRICE FORMAT
+========================================================= */
+
+function formatPrice(
+    price
+) {
+
+    const number =
+        Number(price);
+
+    if (
+        !Number.isFinite(
+            number
+        )
+    ) {
+
+        return "—";
+    }
+
+    return number.toFixed(2);
+}
+
+/* =========================================================
+   TRADE RESULT
+========================================================= */
+
+function showTradeResult(trade) {
+
+    if (!trade) {
+        return;
+    }
+
+    const resultBox =
+        document.getElementById(
+            "resultBox"
+        );
+
+    const resultTitle =
+        document.getElementById(
+            "resultTitle"
+        );
+
+    const resultStatus =
+        document.getElementById(
+            "resultStatus"
+        );
+
+    const resultWaiting =
+        document.getElementById(
+            "resultWaiting"
+        );
+
+    if (!resultBox) {
+        return;
+    }
+
+    /*
+     * Make the result card visible immediately.
+     */
+    resultBox.style.display =
+        "block";
+
+    const status =
+        String(
+            trade.status ||
+            "pending"
+        )
+            .toLowerCase();
+
+    /*
+     * STATUS
+     */
+
+    resultStatus.className =
+        "result-status-large";
+
+    if (status === "won") {
+
+        resultStatus.textContent =
+            "✓ WON";
+
+        resultStatus.classList.add(
+            "status-won"
+        );
+
+        resultTitle.textContent =
+            "Trade Won";
+
+        if (resultWaiting) {
+            resultWaiting.style.display =
+                "none";
+        }
+    }
+
+    else if (status === "lost") {
+
+        resultStatus.textContent =
+            "✕ LOST";
+
+        resultStatus.classList.add(
+            "status-lost"
+        );
+
+        resultTitle.textContent =
+            "Trade Lost";
+
+        if (resultWaiting) {
+            resultWaiting.style.display =
+                "none";
+        }
+    }
+
+    else if (
+        status === "cancelled"
+    ) {
+
+        resultStatus.textContent =
+            "CANCELLED";
+
+        resultStatus.classList.add(
+            "status-cancelled"
+        );
+
+        resultTitle.textContent =
+            "Trade Cancelled";
+
+        if (resultWaiting) {
+            resultWaiting.style.display =
+                "none";
+        }
+    }
+
+    else {
+
+        resultStatus.textContent =
+            "⏳ PENDING";
+
+        resultStatus.classList.add(
+            "status-pending"
+        );
+
+        resultTitle.textContent =
+            "Trade Result";
+
+        if (resultWaiting) {
+            resultWaiting.style.display =
+                "block";
+        }
+    }
+
+    /*
+     * STAKE
+     */
+
+    const resultStake =
+        document.getElementById(
+            "resultStake"
+        );
+
+    if (resultStake) {
+
+        resultStake.textContent =
+            "$" +
+            Number(
+                trade.stake || 0
+            ).toFixed(2);
+    }
+
+    /*
+     * ENTRY / EXIT
+     */
+
+    document.getElementById(
+        "resultEntry"
+    ).textContent =
+        formatPrice(
+            trade.entry_price
+        );
+
+    document.getElementById(
+        "resultExit"
+    ).textContent =
+        formatPrice(
+            trade.exit_price
+        );
+
+    /*
+     * FINAL DIGIT
+     */
+
+    let finalDigit = "—";
+
+    if (
+        trade.final_digit !== null &&
+        trade.final_digit !== undefined
+    ) {
+
+        finalDigit =
+            trade.final_digit;
+    }
+
+    else if (
+        trade.exit_price !== null &&
+        trade.exit_price !== undefined
+    ) {
+
+        finalDigit =
+            getLastDigit(
+                trade.exit_price
+            );
+    }
+
+    document.getElementById(
+        "resultDigit"
+    ).textContent =
+        finalDigit;
+
+    /*
+     * TARGET
+     */
+
+    let target = "—";
+
+    const tradeContract =
+        trade.contract_type ||
+        selectedContractType;
+
+    if (
+        tradeContract ===
+        "higher_lower"
+    ) {
+
+        target =
+            formatPrice(
+                trade.target_price
+            );
+    }
+
+    else if (
+        tradeContract ===
+        "touch_no_touch"
+    ) {
+
+        target =
+            formatPrice(
+                trade.target_price
+            ) +
+            " (" +
+            (
+                trade.barrier_direction ||
+                "above"
+            ) +
+            ")";
+    }
+
+    else if (
+        tradeContract ===
+        "accumulator"
+    ) {
+
+        target =
+            (
+                trade.accumulator_barrier
+                    ? formatPrice(
+                        trade.accumulator_barrier
+                    )
+                    : "—"
+            ) +
+            " (" +
+            (
+                trade.accumulator_direction ||
+                "above"
+            ) +
+            ")";
+    }
+
+    else if (
+        trade.target_digit !== null &&
+        trade.target_digit !== undefined
+    ) {
+
+        target =
+            String(
+                trade.target_digit
+            );
+    }
+
+    document.getElementById(
+        "resultTarget"
+    ).textContent =
+        target;
+
+    /*
+     * BARRIER
+     */
+
+    let resultBarrier = "—";
+
+    if (
+        tradeContract ===
+        "higher_lower"
+    ) {
+
+        resultBarrier =
+            formatPrice(
+                trade.target_price
+            );
+    }
+
+    else if (
+        tradeContract ===
+        "touch_no_touch"
+    ) {
+
+        resultBarrier =
+            formatPrice(
+                trade.target_price
+            );
+    }
+
+    else if (
+        tradeContract ===
+        "accumulator"
+    ) {
+
+        resultBarrier =
+            trade.accumulator_barrier
+                ? formatPrice(
+                    trade.accumulator_barrier
+                )
+                : "—";
+    }
+
+    document.getElementById(
+        "resultBarrier"
+    ).textContent =
+        resultBarrier;
+
+    /*
+     * TICKS
+     */
+
+    document.getElementById(
+        "resultEntryTick"
+    ).textContent =
+        trade.entry_tick !== null &&
+        trade.entry_tick !== undefined
+            ? trade.entry_tick
+            : "—";
+
+    document.getElementById(
+        "resultExitTick"
+    ).textContent =
+        trade.exit_tick !== null &&
+        trade.exit_tick !== undefined
+            ? trade.exit_tick
+            : "—";
+
+    /*
+     * PAYOUT
+     */
+
+    document.getElementById(
+        "resultPayout"
+    ).textContent =
+        "$" +
+        Number(
+            trade.payout || 0
+        ).toFixed(2);
+
+    /*
+     * PROFIT
+     */
+
+    const profit =
+        Number(
+            trade.profit || 0
+        );
+
+    const profitText =
+        profit >= 0
+            ? "+$" +
+              profit.toFixed(2)
+            : "-$" +
+              Math.abs(
+                  profit
+              ).toFixed(2);
+
+    const resultProfit =
+        document.getElementById(
+            "resultProfit"
+        );
+
+    resultProfit.textContent =
+        profitText;
+
+    /*
+     * Profit color follows result.
+     */
+    resultProfit.className = "";
+
+    if (profit > 0) {
+
+        resultProfit.classList.add(
+            "status-won"
+        );
+    }
+
+    else if (profit < 0) {
+
+        resultProfit.classList.add(
+            "status-lost"
+        );
+    }
+}
+/* =========================================================
+   LAST DIGIT
+========================================================= */
+
+function getLastDigit(
+    price
+) {
+
+    const number =
+        Number(price);
+
+    if (
+        !Number.isFinite(
+            number
+        )
+    ) {
+
+        return null;
+    }
+
+    return Math.abs(
+        Math.floor(
+            number * 100
+        )
+    ) % 10;
+}
+
+/* =========================================================
+   TRADE POLLING
+========================================================= */
+
+function startTradePolling(
+    tradeId
+) {
+
+    if (!tradeId) {
+        return;
+    }
+
+    if (pollingTimer) {
+
+        clearInterval(
+            pollingTimer
+        );
+
+        pollingTimer = null;
+    }
+
+    let attempts = 0;
+
+    const maxAttempts = 600;
+
+    /*
+     * Update immediately before
+     * starting the 1-second loop.
+     */
+    (async () => {
+
+        try {
+
+            const trade =
+                await getTradeById(
+                    tradeId
+                );
+
+            if (trade) {
+
+                currentTrade =
+                    trade;
+
+                updateSummary(
+                    trade
+                );
+
+                showTradeResult(
+                    trade
+                );
+            }
+
+        }
+        catch (error) {
+
+            console.error(
+                "Initial trade polling error:",
+                error
+            );
+        }
+
+    })();
+
+    pollingTimer =
+        setInterval(
+            async () => {
+
+                attempts++;
+
+                try {
+
+                    const trade =
+                        await getTradeById(
+                            tradeId
+                        );
+
+                    if (!trade) {
+                        return;
+                    }
+
+                    currentTrade =
+                        trade;
+
+                    /*
+                     * Keep both the summary
+                     * and the quick result card
+                     * synchronized with the backend.
+                     */
+                    updateSummary(
+                        trade
+                    );
+
+                    showTradeResult(
+                        trade
+                    );
+
+                    const status =
+                        String(
+                            trade.status ||
+                            ""
+                        ).toLowerCase();
+
+                    /*
+                     * STOP polling once the
+                     * backend has settled the trade.
+                     */
+                    if (
+    status === "won" ||
+    status === "lost" ||
+    status === "cancelled"
+) {
+
+    clearInterval(
+        pollingTimer
+    );
+
+    pollingTimer =
+        null;
+
+    /*
+     * One final update.
+     */
+    showTradeResult(
+        trade
+    );
+
+    /*
+     * Refresh the wallet after
+     * the trade has been settled.
+     */
+    await loadTradeWallet({
+        silent: true
+    });
+
+    return;
+}
+                    if (
+                        attempts >=
+                        maxAttempts
+                    ) {
+
+                        clearInterval(
+                            pollingTimer
+                        );
+
+                        pollingTimer =
+                            null;
+                    }
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "Trade polling error:",
+                        error
+                    );
+                }
+
+            },
+            1000
+        );
+}
+/* =========================================================
+   GET TRADE
+========================================================= */
+
+async function getTradeById(
+    tradeId
+) {
+
+    if (
+        typeof apiRequest ===
+        "function"
+    ) {
+
+        const result =
+            await apiRequest(
+                "/api/trades/" +
+                encodeURIComponent(
+                    tradeId
+                )
+            );
+
+        return (
+            result?.trade ||
+            result?.data?.trade ||
+            result?.data ||
+            result
+        );
+    }
+
+    const response =
+        await fetch(
+            "http://localhost:3000/api/trades/" +
+            encodeURIComponent(
+                tradeId
+            )
+        );
+
+    if (!response.ok) {
+
+        throw new Error(
+            "Failed to retrieve trade."
+        );
+    }
+
+    const data =
+        await response.json();
+
+    return (
+        data.trade ||
+        data.data?.trade ||
+        data.data ||
+        data
+    );
+}
+
+/* =========================================================
+   LOAD MARKETS
+========================================================= */
+
+async function loadMarkets() {
+
+    clearMessage();
+
+    try {
+
+        let result;
+
+        if (
+            typeof apiRequest === "function"
+        ) {
+
+            result =
+                await apiRequest(
+                    "/api/markets"
+                );
+
+        } else {
+
+            const response =
+                await fetch(
+                    "http://localhost:3000/api/markets"
+                );
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Failed to load markets."
+                );
+            }
+
+            result =
+                await response.json();
+        }
+
+        const markets =
+            result?.markets ||
+            result?.data?.markets ||
+            result?.data ||
+            result;
+
+        if (
+            !Array.isArray(markets) ||
+            markets.length === 0
+        ) {
+
+            throw new Error(
+                "No active markets were returned."
+            );
+        }
+
+        /*
+         * Clear the dropdown first.
+         */
+        marketSelect.innerHTML = "";
+
+        /*
+         * Add every active market.
+         */
+        markets.forEach(
+            market => {
+
+                if (
+                    market.is_active === false
+                ) {
+                    return;
+                }
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+                option.value =
+                    market.id;
+
+                option.textContent =
+                    market.market_name ||
+                    market.symbol;
+
+                /*
+                 * Store the exact symbol too.
+                 */
+                option.dataset.symbol =
+                    market.symbol || "";
+
+                marketSelect.appendChild(
+                    option
+                );
+            }
+        );
+
+        /*
+         * =====================================================
+         * RESTORE THE EXACT MARKET FROM MARKETS PAGE
+         * =====================================================
+         */
+
+        const savedMarketId =
+            localStorage.getItem(
+                "selectedMarketId"
+            ) ||
+            localStorage.getItem(
+                "kmf_trade_market_id"
+            );
+
+        const savedMarketSymbol =
+            String(
+                localStorage.getItem(
+                    "selectedMarketSymbol"
+                ) ||
+                localStorage.getItem(
+                    "kmf_trade_market_symbol"
+                ) ||
+                ""
+            ).toUpperCase();
+
+        /*
+         * First try the exact market ID.
+         */
+        let selectedMarketFromStorage =
+            markets.find(
+                market =>
+                    market.is_active !== false &&
+                    savedMarketId &&
+                    String(market.id) ===
+                    String(savedMarketId)
+            );
+
+        /*
+         * If ID is not available, use the exact symbol.
+         */
+        if (
+            !selectedMarketFromStorage &&
+            savedMarketSymbol
+        ) {
+
+            selectedMarketFromStorage =
+                markets.find(
+                    market =>
+                        market.is_active !== false &&
+                        String(
+                            market.symbol || ""
+                        ).toUpperCase() ===
+                        savedMarketSymbol
+                );
+        }
+
+        /*
+         * If Markets page gave us a valid
+         * exact market, select it.
+         */
+        if (
+            selectedMarketFromStorage
+        ) {
+
+            console.log(
+                "Restoring exact market from Markets page:",
+                {
+                    id:
+                        selectedMarketFromStorage.id,
+
+                    symbol:
+                        selectedMarketFromStorage.symbol,
+
+                    name:
+                        selectedMarketFromStorage.market_name
+                }
+            );
+
+            selectMarket(
+                selectedMarketFromStorage
+            );
+
+            /*
+             * Keep the dropdown on that exact market.
+             */
+            marketSelect.value =
+                selectedMarketFromStorage.id;
+
+            return;
+        }
+
+        /*
+         * =====================================================
+         * FALLBACK
+         * =====================================================
+         *
+         * Only use the first market when there is
+         * no previously selected market.
+         */
+
+        const firstOption =
+            marketSelect.options[0];
+
+        if (firstOption) {
+
+            const firstMarket =
+                markets.find(
+                    market =>
+                        String(
+                            market.id
+                        ) ===
+                        String(
+                            firstOption.value
+                        )
+                );
+
+            if (firstMarket) {
+
+                selectMarket(
+                    firstMarket
+                );
+            }
+        }
+
+    }
+    catch (error) {
+
+        console.error(
+            "Market loading error:",
+            error
+        );
+
+        marketSelect.innerHTML =
+            '<option value="">Failed to load markets</option>';
+
+        showMessage(
+            error.message ||
+            "Failed to load markets."
+        );
+    }
+}
+/* =========================================================
+   SELECT MARKET
+========================================================= */
+
+function selectMarket(market) {
+
+    if (!market) {
+        return;
+    }
+
+    /*
+     * Store the EXACT market selected.
+     *
+     * Example:
+     * VOL-25 stays VOL-25.
+     * It does NOT become KMF-25.
+     */
+    selectedMarket = market;
+
+    console.log(
+        "========== MARKET SELECTED =========="
+    );
+
+    console.log(
+        "Market ID:",
+        market.id
+    );
+
+    console.log(
+        "Market Symbol:",
+        market.symbol
+    );
+
+    console.log(
+        "Market Name:",
+        market.market_name
+    );
+
+    console.log(
+        "Synthetic Symbol:",
+        getSyntheticSymbol(market)
+    );
+
+    /*
+     * Keep the dropdown synchronized.
+     */
+    if (marketSelect) {
+
+        marketSelect.value =
+            market.id;
+    }
+
+    /*
+     * Display the exact selected market.
+     */
+    marketName.textContent =
+        market.market_name ||
+        market.symbol ||
+        "—";
+
+    chartMarketLabel.textContent =
+        "Market: " +
+        (
+            market.symbol ||
+            market.market_name ||
+            "—"
+        );
+
+    /*
+     * Update contracts for THIS market.
+     */
+    updateContractSelector();
+
+    contractTypeEl.textContent =
+        formatContractType(
+            selectedContractType
+        );
+
+    contractDescription.textContent =
+        getContractDescription(
+            selectedContractType
+        );
+
+    updateContractInterface();
+
+    updateTradeButtons(
+        selectedContractType
+    );
+
+    updateSummary({
+        symbol:
+            market.symbol,
+
+        contract_type:
+            selectedContractType,
+
+        action:
+            null,
+
+        stake:
+            Number(
+                stakeInput.value
+            ),
+
+        entry_price:
+            currentPrice,
+
+        target_price:
+            null,
+
+        duration:
+            Number(
+                durationInput.value
+            ),
+
+        duration_unit:
+            durationUnitInput.value,
+
+        status:
+            "—"
+    });
+
+    /*
+     * Everything below now uses
+     * the exact selected market.
+     */
+    updateLivePrice();
+
+    updateTradeInformation();
+
+    if (
+        shouldShowChart(
+            selectedContractType
+        )
+    ) {
+
+        loadMarketChart();
+    }
+
+    loadMarketStatistics();
+}
+/* =========================================================
+   MARKET SELECT
+========================================================= */
+
+marketSelect.addEventListener(
+    "change",
+    () => {
+
+        const selectedId =
+            marketSelect.value;
+
+        if (!selectedId) {
+            return;
+        }
+
+        loadSelectedMarket(
+            selectedId
+        );
+    }
+);
+
+
+/* =========================================================
+   LOAD SELECTED MARKET
+========================================================= */
+
+async function loadSelectedMarket(
+    marketId
+) {
+
+    try {
+
+        let result;
+
+        if (
+            typeof apiRequest ===
+            "function"
+        ) {
+
+            result =
+                await apiRequest(
+                    "/api/markets"
+                );
+        }
+
+        else {
+
+            const response =
+                await fetch(
+                    "http://localhost:3000/api/markets"
+                );
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Failed to load markets."
+                );
+            }
+
+            result =
+                await response.json();
+        }
+
+        const markets =
+            result?.markets ||
+            result?.data?.markets ||
+            result?.data ||
+            result;
+
+        const market =
+            Array.isArray(markets)
+                ? markets.find(
+                    item =>
+                        String(
+                            item.id
+                        ) ===
+                        String(
+                            marketId
+                        )
+                )
+                : null;
+
+        if (!market) {
+
+            throw new Error(
+                "Selected market was not found."
+            );
+        }
+
+        selectMarket(
+            market
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Selected market error:",
+            error
+        );
+
+        showMessage(
+            error.message ||
+            "Unable to select market."
+        );
+    }
+}
+
+
+/* =========================================================
+   LIVE PRICE
+========================================================= */
+
+async function updateLivePrice() {
+
+    if (!selectedMarket) {
+        return;
+    }
+
+    const syntheticSymbol =
+        getSyntheticSymbol(
+            selectedMarket
+        );
+
+    if (!syntheticSymbol) {
+
+        livePrice.textContent =
+            "—";
+
+        contractPrice.textContent =
+            "—";
+
+        return;
+    }
+
+    try {
+
+        let result;
+
+        if (
+            typeof apiRequest ===
+            "function"
+        ) {
+
+            result =
+                await apiRequest(
+                    "/api/prices"
+                );
+        }
+
+        else {
+
+            const response =
+                await fetch(
+                    "http://localhost:3000/api/prices"
+                );
+
+            if (!response.ok) {
+                return;
+            }
+
+            result =
+                await response.json();
+        }
+
+        let price = null;
+
+        if (result?.prices) {
+
+            const prices =
+                result.prices;
+
+            const item =
+                prices[
+                    syntheticSymbol
+                ];
+
+            if (
+                typeof item ===
+                "number"
+            ) {
+
+                price =
+                    item;
+            }
+
+            else if (
+                item &&
+                typeof item.price ===
+                "number"
+            ) {
+
+                price =
+                    item.price;
+            }
+        }
+
+        if (
+            price === null &&
+            result?.data
+        ) {
+
+            const item =
+                result.data[
+                    syntheticSymbol
+                ];
+
+            if (
+                typeof item ===
+                "number"
+            ) {
+
+                price =
+                    item;
+            }
+
+            else if (
+                item &&
+                typeof item.price ===
+                "number"
+            ) {
+
+                price =
+                    item.price;
+            }
+        }
+
+        if (
+            price !== null
+        ) {
+
+           currentPrice =
+    Number(price);
+
+updateCurrentDigitIndicator();
+
+livePrice.textContent =
+    formatPrice(
+        currentPrice
+    );
+
+            contractPrice.textContent =
+                formatPrice(
+                    currentPrice
+                );
+
+            updateHigherLowerBarrier();
+
+            updateTradeInformation();
+        }
+
+    }
+    catch (error) {
+
+        console.error(
+            "Price error:",
+            error
+        );
+    }
+}
+/* =========================================================
+   LIVE CURRENT DIGIT INDICATOR
+========================================================= */
+
+function updateCurrentDigitIndicator() {
+
+   if (
+    !statisticsContent ||
+    ![
+        "odd_even",
+        "over_under",
+        "matches_differs"
+    ].includes(
+        selectedContractType
+    )
+) {
+    return;
+}
+
+    const currentDigit =
+        getLastDigit(
+            currentPrice
+        );
+
+    if (
+        currentDigit === null
+    ) {
+        return;
+    }
+
+    const digitItems =
+        statisticsContent.querySelectorAll(
+            ".circular-digit-item"
+        );
+
+    if (
+        !digitItems.length
+    ) {
+        return;
+    }
+
+    digitItems.forEach(
+        item => {
+
+            const circle =
+                item.querySelector(
+                    ".circular-digit-circle span"
+                );
+
+            if (!circle) {
+                return;
+            }
+
+            const digit =
+                Number(
+                    circle.textContent.trim()
+                );
+
+            item.classList.toggle(
+                "current",
+                digit === currentDigit
+            );
+        }
+    );
+}
+
+/* =========================================================
+   CHART STATE
+========================================================= */
+
+function setChartState(
+    state,
+    message = ""
+) {
+
+    chartLoading.style.display =
+        state === "loading"
+            ? "flex"
+            : "none";
+
+    chartError.style.display =
+        state === "error"
+            ? "flex"
+            : "none";
+
+    chartEmpty.style.display =
+        state === "empty"
+            ? "flex"
+            : "none";
+
+    if (
+        state === "error"
+    ) {
+
+        chartError.textContent =
+            message ||
+            "Unable to load market chart.";
+    }
+}
+
+
+/* =========================================================
+   HISTORY TIMESTAMP
+========================================================= */
+
+function normalizeHistoryTimestamp(
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return null;
+    }
+
+    if (
+        typeof value === "number"
+    ) {
+
+        if (
+            value < 10000000000
+        ) {
+
+            return value * 1000;
+        }
+
+        return value;
+    }
+
+    const parsed =
+        new Date(
+            value
+        )
+        .getTime();
+
+    return Number.isFinite(parsed)
+        ? parsed
+        : null;
+}
+
+
+/* =========================================================
+   BUILD 1-MINUTE CANDLES
+========================================================= */
+function buildMinuteCandles(history) {
+
+    const candles = [];
+
+    if (!Array.isArray(history) || history.length === 0) {
+        return candles;
+    }
+
+    const CANDLE_INTERVAL = 10000; // 10 seconds
+
+    const sortedHistory = history
+        .map(tick => ({
+            price: Number(tick.price),
+            timestamp: normalizeHistoryTimestamp(tick.timestamp)
+        }))
+        .filter(tick =>
+            Number.isFinite(tick.price) &&
+            Number.isFinite(tick.timestamp)
+        )
+        .sort((a, b) => a.timestamp - b.timestamp);
+
+    const grouped = new Map();
+
+    for (const tick of sortedHistory) {
+
+        const candleStart =
+            Math.floor(
+                tick.timestamp / CANDLE_INTERVAL
+            ) * CANDLE_INTERVAL;
+
+        if (!grouped.has(candleStart)) {
+
+            grouped.set(candleStart, {
+                time: candleStart,
+                open: tick.price,
+                high: tick.price,
+                low: tick.price,
+                close: tick.price
+            });
+
+        } else {
+
+            const candle =
+                grouped.get(candleStart);
+
+            candle.high =
+                Math.max(
+                    candle.high,
+                    tick.price
+                );
+
+            candle.low =
+                Math.min(
+                    candle.low,
+                    tick.price
+                );
+
+            candle.close =
+                tick.price;
+        }
+    }
+
+    for (const candle of grouped.values()) {
+        candles.push(candle);
+    }
+
+    return candles;
+}
+/* =========================================================
+   RESIZE CHART
+========================================================= */
+
+function resizeMarketChart() {
+
+    if (
+        !marketChart ||
+        !chartContainer ||
+        !shouldShowChart(
+            selectedContractType
+        )
+    ) {
+
+        return;
+    }
+
+    const rect =
+        chartContainer.getBoundingClientRect();
+
+    const width =
+        Math.max(
+            1,
+            Math.floor(
+                rect.width
+            )
+        );
+
+    const height =
+        Math.max(
+            1,
+            Math.floor(
+                rect.height
+            )
+        );
+
+    const devicePixelRatio =
+        window.devicePixelRatio ||
+        1;
+
+    marketChart.width =
+        Math.floor(
+            width *
+            devicePixelRatio
+        );
+
+    marketChart.height =
+        Math.floor(
+            height *
+            devicePixelRatio
+        );
+
+    marketChart.style.width =
+        width + "px";
+
+    marketChart.style.height =
+        height + "px";
+
+    const context =
+        marketChart.getContext(
+            "2d"
+        );
+
+    context.setTransform(
+        devicePixelRatio,
+        0,
+        0,
+        devicePixelRatio,
+        0,
+        0
+    );
+
+    drawMarketChart();
+}
+
+
+/* =========================================================
+   DRAW CHART
+========================================================= */
+
+function drawMarketChart() {
+
+    if (
+        !marketChart ||
+        !chartContainer ||
+        !shouldShowChart(
+            selectedContractType
+        )
+    ) {
+
+        return;
+    }
+
+    const context =
+        marketChart.getContext(
+            "2d"
+        );
+
+    const width =
+        chartContainer.clientWidth;
+
+    const height =
+        chartContainer.clientHeight;
+
+    if (
+        width <= 0 ||
+        height <= 0
+    ) {
+
+        return;
+    }
+
+    context.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+    if (
+        !chartCandles.length
+    ) {
+
+        return;
+    }
+
+    const paddingLeft = 12;
+    const paddingRight = 68;
+    const paddingTop = 15;
+    const paddingBottom = 28;
+
+    const chartWidth =
+        width -
+        paddingLeft -
+        paddingRight;
+
+    const chartHeight =
+        height -
+        paddingTop -
+        paddingBottom;
+
+    if (
+        chartWidth <= 0 ||
+        chartHeight <= 0
+    ) {
+
+        return;
+    }
+
+    const prices = [];
+
+    chartCandles.forEach(
+        candle => {
+
+            prices.push(
+                candle.high,
+                candle.low
+            );
+        }
+    );
+
+    let minPrice =
+        Math.min(
+            ...prices
+        );
+
+    let maxPrice =
+        Math.max(
+            ...prices
+        );
+
+    if (
+        !Number.isFinite(minPrice) ||
+        !Number.isFinite(maxPrice)
+    ) {
+
+        return;
+    }
+
+    const priceRange =
+        maxPrice -
+        minPrice;
+
+    const padding =
+        priceRange > 0
+            ? priceRange * 0.08
+            : Math.max(
+                Math.abs(
+                    maxPrice
+                ) * 0.001,
+                1
+            );
+
+    minPrice -=
+        padding;
+
+    maxPrice +=
+        padding;
+
+    const finalRange =
+        maxPrice -
+        minPrice;
+
+    const candleCount =
+        chartCandles.length;
+
+    const slotWidth =
+        chartWidth /
+        candleCount;
+
+    const candleWidth =
+        Math.max(
+            2,
+            Math.min(
+                16,
+                slotWidth * 0.62
+            )
+        );
+
+    function priceToY(
+        price
+    ) {
+
+        return (
+            paddingTop +
+            (
+                (
+                    maxPrice -
+                    price
+                ) /
+                finalRange
+            ) *
+            chartHeight
+        );
+    }
+
+    function candleX(
+        index
+    ) {
+
+        return (
+            paddingLeft +
+            (
+                index +
+                0.5
+            ) *
+            slotWidth
+        );
+    }
+
+    /* GRID */
+
+    context.lineWidth =
+        1;
+
+    context.strokeStyle =
+        "#14251e";
+
+    context.fillStyle =
+        "#718b81";
+
+    context.font =
+        "10px Arial";
+
+    const gridLines = 5;
+
+    for (
+        let i = 0;
+        i <= gridLines;
+        i++
+    ) {
+
+        const ratio =
+            i /
+            gridLines;
+
+        const y =
+            paddingTop +
+            ratio *
+            chartHeight;
+
+        context.beginPath();
+
+        context.moveTo(
+            paddingLeft,
+            y
+        );
+
+        context.lineTo(
+            paddingLeft +
+            chartWidth,
+            y
+        );
+
+        context.stroke();
+
+        const price =
+            maxPrice -
+            ratio *
+            finalRange;
+
+        context.fillText(
+            price.toFixed(2),
+            width -
+            paddingRight +
+            8,
+            y + 3
+        );
+    }
+
+    /* VERTICAL GRID */
+
+    context.strokeStyle =
+        "#102019";
+
+    const verticalSteps =
+        Math.min(
+            6,
+            candleCount
+        );
+
+    for (
+        let i = 0;
+        i <= verticalSteps;
+        i++
+    ) {
+
+        const ratio =
+            i /
+            Math.max(
+                1,
+                verticalSteps
+            );
+
+        const x =
+            paddingLeft +
+            ratio *
+            chartWidth;
+
+        context.beginPath();
+
+        context.moveTo(
+            x,
+            paddingTop
+        );
+
+        context.lineTo(
+            x,
+            paddingTop +
+            chartHeight
+        );
+
+        context.stroke();
+    }
+
+    /* CANDLES */
+
+    chartCandles.forEach(
+        (
+            candle,
+            index
+        ) => {
+
+            const x =
+                candleX(index);
+
+            const openY =
+                priceToY(
+                    candle.open
+                );
+
+            const closeY =
+                priceToY(
+                    candle.close
+                );
+
+            const highY =
+                priceToY(
+                    candle.high
+                );
+
+            const lowY =
+                priceToY(
+                    candle.low
+                );
+
+            const rising =
+                candle.close >=
+                candle.open;
+
+            const bodyTop =
+                Math.min(
+                    openY,
+                    closeY
+                );
+
+            const bodyHeight =
+                Math.max(
+                    1,
+                    Math.abs(
+                        closeY -
+                        openY
+                    )
+                );
+
+            const candleColor =
+                rising
+                    ? "#42e38b"
+                    : "#ff6e79";
+
+            context.strokeStyle =
+                candleColor;
+
+            context.lineWidth =
+                1;
+
+            context.beginPath();
+
+            context.moveTo(
+                x,
+                highY
+            );
+
+            context.lineTo(
+                x,
+                lowY
+            );
+
+            context.stroke();
+
+            context.fillStyle =
+                candleColor;
+
+            context.fillRect(
+                x -
+                candleWidth / 2,
+                bodyTop,
+                candleWidth,
+                bodyHeight
+            );
+        }
+    );
+
+    /* CURRENT PRICE LINE */
+
+    const latest =
+        chartCandles[
+            chartCandles.length - 1
+        ];
+
+    if (latest) {
+
+        const latestPrice =
+            latest.close;
+
+        const latestY =
+            priceToY(
+                latestPrice
+            );
+
+        context.strokeStyle =
+            "#42e38b";
+
+        context.lineWidth =
+            1;
+
+        context.setLineDash(
+            [4, 4]
+        );
+
+        context.beginPath();
+
+        context.moveTo(
+            paddingLeft,
+            latestY
+        );
+
+        context.lineTo(
+            paddingLeft +
+            chartWidth,
+            latestY
+        );
+
+        context.stroke();
+
+        context.setLineDash([]);
+
+        context.fillStyle =
+            "#42e38b";
+
+        context.fillRect(
+            width -
+            paddingRight +
+            4,
+            latestY -
+            10,
+            paddingRight -
+            8,
+            20
+        );
+
+        context.fillStyle =
+            "#07100d";
+
+        context.font =
+            "bold 10px Arial";
+
+        context.fillText(
+            latestPrice.toFixed(2),
+            width -
+            paddingRight +
+            9,
+            latestY + 4
+        );
+    }
+
+    /* TIME LABELS */
+
+    context.fillStyle =
+        "#60786f";
+
+    context.font =
+        "10px Arial";
+
+    const labelCount =
+        Math.min(
+            6,
+            candleCount
+        );
+
+    for (
+        let i = 0;
+        i < labelCount;
+        i++
+    ) {
+
+        const index =
+            Math.floor(
+                (
+                    i /
+                    Math.max(
+                        1,
+                        labelCount - 1
+                    )
+                ) *
+                (
+                    candleCount - 1
+                )
+            );
+
+        const candle =
+            chartCandles[index];
+
+        if (!candle) {
+            continue;
+        }
+
+        const x =
+            candleX(index);
+
+        const date =
+            new Date(
+                candle.time
+            );
+
+        const label =
+            date.toLocaleTimeString(
+                [],
+                {
+                    hour: "2-digit",
+                    minute: "2-digit"
+                }
+            );
+
+        context.fillText(
+            label,
+            Math.max(
+                paddingLeft,
+                Math.min(
+                    x - 20,
+                    width -
+                    paddingRight -
+                    40
+                )
+            ),
+            height -
+            9
+        );
+    }
+}
+
+
+/* =========================================================
+   LOAD MARKET HISTORY
+========================================================= */
+
+async function loadMarketChart({
+    silent = false
+} = {}) {
+
+    if (
+        !selectedMarket ||
+        !shouldShowChart(
+            selectedContractType
+        )
+    ) {
+
+        return;
+    }
+
+    const syntheticSymbol =
+        getSyntheticSymbol(
+            selectedMarket
+        );
+
+    if (!syntheticSymbol) {
+
+        if (!silent) {
+
+            setChartState(
+                "error",
+                "Chart is unavailable for this market."
+            );
+        }
+
+        return;
+    }
+
+    if (!silent) {
+
+        setChartState(
+            "loading"
+        );
+    }
+
+    try {
+
+        const query =
+            "/api/market-history" +
+            "?symbol=" +
+            encodeURIComponent(
+                syntheticSymbol
+            ) +
+            "&limit=1000";
+
+        let result;
+
+        if (
+            typeof apiRequest ===
+            "function"
+        ) {
+
+            result =
+                await apiRequest(
+                    query
+                );
+        }
+
+        else {
+
+            const response =
+                await fetch(
+                    "http://localhost:3000" +
+                    query
+                );
+
+            let data = null;
+
+            try {
+
+                data =
+                    await response.json();
+
+            }
+            catch {
+
+                data =
+                    null;
+            }
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data?.message ||
+                    data?.error ||
+                    "Failed to load market history."
+                );
+            }
+
+            result =
+                data;
+        }
+
+        const history =
+            result?.history ||
+            result?.data?.history ||
+            result?.data ||
+            [];
+
+        const candles =
+            buildMinuteCandles(
+                history
+            );
+
+        chartCandles =
+            candles;
+
+        if (
+            candles.length === 0
+        ) {
+
+            setChartState(
+                "empty"
+            );
+
+            drawMarketChart();
+
+            chartUpdated.textContent =
+                "No history";
+
+            return;
+        }
+
+        setChartState(
+            "ready"
+        );
+
+        drawMarketChart();
+
+        chartUpdated.textContent =
+            "Updated " +
+            new Date()
+                .toLocaleTimeString();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Market chart error:",
+            error
+        );
+
+        if (!silent) {
+
+            setChartState(
+                "error",
+                error.message ||
+                "Unable to load market chart."
+            );
+        }
+    }
+}
+
+
+/* =========================================================
+   CHART REFRESH
+========================================================= */
+
+   function startChartRefresh() {
+    if (chartRefreshTimer) {
+        clearInterval(chartRefreshTimer);
+    }
+
+    chartRefreshTimer =
+        setInterval(() => {
+
+            if (
+                selectedMarket &&
+                shouldShowChart(selectedContractType)
+            ) {
+
+                loadMarketChart({
+                    silent: true
+                });
+
+            }
+
+        }, 1000);
+}
+
+/* =========================================================
+   CHART RESIZE
+========================================================= */
+
+window.addEventListener(
+    "resize",
+    () => {
+
+        if (
+            chartResizeTimer
+        ) {
+
+            clearTimeout(
+                chartResizeTimer
+            );
+        }
+
+        chartResizeTimer =
+            setTimeout(
+                () => {
+
+                    resizeMarketChart();
+
+                },
+                100
+            );
+    }
+);
+
+
+/* =========================================================
+   STATISTICS HELPERS
+========================================================= */
+
+function escapeHtml(
+    value
+) {
+
+    return String(
+        value ?? ""
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+}
+
+
+function formatStatisticsPercentage(
+    value
+) {
+
+    const number =
+        Number(value);
+
+    if (
+        !Number.isFinite(
+            number
+        )
+    ) {
+
+        return "0%";
+    }
+
+    return (
+        Number(
+            number.toFixed(2)
+        ) +
+        "%"
+    );
+}
+
+
+function getDigitPercentage(
+    frequency,
+    digit
+) {
+
+    if (!frequency) {
+        return 0;
+    }
+
+    const item =
+        frequency[
+            String(digit)
+        ] ??
+        frequency[
+            digit
+        ];
+
+    if (
+        item &&
+        typeof item ===
+        "object"
+    ) {
+
+        const percentage =
+            Number(
+                item.percentage
+            );
+
+        if (
+            Number.isFinite(
+                percentage
+            )
+        ) {
+
+            return percentage;
+        }
+    }
+
+    const direct =
+        Number(item);
+
+    if (
+        Number.isFinite(
+            direct
+        )
+    ) {
+
+        return direct;
+    }
+
+    return 0;
+}
+
+
+function getDigitCount(
+    frequency,
+    digit
+) {
+
+    if (!frequency) {
+        return 0;
+    }
+
+    const item =
+        frequency[
+            String(digit)
+        ] ??
+        frequency[
+            digit
+        ];
+
+    if (
+        item &&
+        typeof item ===
+        "object"
+    ) {
+
+        const count =
+            Number(
+                item.count
+            );
+
+        if (
+            Number.isFinite(
+                count
+            )
+        ) {
+
+            return count;
+        }
+    }
+
+    return 0;
+}
+
+
+function normalizeMarketStatistics(
+    result
+) {
+
+    if (!result) {
+        return null;
+    }
+
+    let statistics =
+        result.statistics ||
+        result.data?.statistics ||
+        result.data ||
+        result;
+
+    if (
+        statistics &&
+        statistics.statistics &&
+        typeof statistics.statistics ===
+        "object"
+    ) {
+
+        statistics =
+            statistics.statistics;
+    }
+
+    if (
+        !statistics ||
+        typeof statistics !==
+        "object"
+    ) {
+
+        return null;
+    }
+
+    return statistics;
+}
+
+
+/* =========================================================
+   LOAD MARKET STATISTICS
+========================================================= */
+
+async function loadMarketStatistics({
+    silent = false
+} = {}) {
+
+    if (!selectedMarket) {
+
+        if (!silent) {
+
+            renderStatisticsMessage(
+                "Select a market to view statistics.",
+                "empty"
+            );
+        }
+
+        return;
+    }
+
+    const syntheticSymbol =
+        getSyntheticSymbol(
+            selectedMarket
+        );
+
+    if (!syntheticSymbol) {
+
+        if (!silent) {
+
+            renderStatisticsMessage(
+                "Statistics are unavailable for this market.",
+                "error"
+            );
+        }
+
+        return;
+    }
+
+    const selectedLimit =
+        Number(
+            statisticsTickSelect.value
+        );
+
+    const allowedLimits =
+        [
+            100,
+            300,
+            500,
+            1000
+        ];
+
+    const limit =
+        allowedLimits.includes(
+            selectedLimit
+        )
+            ? selectedLimit
+            : 100;
+
+    statisticsTickSelect.value =
+        String(limit);
+
+    if (!silent) {
+
+        renderStatisticsMessage(
+            "Loading market statistics...",
+            "loading"
+        );
+    }
+
+    try {
+
+      const digitParameter =
+    (
+        selectedDigit !== null &&
+        Number.isInteger(
+            Number(selectedDigit)
+        )
+    )
+        ? "&digit=" +
+            encodeURIComponent(
+                Number(selectedDigit)
+            )
+        : "";
+
+const query =
+    "/api/market-statistics" +
+    "?symbol=" +
+    encodeURIComponent(
+        syntheticSymbol
+    ) +
+    "&limit=" +
+    encodeURIComponent(
+        limit
+    ) +
+    digitParameter;
+
+        let result;
+
+        if (
+            typeof apiRequest ===
+            "function"
+        ) {
+
+            result =
+                await apiRequest(
+                    query
+                );
+        }
+
+        else {
+
+            const response =
+                await fetch(
+                    "http://localhost:3000" +
+                    query
+                );
+
+            let data = null;
+
+            try {
+
+                data =
+                    await response.json();
+
+            }
+            catch {
+
+                data =
+                    null;
+            }
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data?.message ||
+                    data?.error ||
+                    "Failed to load market statistics."
+                );
+            }
+
+            result =
+                data;
+        }
+
+        const statistics =
+            normalizeMarketStatistics(
+                result
+            );
+
+        if (!statistics) {
+
+            throw new Error(
+                "The statistics response was empty."
+            );
+        }
+
+        renderMarketStatistics(
+            statistics
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Market statistics error:",
+            error
+        );
+
+        if (!silent) {
+
+            renderStatisticsMessage(
+                error.message ||
+                "Unable to load market statistics.",
+                "error"
+            );
+        }
+    }
+}
+
+
+/* =========================================================
+   STATISTICS MESSAGE
+========================================================= */
+
+function renderStatisticsMessage(
+    message,
+    type
+) {
+
+    const className =
+        type === "error"
+            ? "statistics-error"
+            : type === "empty"
+                ? "statistics-empty"
+                : "statistics-loading";
+
+    statisticsContent.innerHTML =
+        `<div class="${className}">
+            ${escapeHtml(message)}
+        </div>`;
+
+    statisticsUpdated.textContent =
+        "";
+}
+
+
+/* =========================================================
+   RENDER STATISTICS
+========================================================= */
+
+function renderMarketStatistics(
+    statistics
+) {
+
+    const ticks =
+        Number(
+            statistics.ticks ??
+            statistics.tickCount ??
+            statistics.requestedTicks ??
+            statistics.sampleSize ??
+            0
+        );
+const latestDigit =
+    Number.isInteger(
+        Number(statistics.latestDigit)
+    )
+        ? Number(statistics.latestDigit)
+        : null;
+    
+
+    const volatility =
+        Number(
+            statistics.volatility ??
+            0
+        );
+
+    const frequency =
+        statistics.digitFrequency ||
+        statistics.digit_frequency ||
+        {};
+
+    let mostTouched =
+        statistics.mostTouched ??
+        statistics.most_touched ??
+        statistics.mostFrequentDigits ??
+        [];
+
+    let leastTouched =
+        statistics.leastTouched ??
+        statistics.least_touched ??
+        statistics.leastFrequentDigits ??
+        [];
+
+    if (
+        !Array.isArray(
+            mostTouched
+        )
+    ) {
+
+        mostTouched =
+            mostTouched === null ||
+            mostTouched === undefined
+                ? []
+                : [mostTouched];
+    }
+
+    if (
+        !Array.isArray(
+            leastTouched
+        )
+    ) {
+
+        leastTouched =
+            leastTouched === null ||
+            leastTouched === undefined
+                ? []
+                : [leastTouched];
+    }
+
+    const mostSet =
+        new Set(
+            mostTouched.map(
+                value =>
+                    String(value)
+            )
+        );
+
+    const leastSet =
+        new Set(
+            leastTouched.map(
+                value =>
+                    String(value)
+            )
+        );
+
+    const digitPercentages = [];
+    const digitCounts = [];
+
+    for (
+        let digit = 0;
+        digit <= 9;
+        digit++
+    ) {
+
+        digitPercentages.push(
+            getDigitPercentage(
+                frequency,
+                digit
+            )
+        );
+
+        digitCounts.push(
+            getDigitCount(
+                frequency,
+                digit
+            )
+        );
+    }
+    /* =====================================================
+       CALCULATE ODD / EVEN FROM REAL DIGIT FREQUENCY
+    ===================================================== */
+
+    oddPercentage =
+        digitPercentages[1] +
+        digitPercentages[3] +
+        digitPercentages[5] +
+        digitPercentages[7] +
+        digitPercentages[9];
+
+    evenPercentage =
+        digitPercentages[0] +
+        digitPercentages[2] +
+        digitPercentages[4] +
+        digitPercentages[6] +
+        digitPercentages[8];
+      const backendOverPercentage =
+    Number(
+        statistics.overUnder?.over?.percentage
+    );
+
+const backendUnderPercentage =
+    Number(
+        statistics.overUnder?.under?.percentage
+    );
+
+const underPercentage =
+    Number.isFinite(
+        backendUnderPercentage
+    )
+        ? backendUnderPercentage
+        : 0;
+
+const overPercentage =
+    Number.isFinite(
+        backendOverPercentage
+    )
+        ? backendOverPercentage
+        : 0;
+   const backendMatchesPercentage =
+    Number(
+        statistics.matchesDiffers?.matches?.percentage
+    );
+
+const backendDiffersPercentage =
+    Number(
+        statistics.matchesDiffers?.differs?.percentage
+    );
+
+const matchesPercentage =
+    Number.isFinite(
+        backendMatchesPercentage
+    )
+        ? backendMatchesPercentage
+        : 0;
+
+const actualDiffersPercentage =
+    Number.isFinite(
+        backendDiffersPercentage
+    )
+        ? backendDiffersPercentage
+        : 0;
+    if (
+        mostSet.size === 0 &&
+        ticks > 0
+    ) {
+
+        const maximum =
+            Math.max(
+                ...digitCounts
+            );
+
+        for (
+            let digit = 0;
+            digit <= 9;
+            digit++
+        ) {
+
+            if (
+                digitCounts[digit] ===
+                maximum
+            ) {
+
+                mostSet.add(
+                    String(digit)
+                );
+            }
+        }
+    }
+
+    if (
+        leastSet.size === 0 &&
+        ticks > 0
+    ) {
+
+        const minimum =
+            Math.min(
+                ...digitCounts
+            );
+
+        for (
+            let digit = 0;
+            digit <= 9;
+            digit++
+        ) {
+
+            if (
+                digitCounts[digit] ===
+                minimum
+            ) {
+
+                leastSet.add(
+                    String(digit)
+                );
+            }
+        }
+    }
+
+    if (
+        mostSet.size === 0 &&
+        ticks > 0
+    ) {
+
+        const maximum =
+            Math.max(
+                ...digitPercentages
+            );
+
+        for (
+            let digit = 0;
+            digit <= 9;
+            digit++
+        ) {
+
+            if (
+                Math.abs(
+                    digitPercentages[digit] -
+                    maximum
+                ) < 0.000001
+            ) {
+
+                mostSet.add(
+                    String(digit)
+                );
+            }
+        }
+    }
+
+    if (
+        leastSet.size === 0 &&
+        ticks > 0
+    ) {
+
+        const minimum =
+            Math.min(
+                ...digitPercentages
+            );
+
+        for (
+            let digit = 0;
+            digit <= 9;
+            digit++
+        ) {
+
+            if (
+                Math.abs(
+                    digitPercentages[digit] -
+                    minimum
+                ) < 0.000001
+            ) {
+
+                leastSet.add(
+                    String(digit)
+                );
+            }
+        }
+    }
+
+    const percentageTotal =
+        digitPercentages.reduce(
+            (
+                total,
+                percentage
+            ) =>
+                total +
+                (
+                    Number.isFinite(
+                        percentage
+                    )
+                        ? percentage
+                        : 0
+                ),
+            0
+        );
+
+    let percentageTotalText =
+        "0%";
+
+    if (
+        Number.isFinite(
+            percentageTotal
+        )
+    ) {
+
+        percentageTotalText =
+            Math.round(
+                percentageTotal
+            ) +
+            "%";
+    }
+
+    let frequencyRows = "";
+
+    for (
+        let digit = 0;
+        digit <= 9;
+        digit++
+    ) {
+
+        const percentage =
+            Number(
+                digitPercentages[digit]
+            ) || 0;
+
+        const safePercentage =
+            Math.max(
+                0,
+                Math.min(
+                    100,
+                    percentage
+                )
+            );
+
+        const digitKey =
+            String(digit);
+
+        let digitClass = "";
+
+        if (
+            mostSet.has(
+                digitKey
+            )
+        ) {
+
+            digitClass =
+                "most";
+        }
+
+        if (
+            leastSet.has(
+                digitKey
+            ) &&
+            !mostSet.has(
+                digitKey
+            )
+        ) {
+
+            digitClass =
+                "least";
+        }
+
+        const title =
+            mostSet.has(digitKey)
+                ? "Most touched"
+                : leastSet.has(digitKey)
+                    ? "Least touched"
+                    : "Digit " + digit;
+
+        frequencyRows += `
+            <div class="digit-frequency-row">
+
+                <div
+                    class="statistics-digit ${digitClass}"
+                    title="${escapeHtml(title)}"
+                >
+                    ${digit}
+                </div>
+
+                <div class="statistics-bar-container">
+
+                    <div
+                        class="statistics-bar ${digitClass}"
+                        style="width:${safePercentage}%;"
+                    ></div>
+
+                </div>
+
+                <div class="statistics-percentage">
+                    ${formatStatisticsPercentage(
+                        percentage
+                    )}
+                </div>
+
+            </div>
+        `;
+    }
+    statisticsContent.innerHTML = `
+
+        <div class="statistics-overview">
+
+            <div class="statistics-box">
+
+                <div class="statistics-box-label">
+                    Ticks
+                </div>
+
+                <div class="statistics-box-value">
+                    ${escapeHtml(ticks)}
+                </div>
+
+            </div>
+
+            <div class="statistics-box">
+
+                <div class="statistics-box-label">
+                    Volatility
+                </div>
+
+                <div class="statistics-box-value">
+                    ${
+                        Number.isFinite(volatility)
+                            ? volatility.toFixed(4)
+                            : "0.0000"
+                    }
+                </div>
+
+            </div>
+
+            <div class="statistics-box">
+
+                <div class="statistics-box-label">
+                    Sample
+                </div>
+
+                <div class="statistics-box-value">
+                    ${escapeHtml(
+                        statistics.requestedTicks ??
+                        statistics.sampleSize ??
+                        ticks
+                    )}
+                </div>
+
+            </div>
+
+            <div class="statistics-box">
+
+                <div class="statistics-box-label">
+                    Digit Total
+                </div>
+
+                <div class="statistics-box-value">
+                    ${escapeHtml(
+                        percentageTotalText
+                    )}
+                </div>
+
+            </div>
+
+        </div>
+
+     <div class="circular-statistics-section">
+
+    <div class="circular-statistics-title">
+        CONTRACT STATISTICS
+    </div>
+
+    <div class="circular-statistics-grid">
+
+        <!-- ODD / EVEN -->
+        <div class="circular-stat-card">
+
+            <div class="circular-stat-card-title">
+                Odd / Even
+            </div>
+
+            <div class="circular-stat-pair">
+
+                <div class="circular-stat-item">
+
+                    <div
+                        class="circular-stat-circle"
+                        style="--percentage:${Math.max(
+                            0,
+                            Math.min(
+                                100,
+                                oddPercentage
+                            )
+                        )}%"
+                    >
+                        <span>
+                            ${formatStatisticsPercentage(
+                                oddPercentage
+                            )}
+                        </span>
+                    </div>
+
+                    <div class="circular-stat-label">
+                        Odd
+                    </div>
+
+                </div>
+
+                <div class="circular-stat-item">
+
+                    <div
+                        class="circular-stat-circle"
+                        style="--percentage:${Math.max(
+                            0,
+                            Math.min(
+                                100,
+                                evenPercentage
+                            )
+                        )}%"
+                    >
+                        <span>
+                            ${formatStatisticsPercentage(
+                                evenPercentage
+                            )}
+                        </span>
+                    </div>
+
+                    <div class="circular-stat-label">
+                        Even
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- OVER / UNDER -->
+        <div class="circular-stat-card">
+
+          <div class="circular-stat-card-title">
+    Over ${selectedDigit !== null ? selectedDigit : "—"} /
+    Under ${selectedDigit !== null ? selectedDigit : "—"}
+</div>
+
+            <div class="circular-stat-pair">
+
+                <div class="circular-stat-item">
+
+                    <div
+                        class="circular-stat-circle"
+                        style="--percentage:${Math.max(
+                            0,
+                            Math.min(
+                                100,
+                                overPercentage
+                            )
+                        )}%"
+                    >
+                        <span>
+                            ${formatStatisticsPercentage(
+                                overPercentage
+                            )}
+                        </span>
+                    </div>
+
+                    <div class="circular-stat-label">
+                        Over
+                    </div>
+
+                </div>
+
+                <div class="circular-stat-item">
+
+                    <div
+                        class="circular-stat-circle"
+                        style="--percentage:${Math.max(
+                            0,
+                            Math.min(
+                                100,
+                                underPercentage
+                            )
+                        )}%"
+                    >
+                        <span>
+                            ${formatStatisticsPercentage(
+                                underPercentage
+                            )}
+                        </span>
+                    </div>
+
+                    <div class="circular-stat-label">
+                        Under
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- MATCHES / DIFFERS -->
+        <div class="circular-stat-card">
+
+         <div class="circular-stat-card-title">
+    Matches ${selectedDigit !== null ? selectedDigit : "—"} /
+    Differs ${selectedDigit !== null ? selectedDigit : "—"}
+</div>
+
+            <div class="circular-stat-pair">
+
+                <div class="circular-stat-item">
+
+                    <div
+                        class="circular-stat-circle"
+                        style="--percentage:${Math.max(
+                            0,
+                            Math.min(
+                                100,
+                                matchesPercentage
+                            )
+                        )}%"
+                    >
+                        <span>
+                            ${formatStatisticsPercentage(
+                                matchesPercentage
+                            )}
+                        </span>
+                    </div>
+
+                    <div class="circular-stat-label">
+                        Matches
+                    </div>
+
+                </div>
+
+                <div class="circular-stat-item">
+
+                    <div
+                        class="circular-stat-circle"
+                        style="--percentage:${Math.max(
+                            0,
+                            Math.min(
+                                100,
+                                actualDiffersPercentage
+                            )
+                        )}%"
+                    >
+                        <span>
+                            ${formatStatisticsPercentage(
+                                actualDiffersPercentage
+                            )}
+                        </span>
+                    </div>
+
+                    <div class="circular-stat-label">
+                        Differs
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- DIGIT FREQUENCY -->
+        <div class="circular-stat-card">
+
+            <div class="circular-stat-card-title">
+                Digit Frequency
+            </div>
+
+            <div class="circular-digit-grid">
+
+                ${digitPercentages.map(
+                    (percentage, digit) => {
+
+                        const safePercentage =
+                            Math.max(
+                                0,
+                                Math.min(
+                                    100,
+                                    Number(
+                                        percentage
+                                    ) || 0
+                                )
+                            );
+
+                        const digitKey =
+                            String(digit);
+
+                            let digitClass = "";
+
+if (
+    latestDigit !== null &&
+    digit === latestDigit
+) {
+    digitClass += " current";
+}
+
+if (
+    mostSet.has(digitKey)
+) {
+    digitClass += " most";
+}
+else if (
+    leastSet.has(digitKey)
+) {
+    digitClass += " least";
+}
+
+                        return `
+                            <div
+                                class="circular-digit-item ${digitClass}"
+                            >
+
+                                <div
+                                    class="circular-digit-circle"
+                                    style="--percentage:${safePercentage}%"
+                                >
+                                    <span>
+                                        ${digit}
+                                    </span>
+                                </div>
+
+                                <div class="circular-digit-value">
+                                    ${formatStatisticsPercentage(
+                                        percentage
+                                    )}
+                                </div>
+
+                            </div>
+                        `;
+
+                    }
+                ).join("")}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+    `;
+
+
+    /* =====================================================
+       UPDATE DEDICATED DIGIT FREQUENCY PANEL
+    ===================================================== */
+
+   if (digitFrequencyContent) {
+
+    digitFrequencyContent.innerHTML = "";
+}
+
+
+    const updatedAt =
+        statistics.updatedAt ||
+        statistics.updated_at ||
+        null;
+
+
+    if (updatedAt) {
+
+        const parsedDate =
+            new Date(
+                updatedAt
+            );
+
+        if (
+            !Number.isNaN(
+                parsedDate.getTime()
+            )
+        ) {
+
+            statisticsUpdated.textContent =
+                "Updated " +
+                parsedDate.toLocaleTimeString();
+
+        } else {
+
+            statisticsUpdated.textContent =
+                "Updated just now";
+        }
+
+    } else {
+
+        statisticsUpdated.textContent =
+            "Updated just now";
+    }
+
+
+    /* =====================================================
+       UPDATE DIGIT FREQUENCY TIMESTAMP
+    ===================================================== */
+
+    if (digitFrequencyUpdated) {
+
+        digitFrequencyUpdated.textContent =
+            statisticsUpdated.textContent;
+    }
+
+}
+updateCurrentDigitIndicator();
+/* =========================================================
+   STATISTICS SELECTOR
+========================================================= */
+
+statisticsTickSelect.addEventListener(
+    "change",
+    () => {
+
+        loadMarketStatistics({
+            silent: false
+        });
+    }
+);
+
+
+/* =========================================================
+   STATISTICS REFRESH
+========================================================= */
+
+function startStatisticsRefresh() {
+
+    if (
+        statisticsRefreshTimer
+    ) {
+
+        clearInterval(
+            statisticsRefreshTimer
+        );
+    }
+
+    statisticsRefreshTimer =
+        setInterval(
+            () => {
+
+                if (
+                    selectedMarket
+                ) {
+
+                    loadMarketStatistics({
+                        silent: true
+                    });
+                }
+
+            },
+            1000
+        );
+}
+
+
+/* =========================================================
+   PRICE LOOP
+========================================================= */
+
+setInterval(
+    updateLivePrice,
+    1000
+);
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+document
+    .getElementById("refreshTradeBalance")
+    ?.addEventListener("click", async function () {
+        this.disabled = true;
+
+        try {
+            await loadTradeWallet({
+                silent: false
+            });
+        } finally {
+            this.disabled = false;
+        }
+    });
+window.addEventListener("storage", function (event) {
+    if (event.key === "kmf_account_mode") {
+        updateTradeAccountDisplay(tradeWallet);
+        updateTradeAccountButtons();
+
+        loadTradeWallet({
+            silent: true
+        });
+    }
+});
+
+function updateTradeAccountButtons() {
+    const mode = getTradeAccountMode();
+
+    const demoButton =
+        document.getElementById("tradeDemoAccountButton");
+
+    const liveButton =
+        document.getElementById("tradeLiveAccountButton");
+
+    // Update active account buttons.
+    if (demoButton) {
+        demoButton.classList.toggle(
+            "active",
+            mode === "demo"
+        );
+    }
+
+    if (liveButton) {
+        liveButton.classList.toggle(
+            "active",
+            mode === "real"
+        );
+    }
+
+    // Hide currency flags in Demo Account.
+    // Keep currency flags visible in Live Account.
+    document.body.classList.toggle(
+        "demo-account",
+        mode === "demo"
+    );
+
+    document.body.classList.toggle(
+        "live-account",
+        mode === "real"
+    );
+}
+
+async function switchTradeAccount(mode) {
+    const selectedMode =
+        mode === "real"
+            ? "real"
+            : "demo";
+
+    localStorage.setItem(
+        "kmf_account_mode",
+        selectedMode
+    );
+
+    updateTradeAccountDisplay(
+        tradeWallet
+    );
+
+    updateTradeAccountButtons();
+
+    await loadTradeWallet({
+        silent: true
+    });
+}
+
+document
+    .getElementById("tradeDemoAccountButton")
+    ?.addEventListener(
+        "click",
+        function () {
+            switchTradeAccount("demo");
+        }
+    );
+
+document
+    .getElementById("tradeLiveAccountButton")
+    ?.addEventListener(
+        "click",
+        function () {
+            switchTradeAccount("real");
+        }
+    );
+(async function init() {
+
+    try {
+await initSupabase();
+
+await loadTradeWallet();
+
+updateTradeAccountButtons();
+
+await loadMarkets();
+        await updateLivePrice();
+
+        if (
+            shouldShowChart(
+                selectedContractType
+            )
+        ) {
+
+            await loadMarketChart();
+        }
+
+        await loadMarketStatistics();
+
+        resizeMarketChart();
+
+        startChartRefresh();
+
+        startStatisticsRefresh();
+
+      updateAnalysisDisplay();
+
+updateTradeInformation();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Trade page initialization error:",
+            error
+        );
+
+        showMessage(
+            error.message ||
+            "Failed to initialize trading page."
+        );
+
+        renderStatisticsMessage(
+            "Market statistics could not be initialized.",
+            "error"
+        );
+
+        setChartState(
+            "error",
+            "Market chart could not be initialized."
+        );
+    }
+
+})();
+</script>
+
+</body>
+</html>

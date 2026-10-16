@@ -1,0 +1,5254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Dashboard - KMFBinary</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+:root{
+    --bg:#07111f;
+    --bg2:#091525;
+    --panel:#0d1a2c;
+    --panel2:#101f33;
+    --border:#1c2d45;
+    --border2:#263b57;
+    --text:#f5f7fa;
+    --muted:#8293aa;
+    --green:#22c55e;
+    --green2:#16a34a;
+    --red:#ef4444;
+    --yellow:#f59e0b;
+    --blue:#3b82f6;
+}
+
+html,
+body{
+    margin:0;
+    padding:0;
+    min-height:100%;
+}
+
+body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:
+        Inter,
+        Arial,
+        Helvetica,
+        sans-serif;
+}
+
+button,
+select{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.page{
+    min-height:100vh;
+}
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+
+.sidebar{
+    position:fixed;
+    left:0;
+    top:0;
+    bottom:0;
+    width:240px;
+    background:#081321;
+    border-right:1px solid var(--border);
+    display:flex;
+    flex-direction:column;
+    z-index:50;
+}
+
+.sidebar-logo{
+    height:72px;
+    display:flex;
+    align-items:center;
+    padding:0 24px;
+    border-bottom:1px solid var(--border);
+}
+
+.logo{
+    text-decoration:none;
+    color:#fff;
+    font-size:23px;
+    font-weight:900;
+    letter-spacing:-.5px;
+}
+
+.logo span{
+    color:var(--green);
+}
+
+.sidebar-menu{
+    flex:1;
+    padding:18px 12px;
+    overflow-y:auto;
+}
+
+.menu-title{
+    color:#5d7089;
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:1.2px;
+    padding:14px 12px 8px;
+}
+
+.nav-link{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    color:#8fa1b8;
+    text-decoration:none;
+    padding:11px 13px;
+    margin:3px 0;
+    border-radius:8px;
+    font-size:13px;
+    transition:.18s ease;
+}
+
+.nav-link:hover{
+    background:#102036;
+    color:#fff;
+}
+
+.nav-link.active{
+    background:#10283b;
+    color:#fff;
+    box-shadow:
+        inset 3px 0 0 var(--green);
+}
+
+.nav-icon{
+    width:21px;
+    text-align:center;
+    font-size:15px;
+    color:#71869f;
+}
+
+.nav-link.active .nav-icon{
+    color:var(--green);
+}
+
+.sidebar-bottom{
+    padding:15px 12px;
+    border-top:1px solid var(--border);
+}
+
+.logout{
+    width:100%;
+    border:1px solid #26384f;
+    background:#0e1c2e;
+    color:#aebdd0;
+    border-radius:8px;
+    padding:10px;
+}
+
+.logout:hover{
+    background:#17263a;
+    color:#fff;
+}
+
+/* =====================================================
+   MAIN
+===================================================== */
+
+.main{
+    margin-left:240px;
+    min-height:100vh;
+    width:calc(100% - 240px);
+}
+
+/* =====================================================
+   TOPBAR
+===================================================== */
+
+.topbar{
+    min-height:72px;
+    background:#091625;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 24px;
+    gap:20px;
+}
+
+.topbar-left{
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+}
+
+.topbar-title{
+    font-size:17px;
+    font-weight:800;
+}
+
+.topbar-subtitle{
+    color:var(--muted);
+    font-size:11px;
+}
+
+/* =====================================================
+   SINGLE ACCOUNT SELECTOR
+===================================================== */
+
+.account-switcher{
+    display:flex;
+    align-items:center;
+}
+
+.account-card{
+    min-width:210px;
+    border:1px solid var(--border2);
+    background:#0c1a2c;
+    color:#b3c0d0;
+    border-radius:9px;
+    padding:10px 13px;
+    text-align:left;
+    transition:.18s ease;
+}
+
+.account-card:hover{
+    border-color:#39506c;
+    background:#102137;
+}
+
+.account-card.demo{
+    border-color:rgba(34,197,94,.55);
+    background:
+        linear-gradient(
+            135deg,
+            rgba(34,197,94,.12),
+            rgba(34,197,94,.035)
+        );
+}
+
+.account-card.live{
+    border-color:rgba(59,130,246,.65);
+    background:
+        linear-gradient(
+            135deg,
+            rgba(59,130,246,.12),
+            rgba(59,130,246,.035)
+        );
+}
+
+.account-card-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+}
+
+.account-name{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.3px;
+}
+
+.account-dot{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 8px rgba(34,197,94,.7);
+}
+
+.account-card.live .account-dot{
+    background:#3b82f6;
+    box-shadow:0 0 8px rgba(59,130,246,.7);
+}
+
+.us-flag{
+    width:18px;
+    height:12px;
+    object-fit:cover;
+    border-radius:2px;
+    display:block;
+}
+
+.account-switch-label{
+    color:#70839a;
+    font-size:9px;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    margin-top:4px;
+}
+
+.account-balance{
+    margin-top:5px;
+    font-size:15px;
+    font-weight:900;
+    color:#fff;
+}
+
+.account-action{
+    margin-top:3px;
+    color:#61768e;
+    font-size:9px;
+}
+
+/* =====================================================
+   CONTENT
+===================================================== */
+
+.content{
+    max-width:1600px;
+    margin:0 auto;
+    padding:20px;
+}
+
+/* =====================================================
+   MARKET BAR
+===================================================== */
+
+.market-bar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+    margin-bottom:15px;
+    flex-wrap:wrap;
+}
+
+.market-left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.market-select{
+    min-width:190px;
+    background:#0d1d31;
+    border:1px solid var(--border2);
+    color:#fff;
+    border-radius:9px;
+    padding:11px 13px;
+    outline:none;
+}
+
+.market-select:focus{
+    border-color:var(--green);
+}
+
+.market-description{
+    color:var(--muted);
+    font-size:11px;
+}
+
+.market-right{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.live-status{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    color:#83a092;
+    font-size:11px;
+    font-weight:700;
+}
+
+.live-status-dot{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 9px rgba(34,197,94,.7);
+}
+
+.price-header{
+    background:#0d1d31;
+    border:1px solid var(--border2);
+    border-radius:9px;
+    padding:9px 14px;
+    min-width:150px;
+    text-align:right;
+}
+
+.price-header-label{
+    color:#657993;
+    font-size:9px;
+    text-transform:uppercase;
+    letter-spacing:.6px;
+}
+
+.price-header-value{
+    margin-top:2px;
+    font-size:17px;
+    font-weight:900;
+}
+
+/* =====================================================
+   MAIN GRID
+===================================================== */
+
+.dashboard-grid{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 280px;
+    gap:15px;
+}
+
+/* =====================================================
+   CHART PANEL
+===================================================== */
+
+.chart-panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:12px;
+    overflow:hidden;
+    min-width:0;
+}
+
+.chart-panel-header{
+    min-height:58px;
+    padding:12px 15px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.chart-heading{
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+}
+
+.chart-title{
+    font-size:13px;
+    font-weight:900;
+    letter-spacing:.3px;
+}
+
+.chart-subtitle{
+    color:#6e8199;
+    font-size:10px;
+}
+
+.chart-tools{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.chart-type{
+    display:flex;
+    background:#081523;
+    border:1px solid #1d3047;
+    border-radius:8px;
+    padding:3px;
+}
+
+.chart-type button{
+    border:0;
+    background:transparent;
+    color:#71849d;
+    border-radius:6px;
+    padding:7px 10px;
+    font-size:10px;
+    font-weight:800;
+}
+
+.chart-type button.active{
+    background:#19334a;
+    color:#fff;
+}
+
+.chart-wrap{
+    position:relative;
+    height:500px;
+    background:
+        radial-gradient(
+            circle at 50% 35%,
+            rgba(22,163,74,.025),
+            transparent 45%
+        ),
+        #081421;
+}
+
+#priceChart{
+    display:block;
+    width:100%;
+    height:100%;
+}
+
+.chart-current-price{
+    position:absolute;
+    right:10px;
+    top:18px;
+    background:#12253a;
+    border:1px solid #28415e;
+    border-radius:6px;
+    padding:6px 8px;
+    color:#fff;
+    font-size:11px;
+    font-weight:900;
+    pointer-events:none;
+    white-space:nowrap;
+}
+
+.chart-bottom{
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:15px;
+    align-items:center;
+    padding:11px 15px;
+    border-top:1px solid var(--border);
+    background:#0a1828;
+}
+
+.tick-stream{
+    min-width:0;
+}
+
+.tick-stream-label{
+    color:#667a94;
+    font-size:9px;
+    text-transform:uppercase;
+    letter-spacing:.7px;
+    margin-bottom:5px;
+}
+
+.tick-values{
+    display:flex;
+    gap:6px;
+    overflow:hidden;
+    white-space:nowrap;
+}
+
+.tick-pill{
+    min-width:32px;
+    padding:5px 7px;
+    text-align:center;
+    background:#102136;
+    border:1px solid #1e344d;
+    border-radius:5px;
+    font-size:10px;
+    font-weight:800;
+    color:#aebbd0;
+}
+
+.tick-pill.latest{
+    color:#fff;
+    border-color:rgba(34,197,94,.55);
+    background:rgba(34,197,94,.1);
+}
+
+.last-digit-box{
+    text-align:right;
+}
+
+.last-digit-label{
+    color:#667a94;
+    font-size:9px;
+    text-transform:uppercase;
+}
+
+.last-digit{
+    margin-top:2px;
+    font-size:25px;
+    line-height:1;
+    font-weight:900;
+    color:var(--green);
+}
+
+/* =====================================================
+   MARKET SIDE PANEL
+===================================================== */
+
+.market-panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:15px;
+    min-width:0;
+}
+
+.panel-heading{
+    font-size:12px;
+    font-weight:900;
+    margin-bottom:13px;
+}
+
+.market-info{
+    display:grid;
+    gap:8px;
+}
+
+.market-info-row{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    padding:9px 0;
+    border-bottom:1px solid #16283d;
+}
+
+.market-info-row:last-child{
+    border-bottom:0;
+}
+
+.market-info-label{
+    color:#71849d;
+    font-size:10px;
+}
+
+.market-info-value{
+    color:#fff;
+    font-size:11px;
+    font-weight:800;
+    text-align:right;
+}
+
+.market-note{
+    margin-top:13px;
+    padding:10px;
+    border-radius:8px;
+    background:#091725;
+    border:1px solid #172a40;
+    color:#71849c;
+    font-size:10px;
+    line-height:1.5;
+}
+
+/* =====================================================
+   STATISTICS
+===================================================== */
+
+.statistics{
+    margin-top:15px;
+}
+
+.statistics-title{
+    font-size:12px;
+    font-weight:900;
+    margin-bottom:10px;
+}
+
+.statistics-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+}
+
+.stat-card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:15px;
+    min-height:135px;
+}
+
+.stat-card-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:13px;
+}
+
+.stat-card-title{
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.3px;
+}
+
+.stat-card-icon{
+    width:25px;
+    height:25px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:7px;
+    background:#102237;
+    color:#86a0ba;
+    font-size:10px;
+    font-weight:900;
+}
+
+.stat-row{
+    display:grid;
+    grid-template-columns:60px 1fr 45px;
+    gap:8px;
+    align-items:center;
+    margin-top:10px;
+}
+
+.stat-label{
+    color:#8192a8;
+    font-size:10px;
+}
+
+.stat-track{
+    height:6px;
+    background:#15273b;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.stat-fill{
+    height:100%;
+    border-radius:20px;
+    transition:width .25s ease;
+}
+
+.stat-fill.green{
+    background:var(--green);
+}
+
+.stat-fill.red{
+    background:var(--red);
+}
+
+.stat-fill.yellow{
+    background:var(--yellow);
+}
+
+.stat-fill.blue{
+    background:var(--blue);
+}
+
+.stat-percent{
+    color:#dce4ed;
+    font-size:10px;
+    font-weight:800;
+    text-align:right;
+}
+
+/* =====================================================
+   DIGIT FREQUENCY
+===================================================== */
+
+.frequency-panel{
+    margin-top:15px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:15px;
+}
+
+.frequency-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:14px;
+}
+
+.frequency-title{
+    font-size:12px;
+    font-weight:900;
+}
+
+.frequency-subtitle{
+    color:#6d8098;
+    font-size:10px;
+}
+
+.frequency-grid{
+    display:grid;
+    grid-template-columns:repeat(10,1fr);
+    gap:8px;
+}
+
+.frequency-item{
+    background:#091827;
+    border:1px solid #172b42;
+    border-radius:8px;
+    padding:9px 7px;
+    text-align:center;
+}
+
+.frequency-digit{
+    font-size:13px;
+    font-weight:900;
+    color:#fff;
+}
+
+.frequency-bar{
+    height:45px;
+    margin:7px 0;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+}
+
+.frequency-bar-inner{
+    width:13px;
+    min-height:3px;
+    border-radius:4px 4px 2px 2px;
+    background:var(--green);
+    transition:height .25s ease;
+}
+
+.frequency-percent{
+    color:#7e90a7;
+    font-size:9px;
+    font-weight:800;
+}
+
+/* =====================================================
+   REFERRAL PROGRAM
+===================================================== */
+
+.referral-section {
+    margin-top: 20px;
+    display: grid;
+    gap: 12px;
+    min-width: 0;
+}
+
+.referral-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.referral-title {
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: .4px;
+}
+
+.referral-subtitle {
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.referral-badge {
+    padding: 6px 9px;
+    color: var(--green);
+    background: rgba(34, 197, 94, .08);
+    border: 1px solid rgba(34, 197, 94, .25);
+    border-radius: 6px;
+    font-size: 9px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.referral-card {
+    min-width: 0;
+    padding: 15px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+.referral-card-title {
+    color: #aebdd0;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .3px;
+}
+
+.referral-code-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 9px;
+    min-width: 0;
+}
+
+.referral-code,
+.referral-link-value {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.referral-link-value {
+    color: #a8bacf;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.referral-link-label {
+    margin-top: 20px;
+}
+
+.referral-button {
+    flex-shrink: 0;
+    padding: 9px 12px;
+    border: 1px solid rgba(34, 197, 94, .4);
+    border-radius: 7px;
+    background: rgba(34, 197, 94, .1);
+    color: #86efac;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.referral-button:hover {
+    background: rgba(34, 197, 94, .18);
+}
+
+.referral-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.referral-stat-label {
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.referral-stat-value {
+    margin-top: 10px;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 900;
+    overflow-wrap: anywhere;
+}
+
+.referral-table-wrap {
+    margin-top: 12px;
+    overflow-x: auto;
+}
+
+.referral-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.referral-table th,
+.referral-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #192b40;
+    font-size: 10px;
+}
+
+.referral-table th {
+    color: #7f93ab;
+    font-weight: 800;
+}
+
+.referral-table td {
+    color: #d7e0eb;
+}
+
+.referral-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.referral-empty {
+    text-align: center;
+    color: var(--muted) !important;
+    white-space: normal;
+}
+
+.referral-promotions {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+.referral-apply-description {
+    margin-bottom: 12px;
+}
+
+.referral-apply-row {
+    display: flex;
+    gap: 10px;
+}
+
+.referral-apply-row input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 12px;
+    background: #081523;
+    border: 1px solid var(--border2);
+    border-radius: 7px;
+    color: #fff;
+    outline: none;
+    font: inherit;
+    font-size: 11px;
+}
+
+.referral-apply-row input:focus {
+    border-color: var(--green);
+}
+
+.referral-message {
+    margin-top: 9px;
+    color: var(--muted);
+    font-size: 10px;
+    overflow-wrap: anywhere;
+}
+
+.referral-message.error {
+    color: #fca5a5;
+}
+
+@media (max-width: 900px) {
+    .referral-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 500px) {
+    .referral-heading {
+        align-items: flex-start;
+    }
+
+    .referral-code-row,
+    .referral-apply-row {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .referral-button {
+        width: 100%;
+    }
+
+    .referral-stat-value {
+        font-size: 19px;
+    }
+}
+/* =====================================================
+   STATUS
+===================================================== */
+
+.status-message{
+    padding:10px 12px;
+    margin-bottom:12px;
+    border-radius:8px;
+    border:1px solid #1b3047;
+    background:#0b1a2b;
+    color:#8193aa;
+    font-size:11px;
+    display:none;
+}
+
+.status-message.show{
+    display:block;
+}
+
+.status-message.error{
+    color:#fca5a5;
+    border-color:#5c2525;
+    background:#241215;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media(max-width:1150px){
+
+    .dashboard-grid{
+        grid-template-columns:1fr;
+    }
+
+    .market-panel{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:15px;
+    }
+
+    .panel-heading{
+        grid-column:1/-1;
+        margin-bottom:0;
+    }
+
+}
+
+@media(max-width:900px){
+
+    .sidebar{
+        width:70px;
+    }
+
+    .sidebar-logo{
+        justify-content:center;
+        padding:0;
+    }
+
+    .logo{
+        font-size:0;
+    }
+
+    .logo span{
+        font-size:21px;
+    }
+
+    .menu-title,
+    .nav-link span:not(.nav-icon){
+        display:none;
+    }
+
+    .nav-link{
+        justify-content:center;
+        padding:12px 5px;
+    }
+
+    .main{
+        margin-left:70px;
+        width:calc(100% - 70px);
+    }
+
+    .statistics-grid{
+        grid-template-columns:1fr;
+    }
+
+    .frequency-grid{
+        grid-template-columns:repeat(5,1fr);
+    }
+
+}
+
+@media(max-width:650px){
+
+    .topbar{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+
+    .account-switcher{
+        width:100%;
+    }
+
+    .account-card{
+        width:100%;
+        min-width:0;
+    }
+
+    .content{
+        padding:12px;
+    }
+
+    .market-bar{
+        align-items:stretch;
+        flex-direction:column;
+    }
+
+    .market-left,
+    .market-right{
+        width:100%;
+    }
+
+    .market-select{
+        width:100%;
+    }
+
+    .price-header{
+        flex:1;
+    }
+
+    .chart-panel-header{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+
+    .chart-tools{
+        width:100%;
+    }
+
+    .chart-type{
+        width:100%;
+    }
+
+    .chart-type button{
+        flex:1;
+    }
+
+    .chart-wrap{
+        height:400px;
+    }
+
+    .market-panel{
+        grid-template-columns:1fr;
+    }
+
+    .frequency-grid{
+        grid-template-columns:repeat(5,1fr);
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="page">
+
+    <!-- =================================================
+         SIDEBAR
+    ================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+
+            <a
+                href="dashboard.html"
+                class="logo"
+            >
+                <span>KMF</span>Binary
+            </a>
+
+        </div>
+
+
+        <div class="sidebar-menu">
+
+            <div class="menu-title">
+                MAIN
+            </div>
+
+            <a
+                href="dashboard.html"
+                class="nav-link active"
+            >
+                <span class="nav-icon">⌂</span>
+                <span>Dashboard</span>
+            </a>
+
+            <a
+                href="markets.html"
+                class="nav-link"
+            >
+                <span class="nav-icon">◈</span>
+                <span>Markets</span>
+            </a>
+
+            <a
+                href="trade.html"
+                class="nav-link"
+            >
+                <span class="nav-icon">↗</span>
+                <span>Trade</span>
+            </a>
+
+            <a
+                href="buy-sell.html"
+                class="nav-link"
+            >
+                <span class="nav-icon">⇅</span>
+                <span>Buy / Sell</span>
+            </a>
+
+            <a
+                href="history.html"
+                class="nav-link"
+            >
+                <span class="nav-icon">◷</span>
+                <span>History</span>
+            </a>
+
+
+            <div class="menu-title">
+                ACCOUNT
+            </div>
+
+            <a
+                href="wallet.html"
+                class="nav-link"
+            >
+                <span class="nav-icon">▣</span>
+                <span>Wallet</span>
+            </a>
+
+            <a
+                href="profile.html"
+                class="nav-link"
+            >
+                <span class="nav-icon">◉</span>
+                <span>Profile</span>
+            </a>
+
+
+            <div class="menu-title">
+                TOOLS
+            </div>
+
+            <a
+                href="ai.html"
+                class="nav-link"
+            >
+                <span class="nav-icon">AI</span>
+                <span>AI Analysis</span>
+            </a>
+
+            <a
+                href="automation.html"
+                class="nav-link"
+            >
+                <span class="nav-icon">⚡</span>
+                <span>Automation</span>
+            </a>
+
+        </div>
+
+
+        <div class="sidebar-bottom">
+
+            <button
+                id="logout"
+                class="logout"
+            >
+                ↩ Logout
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =================================================
+         MAIN
+    ================================================== -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <div class="topbar-title">
+                    Trading Dashboard
+                </div>
+
+                <div
+                    class="topbar-subtitle"
+                    id="userEmail"
+                >
+                    Loading...
+                </div>
+
+            </div>
+
+
+            <!-- ONLY CURRENT ACCOUNT IS SHOWN -->
+
+            <div class="account-switcher">
+
+                <button
+                    type="button"
+                    id="activeAccountBtn"
+                    class="account-card demo"
+                    onclick="switchAccount()"
+                    title="Click to switch account"
+                >
+
+                    <div class="account-card-top">
+
+                        <div
+                            id="activeAccountName"
+                            class="account-name"
+                        >
+
+                            <span class="account-dot"></span>
+
+                            DEMO ACCOUNT
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="activeAccountBalance"
+                        class="account-balance"
+                    >
+                        $10,000.00
+                    </div>
+
+
+                    <div
+                        id="activeAccountLabel"
+                        class="account-switch-label"
+                    >
+                        Practice trading
+                    </div>
+
+
+                    <div class="account-action">
+                        Click to switch account
+                    </div>
+
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <section class="content">
+
+            <div
+                id="statusMessage"
+                class="status-message"
+            ></div>
+
+
+            <!-- MARKET BAR -->
+
+            <div class="market-bar">
+
+                <div class="market-left">
+
+                    <select
+                        id="marketSelect"
+                        class="market-select"
+                    >
+
+                        <option value="KMF-15">
+                            KMF-15
+                        </option>
+
+                        <option value="KMF-25">
+                            KMF-25
+                        </option>
+
+                        <option value="KMF-50">
+                            KMF-50
+                        </option>
+
+                        <option value="KMF-100">
+                            KMF-100
+                        </option>
+
+                        <option value="VOL-10">
+                            VOL-10
+                        </option>
+
+                        <option value="VOL-25">
+                            VOL-25
+                        </option>
+
+                        <option value="VOL-50">
+                            VOL-50
+                        </option>
+
+                        <option value="VOL-75">
+                            VOL-75
+                        </option>
+
+                        <option value="VOL-100">
+                            VOL-100
+                        </option>
+
+                        <option value="VOL-10-1S">
+                            VOL-10-1S
+                        </option>
+
+                        <option value="VOL-25-1S">
+                            VOL-25-1S
+                        </option>
+
+                        <option value="VOL-50-1S">
+                            VOL-50-1S
+                        </option>
+
+                        <option value="VOL-75-1S">
+                            VOL-75-1S
+                        </option>
+
+                        <option value="VOL-100-1S">
+                            VOL-100-1S
+                        </option>
+
+                    </select>
+
+
+                    <div
+                        class="market-description"
+                        id="marketDescription"
+                    >
+                        Volatility market
+                    </div>
+
+                </div>
+
+
+                <div class="market-right">
+
+                    <div class="live-status">
+
+                        <span class="live-status-dot"></span>
+
+                        LIVE PRICE
+
+                    </div>
+
+
+                    <div class="price-header">
+
+                        <div class="price-header-label">
+                            Current price
+                        </div>
+
+                        <div
+                            class="price-header-value"
+                            id="headerPrice"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- MAIN CHART -->
+
+            <div class="dashboard-grid">
+
+                <section class="chart-panel">
+
+                    <div class="chart-panel-header">
+
+                        <div class="chart-heading">
+
+                            <div class="chart-title">
+                                PRICE CHART
+                            </div>
+
+                            <div
+                                class="chart-subtitle"
+                                id="chartMarketSubtitle"
+                            >
+                                KMF-15 live market price
+                            </div>
+
+                        </div>
+
+
+                        <div class="chart-tools">
+
+                            <div class="chart-type">
+
+                                <button
+                                    type="button"
+                                    id="areaChartBtn"
+                                    class="active"
+                                    onclick="setChartType('area')"
+                                >
+                                    AREA
+                                </button>
+
+                                <button
+                                    type="button"
+                                    id="candleChartBtn"
+                                    onclick="setChartType('candles')"
+                                >
+                                    CANDLESTICK
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="chart-wrap">
+
+                        <canvas id="priceChart"></canvas>
+
+                        <div
+                            id="chartCurrentPrice"
+                            class="chart-current-price"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+
+                    <div class="chart-bottom">
+
+                        <div class="tick-stream">
+
+                            <div class="tick-stream-label">
+                                Latest ticks
+                            </div>
+
+                            <div
+                                id="tickValues"
+                                class="tick-values"
+                            >
+
+                                <span class="tick-pill">
+                                    Waiting...
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="last-digit-box">
+
+                            <div class="last-digit-label">
+                                Last digit
+                            </div>
+
+                            <div
+                                id="lastDigit"
+                                class="last-digit"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- MARKET INFORMATION -->
+
+                <aside class="market-panel">
+
+                    <div class="panel-heading">
+                        MARKET INFORMATION
+                    </div>
+
+
+                    <div class="market-info">
+
+                        <div class="market-info-row">
+
+                            <span class="market-info-label">
+                                Market
+                            </span>
+
+                            <span
+                                class="market-info-value"
+                                id="infoMarket"
+                            >
+                                KMF-15
+                            </span>
+
+                        </div>
+
+
+                        <div class="market-info-row">
+
+                            <span class="market-info-label">
+                                Current price
+                            </span>
+
+                            <span
+                                class="market-info-value"
+                                id="infoPrice"
+                            >
+                                —
+                            </span>
+
+                        </div>
+
+
+                        <div class="market-info-row">
+
+                            <span class="market-info-label">
+                                Last digit
+                            </span>
+
+                            <span
+                                class="market-info-value"
+                                id="infoDigit"
+                            >
+                                —
+                            </span>
+
+                        </div>
+
+
+                        <div class="market-info-row">
+
+                            <span class="market-info-label">
+                                Ticks loaded
+                            </span>
+
+                            <span
+                                class="market-info-value"
+                                id="infoTicks"
+                            >
+                                0
+                            </span>
+
+                        </div>
+
+
+                        <div class="market-info-row">
+
+                            <span class="market-info-label">
+                                Account
+                            </span>
+
+                            <span
+                                class="market-info-value"
+                                id="infoAccount"
+                            >
+                                DEMO
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="market-note">
+
+                        The price chart and market statistics
+                        use the same selected market tick
+                        history.
+
+                    </div>
+
+                </aside>
+
+            </div>
+
+
+<!-- =====================================================
+     REFERRAL PROGRAM
+====================================================== -->
+
+<section class="referral-section">
+
+    <div class="referral-heading">
+        <div>
+            <div class="referral-title">MY REFERRALS</div>
+            <div class="referral-subtitle">
+                Invite friends and track your referral rewards.
+            </div>
+        </div>
+        <span class="referral-badge">REWARDS</span>
+    </div>
+
+    <div class="referral-card referral-link-card">
+        <div class="referral-card-title">YOUR REFERRAL CODE</div>
+
+        <div class="referral-code-row">
+            <div id="referralCode" class="referral-code">Loading...</div>
+            <button type="button" class="referral-button"
+                onclick="copyReferralCode()">Copy code</button>
+        </div>
+
+        <div class="referral-card-title referral-link-label">
+            YOUR REFERRAL LINK
+        </div>
+
+        <div class="referral-code-row">
+            <div id="referralLink" class="referral-link-value">
+                Loading referral link...
+            </div>
+            <button type="button" class="referral-button"
+                onclick="copyReferralLink()">Copy link</button>
+        </div>
+
+        <div id="referralMessage" class="referral-message"
+            aria-live="polite"></div>
+    </div>
+
+    <div class="referral-stats-grid">
+
+        <div class="referral-card">
+            <div class="referral-stat-label">Total Referrals</div>
+            <div id="referralTotal" class="referral-stat-value">—</div>
+        </div>
+
+        <div class="referral-card">
+            <div class="referral-stat-label">Depositing Referrals</div>
+            <div id="referralDepositing" class="referral-stat-value">—</div>
+        </div>
+
+        <div class="referral-card">
+            <div class="referral-stat-label">Commissions Earned</div>
+            <div id="referralEarned" class="referral-stat-value">$—</div>
+        </div>
+
+        <div class="referral-card">
+            <div class="referral-stat-label">Pending Commissions</div>
+            <div id="referralPending" class="referral-stat-value">$—</div>
+        </div>
+
+    </div>
+
+    <div class="referral-card referral-users-card">
+        <div class="referral-card-title">REFERRED USERS</div>
+
+        <div class="referral-table-wrap">
+            <table class="referral-table">
+                <thead>
+                    <tr>
+                        <th>Registration Date</th>
+                        <th>Successful Deposits</th>
+                        <th>Commission Status</th>
+                    </tr>
+                </thead>
+                <tbody id="referralUsersBody">
+                    <tr>
+                        <td colspan="3" class="referral-empty">
+                            Referral data will load when connected.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="referral-card">
+        <div class="referral-card-title">DEPOSIT PROMOTIONS</div>
+        <div id="referralPromotions" class="referral-promotions">
+            Promotions will appear when loaded from the server.
+        </div>
+    </div>
+
+    <div class="referral-card">
+        <div class="referral-card-title">HAVE A REFERRAL CODE?</div>
+        <div class="referral-subtitle referral-apply-description">
+            You can apply a referral code only if you have not already used one.
+        </div>
+
+        <div class="referral-apply-row">
+            <input id="applyReferralCode" type="text"
+                maxlength="64" placeholder="Enter referral code"
+                autocomplete="off">
+            <button id="applyReferralButton" type="button"
+                class="referral-button"onclick="submitReferralCode()"
+                Apply code
+            </button>
+        </div>
+
+        <div id="applyReferralMessage" class="referral-message"
+            aria-live="polite"></div>
+    </div>
+
+</section>
+            <!-- STATISTICS -->
+
+            <section class="statistics">
+
+                <div class="statistics-title">
+                    MARKET STATISTICS
+                </div>
+
+
+                <div class="statistics-grid">
+
+                    <!-- EVEN / ODD -->
+
+                    <div class="stat-card">
+
+                        <div class="stat-card-header">
+
+                            <div class="stat-card-title">
+                                EVEN / ODD
+                            </div>
+
+                            <div class="stat-card-icon">
+                                EO
+                            </div>
+
+                        </div>
+
+
+                        <div class="stat-row">
+
+                            <div class="stat-label">
+                                Even
+                            </div>
+
+                            <div class="stat-track">
+
+                                <div
+                                    id="evenBar"
+                                    class="stat-fill green"
+                                    style="width:50%"
+                                ></div>
+
+                            </div>
+
+                            <div
+                                id="evenPercent"
+                                class="stat-percent"
+                            >
+                                50%
+                            </div>
+
+                        </div>
+
+
+                        <div class="stat-row">
+
+                            <div class="stat-label">
+                                Odd
+                            </div>
+
+                            <div class="stat-track">
+
+                                <div
+                                    id="oddBar"
+                                    class="stat-fill red"
+                                    style="width:50%"
+                                ></div>
+
+                            </div>
+
+                            <div
+                                id="oddPercent"
+                                class="stat-percent"
+                            >
+                                50%
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- OVER / UNDER -->
+
+                    <div class="stat-card">
+
+                        <div class="stat-card-header">
+
+                            <div class="stat-card-title">
+                                OVER / UNDER
+                            </div>
+
+                            <div class="stat-card-icon">
+                                OU
+                            </div>
+
+                        </div>
+
+
+                        <div class="stat-row">
+
+                            <div class="stat-label">
+                                Over
+                            </div>
+
+                            <div class="stat-track">
+
+                                <div
+                                    id="overBar"
+                                    class="stat-fill yellow"
+                                    style="width:50%"
+                                ></div>
+
+                            </div>
+
+                            <div
+                                id="overPercent"
+                                class="stat-percent"
+                            >
+                                50%
+                            </div>
+
+                        </div>
+
+
+                        <div class="stat-row">
+
+                            <div class="stat-label">
+                                Under
+                            </div>
+
+                            <div class="stat-track">
+
+                                <div
+                                    id="underBar"
+                                    class="stat-fill blue"
+                                    style="width:50%"
+                                ></div>
+
+                            </div>
+
+                            <div
+                                id="underPercent"
+                                class="stat-percent"
+                            >
+                                50%
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- MATCHES / DIFFERS -->
+
+                    <div class="stat-card">
+
+                        <div class="stat-card-header">
+
+                            <div class="stat-card-title">
+                                MATCHES / DIFFERS
+                            </div>
+
+                            <div class="stat-card-icon">
+                                MD
+                            </div>
+
+                        </div>
+
+
+                        <div class="stat-row">
+
+                            <div class="stat-label">
+                                Match
+                            </div>
+
+                            <div class="stat-track">
+
+                                <div
+                                    id="matchBar"
+                                    class="stat-fill green"
+                                    style="width:0%"
+                                ></div>
+
+                            </div>
+
+                            <div
+                                id="matchPercent"
+                                class="stat-percent"
+                            >
+                                0%
+                            </div>
+
+                        </div>
+
+
+                        <div class="stat-row">
+
+                            <div class="stat-label">
+                                Differ
+                            </div>
+
+                            <div class="stat-track">
+
+                                <div
+                                    id="differBar"
+                                    class="stat-fill red"
+                                    style="width:100%"
+                                ></div>
+
+                            </div>
+
+                            <div
+                                id="differPercent"
+                                class="stat-percent"
+                            >
+                                100%
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- DIGIT FREQUENCY -->
+
+            <section class="frequency-panel">
+
+                <div class="frequency-header">
+
+                    <div>
+
+                        <div class="frequency-title">
+                            DIGIT FREQUENCY
+                        </div>
+
+                        <div class="frequency-subtitle">
+                            Based on the same selected-market ticks
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="frequencyGrid"
+                    class="frequency-grid"
+                ></div>
+
+            </section>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script>
+
+"use strict";
+
+/* =====================================================
+   SUPABASE
+   IMPORTANT:
+   This is the ONLY Supabase client declaration
+===================================================== */
+
+const SUPABASE_URL =
+    "https://nugufikdivanyzmghofq.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_NfsjmPephsaJrRB6vLXglw_G6yTdPTl";
+
+const API_BASE =
+    "http://localhost:3000";
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+/* =====================================================
+   STATE
+===================================================== */
+
+let currentMarket =
+    localStorage.getItem(
+        "kmf_dashboard_market"
+    ) ||
+    "KMF-15";
+
+let currentAccount =
+    localStorage.getItem(
+        "kmf_account_mode"
+    ) ||
+    "demo";
+
+let currentChartType =
+    localStorage.getItem(
+        "kmf_dashboard_chart"
+    ) ||
+    "area";
+
+let currentTicks = [];
+
+let currentPrice = null;
+
+let currentSession = null;
+
+let priceTimer = null;
+
+let historyTimer = null;
+
+let resizeTimer = null;
+
+let isLoadingHistory = false;
+
+
+/* =====================================================
+   ELEMENTS
+===================================================== */
+
+const $ = id =>
+    document.getElementById(id);
+
+
+/* =====================================================
+   MARKET DESCRIPTIONS
+===================================================== */
+
+const marketDescriptions = {
+
+    "KMF-15":
+        "Low volatility",
+
+    "KMF-25":
+        "Moderate volatility",
+
+    "KMF-50":
+        "Medium volatility",
+
+    "KMF-100":
+        "Very high volatility",
+
+    "VOL-10":
+        "Volatility 10 Index",
+
+    "VOL-25":
+        "Volatility 25 Index",
+
+    "VOL-50":
+        "Volatility 50 Index",
+
+    "VOL-75":
+        "Volatility 75 Index",
+
+    "VOL-100":
+        "Volatility 100 Index",
+
+    "VOL-10-1S":
+        "Volatility 10 — 1 second",
+
+    "VOL-25-1S":
+        "Volatility 25 — 1 second",
+
+    "VOL-50-1S":
+        "Volatility 50 — 1 second",
+
+    "VOL-75-1S":
+        "Volatility 75 — 1 second",
+
+    "VOL-100-1S":
+        "Volatility 100 — 1 second"
+
+};
+
+
+/* =====================================================
+   AUTH
+===================================================== */
+
+async function getSession(){
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient.auth.getSession();
+
+    if(error){
+
+        console.error(
+            "Supabase session error:",
+            error
+        );
+
+        return null;
+    }
+
+    return data?.session || null;
+}
+
+
+async function refreshSession(){
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient.auth.refreshSession();
+
+    if(error){
+
+        console.error(
+            "Session refresh error:",
+            error
+        );
+
+        return null;
+    }
+
+    return data?.session || null;
+}
+
+
+async function requireAuth(){
+
+    let session =
+        await getSession();
+
+    if(!session){
+
+        window.location.href =
+            "login.html";
+
+        return null;
+    }
+
+    currentSession =
+        session;
+
+    $("userEmail").textContent =
+        session.user?.email ||
+        "Authenticated";
+
+    return session;
+}
+
+
+/* =====================================================
+   AUTHENTICATED API
+===================================================== */
+
+async function dashboardFetch(
+    endpoint,
+    options = {},
+    retry = true
+){
+
+    let session =
+        currentSession ||
+        await getSession();
+
+    if(!session){
+
+        throw new Error(
+            "Please log in first."
+        );
+    }
+
+    const headers = {
+        ...(options.headers || {})
+    };
+
+    headers.Authorization =
+        "Bearer " +
+        session.access_token;
+
+    if(
+        options.body &&
+        !headers["Content-Type"]
+    ){
+
+        headers["Content-Type"] =
+            "application/json";
+    }
+
+    let response =
+        await fetch(
+            API_BASE +
+            endpoint,
+            {
+                ...options,
+                headers
+            }
+        );
+
+    if(
+        response.status === 401 &&
+        retry
+    ){
+
+        const refreshed =
+            await refreshSession();
+
+        if(refreshed){
+
+            currentSession =
+                refreshed;
+
+            return dashboardFetch(
+                endpoint,
+                options,
+                false
+            );
+        }
+    }
+
+    let data = null;
+
+    try{
+
+        data =
+            await response.json();
+
+    }catch{
+
+        throw new Error(
+            "Server returned an invalid response."
+        );
+    }
+
+    if(!response.ok){
+
+        throw new Error(
+            data?.message ||
+            data?.error ||
+            `Request failed (${response.status})`
+        );
+    }
+
+    return data;
+}
+
+
+/* =====================================================
+   ACCOUNT
+===================================================== */
+
+/*
+   Only ONE account card exists in the HTML.
+
+   Clicking it toggles:
+
+   DEMO -> LIVE
+   LIVE -> DEMO
+*/
+
+function applyAccountUI(){
+
+    const isDemo =
+        currentAccount === "demo";
+
+    const card =
+        $("activeAccountBtn");
+
+    if(!card){
+
+        return;
+    }
+
+    card.classList.toggle(
+        "demo",
+        isDemo
+    );
+
+    card.classList.toggle(
+        "live",
+        !isDemo
+    );
+
+
+    $("activeAccountName").innerHTML =
+        isDemo
+
+            ? `
+                <span class="account-dot"></span>
+                DEMO ACCOUNT
+              `
+
+            : `
+                <span class="account-dot"></span>
+
+                <img
+                    src="images/us-flag.svg"
+                    class="us-flag"
+                    alt="US"
+                >
+
+                LIVE ACCOUNT
+              `;
+
+
+    $("activeAccountLabel").textContent =
+        isDemo
+            ? "Practice trading"
+            : "Real trading";
+
+
+    $("infoAccount").textContent =
+        isDemo
+            ? "DEMO"
+            : "LIVE";
+
+
+    loadWallet();
+}
+
+
+/*
+   Switch account.
+
+   No second account card is created.
+*/
+
+async function switchAccount(){
+
+    currentAccount =
+        currentAccount === "demo"
+            ? "real"
+            : "demo";
+
+
+    localStorage.setItem(
+        "kmf_account_mode",
+        currentAccount
+    );
+
+    localStorage.setItem(
+        "kmf_selected_account",
+        currentAccount
+    );
+
+
+    applyAccountUI();
+
+    await loadWallet();
+}
+
+
+/*
+   Explicitly expose this function
+   for the HTML onclick.
+*/
+
+window.switchAccount =
+    switchAccount;
+
+
+async function loadWallet(){
+
+    try{
+
+        const data =
+            await dashboardFetch(
+                "/api/wallet"
+            );
+
+        const wallet =
+            data?.wallet ||
+            data;
+
+        const realBalance =
+            Number(
+                wallet?.balance || 0
+            );
+
+
+        /*
+           Demo balance remains virtual.
+        */
+
+        const demoBalance =
+            Number(
+                wallet?.demo_balance ??
+                10000
+            );
+
+
+        const displayedBalance =
+            currentAccount === "demo"
+                ? demoBalance
+                : realBalance;
+
+
+        $("activeAccountBalance").textContent =
+            "$" +
+            displayedBalance.toFixed(2);
+
+
+    }catch(error){
+
+        console.error(
+            "Wallet load error:",
+            error
+        );
+
+
+        $("activeAccountBalance").textContent =
+            currentAccount === "demo"
+                ? "$10,000.00"
+                : "$0.00";
+    }
+}
+
+
+/* =====================================================
+   MARKET
+===================================================== */
+
+function setMarketUI(){
+
+    $("marketSelect").value =
+        currentMarket;
+
+    $("marketDescription").textContent =
+        marketDescriptions[currentMarket] ||
+        "Synthetic volatility market";
+
+    $("chartMarketSubtitle").textContent =
+        currentMarket +
+        " live market price";
+
+    $("infoMarket").textContent =
+        currentMarket;
+}
+
+
+async function selectMarket(symbol){
+
+    if(!symbol){
+
+        return;
+    }
+
+    currentMarket =
+        symbol;
+
+    localStorage.setItem(
+        "kmf_dashboard_market",
+        symbol
+    );
+
+    setMarketUI();
+
+    currentTicks = [];
+
+    currentPrice = null;
+
+    updatePriceDisplays();
+
+    renderTickStream();
+
+    renderStatistics();
+
+    renderFrequency();
+
+    drawChart();
+
+    await loadDashboardHistory();
+
+    await loadLivePrice();
+}
+
+
+/* =====================================================
+   HISTORY NORMALIZATION
+===================================================== */
+
+function getHistoryArray(data){
+
+    if(Array.isArray(data)){
+
+        return data;
+    }
+
+    if(
+        Array.isArray(
+            data?.history
+        )
+    ){
+
+        return data.history;
+    }
+
+    if(
+        Array.isArray(
+            data?.ticks
+        )
+    ){
+
+        return data.ticks;
+    }
+
+    if(
+        Array.isArray(
+            data?.prices
+        )
+    ){
+
+        return data.prices;
+    }
+
+    if(
+        Array.isArray(
+            data?.data
+        )
+    ){
+
+        return data.data;
+    }
+
+    if(
+        Array.isArray(
+            data?.marketHistory
+        )
+    ){
+
+        return data.marketHistory;
+    }
+
+    return [];
+}
+
+
+function extractPrice(item){
+
+    if(
+        typeof item === "number"
+    ){
+
+        return Number(item);
+    }
+
+    if(
+        typeof item === "string"
+    ){
+
+        const n =
+            Number(item);
+
+        return Number.isFinite(n)
+            ? n
+            : null;
+    }
+
+    if(!item){
+
+        return null;
+    }
+
+    const candidates = [
+
+        item.price,
+        item.Price,
+        item.close,
+        item.Close,
+        item.value,
+        item.Value,
+        item.quote,
+        item.Quote,
+        item.last_price,
+        item.lastPrice,
+        item.current_price,
+        item.currentPrice
+
+    ];
+
+    for(
+        const candidate
+        of candidates
+    ){
+
+        const n =
+            Number(candidate);
+
+        if(
+            Number.isFinite(n)
+        ){
+
+            return n;
+        }
+    }
+
+    return null;
+}
+
+
+function normalizeTick(
+    item,
+    index
+){
+
+    const price =
+        extractPrice(item);
+
+    if(
+        !Number.isFinite(price)
+    ){
+
+        return null;
+    }
+
+    let timestamp =
+        Date.now() -
+        ((100 - index) * 1000);
+
+
+    if(
+        typeof item === "object" &&
+        item
+    ){
+
+        const possibleTime =
+            item.timestamp ||
+            item.time ||
+            item.created_at ||
+            item.createdAt ||
+            item.ts;
+
+        if(possibleTime){
+
+            const parsed =
+                new Date(
+                    possibleTime
+                ).getTime();
+
+            if(
+                Number.isFinite(parsed)
+            ){
+
+                timestamp =
+                    parsed;
+            }
+        }
+    }
+
+    return {
+        price,
+        timestamp
+    };
+}
+
+
+function getLastDigit(price){
+
+    if(
+        !Number.isFinite(
+            Number(price)
+        )
+    ){
+
+        return null;
+    }
+
+    const value =
+        Math.abs(
+            Number(price)
+        );
+
+    return (
+        Math.floor(
+            value * 100
+        ) % 10
+    );
+}
+
+
+/* =====================================================
+   LOAD HISTORY
+===================================================== */
+
+async function loadDashboardHistory(){
+
+    if(isLoadingHistory){
+
+        return;
+    }
+
+    isLoadingHistory = true;
+
+    try{
+
+        const data =
+            await dashboardFetch(
+                `/api/market-history?symbol=${encodeURIComponent(currentMarket)}&limit=100`
+            );
+
+
+        const history =
+            getHistoryArray(data);
+
+
+        const normalized =
+            history
+                .map(
+                    (item,index) =>
+                        normalizeTick(
+                            item,
+                            index
+                        )
+                )
+                .filter(Boolean);
+
+
+        if(normalized.length){
+
+            currentTicks =
+                normalized.slice(-100);
+
+            currentPrice =
+                currentTicks[
+                    currentTicks.length - 1
+                ].price;
+
+        }
+
+
+        updateEverything();
+
+    }catch(error){
+
+        console.error(
+            "Dashboard history error:",
+            error
+        );
+
+        showStatus(
+            "Unable to load market history. Live price will continue retrying.",
+            true
+        );
+
+    }finally{
+
+        isLoadingHistory = false;
+    }
+}
+
+
+/* =====================================================
+   LIVE PRICE
+===================================================== */
+async function loadLivePrice(){
+
+    try{
+
+        const data =
+            await dashboardFetch(
+                `/api/prices?symbol=${encodeURIComponent(currentMarket)}`
+            );
+
+
+        /*
+           /api/prices returns:
+
+           {
+               success: true,
+               prices: {
+                   "VOL-50": {
+                       price: 8500.25,
+                       ...
+                   }
+               }
+           }
+
+           Always read the currently
+           selected market directly.
+        */
+
+        const marketData =
+            data?.prices?.[currentMarket];
+
+
+        const price =
+            extractPrice(
+                marketData
+            );
+
+
+        if(
+            Number.isFinite(price)
+        ){
+
+            const previousTick =
+                currentTicks[
+                    currentTicks.length - 1
+                ];
+
+
+            /*
+               Only add a new tick when
+               the actual backend price
+               has changed.
+
+               This prevents the dashboard
+               from creating fake duplicate
+               ticks while polling faster
+               than the market itself moves.
+            */
+
+            const previousPrice =
+                Number(
+                    previousTick?.price
+                );
+
+
+            if(
+                !Number.isFinite(previousPrice) ||
+                previousPrice !== price
+            ){
+
+                currentTicks.push({
+
+                    price,
+
+                    timestamp:
+                        Date.now()
+
+                });
+
+
+                if(
+                    currentTicks.length > 200
+                ){
+
+                    currentTicks =
+                        currentTicks.slice(-200);
+                }
+            }
+
+
+            currentPrice =
+                price;
+
+
+            updateEverything();
+        }
+
+
+        hideStatus();
+
+
+    }catch(error){
+
+        console.error(
+            "Live price error:",
+            error
+        );
+    }
+}
+
+/* =====================================================
+   UPDATE EVERYTHING
+===================================================== */
+
+function updateEverything(){
+
+    updatePriceDisplays();
+
+    renderTickStream();
+
+    renderStatistics();
+
+    renderFrequency();
+
+    drawChart();
+}
+
+
+function updatePriceDisplays(){
+
+    const price =
+        Number(currentPrice);
+
+
+    const formatted =
+        Number.isFinite(price)
+            ? price.toFixed(3)
+            : "—";
+
+
+    $("headerPrice").textContent =
+        formatted;
+
+
+    $("infoPrice").textContent =
+        formatted;
+
+
+    $("chartCurrentPrice").textContent =
+        Number.isFinite(price)
+            ? formatted
+            : "—";
+
+
+    const digit =
+        getLastDigit(price);
+
+
+    $("lastDigit").textContent =
+        digit === null
+            ? "—"
+            : digit;
+
+
+    $("infoDigit").textContent =
+        digit === null
+            ? "—"
+            : digit;
+
+
+    $("infoTicks").textContent =
+        currentTicks.length;
+}
+
+
+/* =====================================================
+   TICK STREAM
+===================================================== */
+
+function renderTickStream(){
+
+    const container =
+        $("tickValues");
+
+    container.innerHTML = "";
+
+
+    const ticks =
+        currentTicks.slice(-14);
+
+
+    if(!ticks.length){
+
+        const empty =
+            document.createElement(
+                "span"
+            );
+
+        empty.className =
+            "tick-pill";
+
+        empty.textContent =
+            "Waiting...";
+
+        container.appendChild(
+            empty
+        );
+
+        return;
+    }
+
+
+    ticks.forEach(
+        (tick,index) => {
+
+            const digit =
+                getLastDigit(
+                    tick.price
+                );
+
+
+            const el =
+                document.createElement(
+                    "span"
+                );
+
+
+            el.className =
+                "tick-pill" +
+                (
+                    index ===
+                    ticks.length - 1
+                        ? " latest"
+                        : ""
+                );
+
+
+            el.textContent =
+                digit === null
+                    ? "—"
+                    : digit;
+
+
+            el.title =
+                Number(tick.price)
+                    .toFixed(3);
+
+
+            container.appendChild(
+                el
+            );
+
+        }
+    );
+}
+
+
+/* =====================================================
+   STATISTICS
+===================================================== */
+
+function calculateStatistics(){
+
+    const digits =
+        currentTicks
+            .map(
+                tick =>
+                    getLastDigit(
+                        tick.price
+                    )
+            )
+            .filter(
+                digit =>
+                    digit !== null
+            );
+
+
+    const total =
+        digits.length;
+
+
+    if(!total){
+
+        return {
+
+            even:50,
+
+            odd:50,
+
+            over:50,
+
+            under:50,
+
+            match:0,
+
+            differ:100
+
+        };
+    }
+
+
+    let even = 0;
+
+    let odd = 0;
+
+    let over = 0;
+
+    let under = 0;
+
+    let match = 0;
+
+
+    for(
+        let i = 0;
+        i < digits.length;
+        i++
+    ){
+
+        const digit =
+            digits[i];
+
+
+        if(
+            digit % 2 === 0
+        ){
+
+            even++;
+
+        }else{
+
+            odd++;
+        }
+
+
+        if(digit > 5){
+
+            over++;
+
+        }else{
+
+            under++;
+        }
+
+
+        if(i > 0){
+
+            if(
+                digit ===
+                digits[i - 1]
+            ){
+
+                match++;
+            }
+        }
+    }
+
+
+    const comparisons =
+        Math.max(
+            0,
+            digits.length - 1
+        );
+
+
+    const differ =
+        Math.max(
+            0,
+            comparisons - match
+        );
+
+
+    return {
+
+        even:
+            (even / total) * 100,
+
+        odd:
+            (odd / total) * 100,
+
+        over:
+            (over / total) * 100,
+
+        under:
+            (under / total) * 100,
+
+        match:
+            comparisons
+                ? (match / comparisons) * 100
+                : 0,
+
+        differ:
+            comparisons
+                ? (differ / comparisons) * 100
+                : 100
+
+    };
+}
+
+
+function setStatistic(
+    barId,
+    percentId,
+    value
+){
+
+    const safe =
+        Math.max(
+            0,
+            Math.min(
+                100,
+                Number(value) || 0
+            )
+        );
+
+
+    $(barId).style.width =
+        safe.toFixed(1) +
+        "%";
+
+
+    $(percentId).textContent =
+        safe.toFixed(0) +
+        "%";
+}
+
+
+function renderStatistics(){
+
+    const stats =
+        calculateStatistics();
+
+
+    setStatistic(
+        "evenBar",
+        "evenPercent",
+        stats.even
+    );
+
+
+    setStatistic(
+        "oddBar",
+        "oddPercent",
+        stats.odd
+    );
+
+
+    setStatistic(
+        "overBar",
+        "overPercent",
+        stats.over
+    );
+
+
+    setStatistic(
+        "underBar",
+        "underPercent",
+        stats.under
+    );
+
+
+    setStatistic(
+        "matchBar",
+        "matchPercent",
+        stats.match
+    );
+
+
+    setStatistic(
+        "differBar",
+        "differPercent",
+        stats.differ
+    );
+}
+
+
+/* =====================================================
+   DIGIT FREQUENCY
+===================================================== */
+
+function renderFrequency(){
+
+    const grid =
+        $("frequencyGrid");
+
+
+    grid.innerHTML = "";
+
+
+    const counts =
+        Array(10).fill(0);
+
+
+    currentTicks.forEach(
+        tick => {
+
+            const digit =
+                getLastDigit(
+                    tick.price
+                );
+
+
+            if(
+                digit !== null &&
+                digit >= 0 &&
+                digit <= 9
+            ){
+
+                counts[digit]++;
+            }
+
+        }
+    );
+
+
+    const total =
+        counts.reduce(
+            (sum,value) =>
+                sum + value,
+            0
+        );
+
+
+    const max =
+        Math.max(
+            1,
+            ...counts
+        );
+
+
+    for(
+        let digit = 0;
+        digit <= 9;
+        digit++
+    ){
+
+        const percent =
+            total
+                ? (counts[digit] / total) * 100
+                : 0;
+
+
+        const item =
+            document.createElement(
+                "div"
+            );
+
+
+        item.className =
+            "frequency-item";
+
+
+        item.innerHTML = `
+
+            <div class="frequency-digit">
+                ${digit}
+            </div>
+
+            <div class="frequency-bar">
+
+                <div
+                    class="frequency-bar-inner"
+                    style="height:${
+                        Math.max(
+                            3,
+                            (counts[digit] / max) * 45
+                        )
+                    }px"
+                ></div>
+
+            </div>
+
+            <div class="frequency-percent">
+                ${percent.toFixed(0)}%
+            </div>
+
+        `;
+
+
+        grid.appendChild(
+            item
+        );
+    }
+}
+
+
+/* =====================================================
+   CHART TYPE
+===================================================== */
+
+function setChartType(type){
+
+    if(
+        type !== "area" &&
+        type !== "candles"
+    ){
+
+        return;
+    }
+
+
+    currentChartType =
+        type;
+
+
+    localStorage.setItem(
+        "kmf_dashboard_chart",
+        type
+    );
+
+
+    $("areaChartBtn")
+        .classList
+        .toggle(
+            "active",
+            type === "area"
+        );
+
+
+    $("candleChartBtn")
+        .classList
+        .toggle(
+            "active",
+            type === "candles"
+        );
+
+
+    drawChart();
+}
+
+
+/*
+   Explicitly expose the function
+   used by onclick.
+*/
+
+window.setChartType =
+    setChartType;
+
+
+/* =====================================================
+   CANVAS
+===================================================== */
+
+function resizeCanvas(){
+
+    const canvas =
+        $("priceChart");
+
+
+    if(!canvas){
+
+        return;
+    }
+
+
+    const rect =
+        canvas.getBoundingClientRect();
+
+
+    const dpr =
+        window.devicePixelRatio || 1;
+
+
+    canvas.width =
+        Math.max(
+            1,
+            Math.floor(
+                rect.width * dpr
+            )
+        );
+
+
+    canvas.height =
+        Math.max(
+            1,
+            Math.floor(
+                rect.height * dpr
+            )
+        );
+
+
+    const ctx =
+        canvas.getContext(
+            "2d"
+        );
+
+
+    ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+    );
+
+
+    drawChart();
+}
+
+
+/* =====================================================
+   CHART HELPERS
+===================================================== */
+
+function niceDecimals(range){
+
+    if(range >= 1000){
+        return 2;
+    }
+
+    if(range >= 100){
+        return 2;
+    }
+
+    if(range >= 10){
+        return 3;
+    }
+
+    if(range >= 1){
+        return 4;
+    }
+
+    return 5;
+}
+
+
+function formatPrice(value){
+
+    if(
+        !Number.isFinite(
+            Number(value)
+        )
+    ){
+
+        return "—";
+    }
+
+
+    return Number(value)
+        .toFixed(
+            niceDecimals(
+                Math.abs(
+                    Number(value)
+                )
+            )
+        );
+}
+
+
+/* =====================================================
+   DRAW CHART
+===================================================== */
+
+function drawChart(){
+
+    const canvas =
+        $("priceChart");
+
+
+    if(!canvas){
+
+        return;
+    }
+
+
+    const ctx =
+        canvas.getContext(
+            "2d"
+        );
+
+
+    const width =
+        canvas.clientWidth;
+
+
+    const height =
+        canvas.clientHeight;
+
+
+    if(
+        width <= 0 ||
+        height <= 0
+    ){
+
+        return;
+    }
+
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    /*
+       BACKGROUND
+    */
+
+    ctx.fillStyle =
+        "#081421";
+
+
+    ctx.fillRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    /*
+       PADDING
+    */
+
+    const left =
+        62;
+
+    const right =
+        82;
+
+    const top =
+        28;
+
+    const bottom =
+        30;
+
+
+    const chartWidth =
+        width -
+        left -
+        right;
+
+
+    const chartHeight =
+        height -
+        top -
+        bottom;
+
+
+    /*
+       PRICE DATA
+
+       The chart uses the exact
+       selected market prices.
+
+       Example:
+
+       VOL-25 selected
+       -> VOL-25 prices
+       -> VOL-25 chart
+    */
+
+    const prices =
+        currentTicks
+            .map(
+                tick =>
+                    Number(
+                        tick.price
+                    )
+            )
+            .filter(
+                Number.isFinite
+            );
+
+
+    if(!prices.length){
+
+        ctx.fillStyle =
+            "#667a92";
+
+
+        ctx.font =
+            "12px Arial";
+
+
+        ctx.fillText(
+            "Waiting for market price...",
+            left,
+            top + 30
+        );
+
+
+        return;
+    }
+
+
+    /*
+       RANGE
+    */
+
+    let min =
+        Math.min(
+            ...prices
+        );
+
+
+    let max =
+        Math.max(
+            ...prices
+        );
+
+
+    const livePrice =
+        Number(currentPrice);
+
+
+    if(
+        Number.isFinite(
+            livePrice
+        )
+    ){
+
+        min =
+            Math.min(
+                min,
+                livePrice
+            );
+
+
+        max =
+            Math.max(
+                max,
+                livePrice
+            );
+    }
+
+
+    let range =
+        max - min;
+
+
+    if(
+        !Number.isFinite(range) ||
+        range <= 0
+    ){
+
+        range =
+            Math.max(
+                Math.abs(max) * .0005,
+                .01
+            );
+    }
+
+
+    const padding =
+        range * .16;
+
+
+    min -= padding;
+
+    max += padding;
+
+
+    range =
+        max - min;
+
+
+    function yForPrice(price){
+
+        return (
+            top +
+            (
+                (max - price) /
+                range
+            ) *
+            chartHeight
+        );
+    }
+
+
+    /*
+       HORIZONTAL GRID
+    */
+
+    ctx.lineWidth =
+        1;
+
+
+    ctx.strokeStyle =
+        "rgba(89,111,137,.13)";
+
+
+    ctx.fillStyle =
+        "#64768d";
+
+
+    ctx.font =
+        "10px Arial";
+
+
+    const gridCount =
+        5;
+
+
+    for(
+        let i = 0;
+        i <= gridCount;
+        i++
+    ){
+
+        const ratio =
+            i / gridCount;
+
+
+        const y =
+            top +
+            ratio *
+            chartHeight;
+
+
+        ctx.beginPath();
+
+
+        ctx.moveTo(
+            left,
+            y
+        );
+
+
+        ctx.lineTo(
+            width - right,
+            y
+        );
+
+
+        ctx.stroke();
+
+
+        const value =
+            max -
+            ratio * range;
+
+
+        ctx.fillText(
+            formatPrice(value),
+            width - right + 8,
+            y + 3
+        );
+    }
+
+
+    /*
+       VERTICAL GRID
+    */
+
+    const verticalCount =
+        6;
+
+
+    for(
+        let i = 0;
+        i <= verticalCount;
+        i++
+    ){
+
+        const x =
+            left +
+            (
+                i /
+                verticalCount
+            ) *
+            chartWidth;
+
+
+        ctx.beginPath();
+
+
+        ctx.moveTo(
+            x,
+            top
+        );
+
+
+        ctx.lineTo(
+            x,
+            top + chartHeight
+        );
+
+
+        ctx.stroke();
+    }
+
+
+    /*
+       AREA OR CANDLESTICK
+    */
+
+    if(
+        currentChartType === "area"
+    ){
+
+        drawAreaChart(
+            ctx,
+            prices,
+            left,
+            top,
+            chartWidth,
+            chartHeight,
+            yForPrice
+        );
+
+    }else{
+
+        drawCandles(
+            ctx,
+            prices,
+            left,
+            top,
+            chartWidth,
+            chartHeight,
+            yForPrice
+        );
+    }
+
+
+    /*
+       LIVE PRICE BROKEN LINE
+    */
+
+    if(
+        Number.isFinite(
+            livePrice
+        )
+    ){
+
+        const currentY =
+            yForPrice(
+                livePrice
+            );
+
+
+        ctx.save();
+
+
+        ctx.strokeStyle =
+            "rgba(34,197,94,.85)";
+
+
+        ctx.lineWidth =
+            1;
+
+
+        ctx.setLineDash(
+            [6,5]
+        );
+
+
+        ctx.beginPath();
+
+
+        ctx.moveTo(
+            left,
+            currentY
+        );
+
+
+        ctx.lineTo(
+            width - right,
+            currentY
+        );
+
+
+        ctx.stroke();
+
+
+        ctx.restore();
+
+
+        /*
+           LIVE PRICE LABEL
+        */
+
+        const label =
+            formatPrice(
+                livePrice
+            );
+
+
+        const labelWidth =
+            72;
+
+
+        const labelHeight =
+            22;
+
+
+        const labelX =
+            width -
+            labelWidth -
+            7;
+
+
+        const labelY =
+            Math.max(
+                4,
+                Math.min(
+                    height -
+                    labelHeight -
+                    4,
+                    currentY -
+                    labelHeight / 2
+                )
+            );
+
+
+        ctx.fillStyle =
+            "#16a34a";
+
+
+        roundRect(
+            ctx,
+            labelX,
+            labelY,
+            labelWidth,
+            labelHeight,
+            5
+        );
+
+
+        ctx.fill();
+
+
+        ctx.fillStyle =
+            "#ffffff";
+
+
+        ctx.font =
+            "bold 10px Arial";
+
+
+        ctx.textAlign =
+            "center";
+
+
+        ctx.fillText(
+            label,
+            labelX +
+            labelWidth / 2,
+            labelY + 14
+        );
+
+
+        ctx.textAlign =
+            "left";
+    }
+}
+
+
+/* =====================================================
+   AREA CHART
+===================================================== */
+
+function drawAreaChart(
+    ctx,
+    prices,
+    left,
+    top,
+    chartWidth,
+    chartHeight,
+    yForPrice
+){
+
+    if(
+        prices.length === 1
+    ){
+
+        prices.push(
+            prices[0]
+        );
+    }
+
+
+    const step =
+        chartWidth /
+        Math.max(
+            1,
+            prices.length - 1
+        );
+
+
+    /*
+       AREA FILL
+    */
+
+    const gradient =
+        ctx.createLinearGradient(
+            0,
+            top,
+            0,
+            top + chartHeight
+        );
+
+
+    gradient.addColorStop(
+        0,
+        "rgba(34,197,94,.22)"
+    );
+
+
+    gradient.addColorStop(
+        1,
+        "rgba(34,197,94,0)"
+    );
+
+
+    ctx.beginPath();
+
+
+    prices.forEach(
+        (price,index) => {
+
+            const x =
+                left +
+                index *
+                step;
+
+
+            const y =
+                yForPrice(
+                    price
+                );
+
+
+            if(index === 0){
+
+                ctx.moveTo(
+                    x,
+                    y
+                );
+
+            }else{
+
+                ctx.lineTo(
+                    x,
+                    y
+                );
+            }
+
+        }
+    );
+
+
+    const lastX =
+        left +
+        (prices.length - 1) *
+        step;
+
+
+    ctx.lineTo(
+        lastX,
+        top + chartHeight
+    );
+
+
+    ctx.lineTo(
+        left,
+        top + chartHeight
+    );
+
+
+    ctx.closePath();
+
+
+    ctx.fillStyle =
+        gradient;
+
+
+    ctx.fill();
+
+
+    /*
+       PRICE LINE
+    */
+
+    ctx.beginPath();
+
+
+    prices.forEach(
+        (price,index) => {
+
+            const x =
+                left +
+                index *
+                step;
+
+
+            const y =
+                yForPrice(
+                    price
+                );
+
+
+            if(index === 0){
+
+                ctx.moveTo(
+                    x,
+                    y
+                );
+
+            }else{
+
+                const previousPrice =
+                    prices[index - 1];
+
+
+                const previousX =
+                    left +
+                    (index - 1) *
+                    step;
+
+
+                const previousY =
+                    yForPrice(
+                        previousPrice
+                    );
+
+
+                const controlX =
+                    (previousX + x) / 2;
+
+
+                ctx.bezierCurveTo(
+                    controlX,
+                    previousY,
+                    controlX,
+                    y,
+                    x,
+                    y
+                );
+            }
+
+        }
+    );
+
+
+    ctx.strokeStyle =
+        "#22c55e";
+
+
+    ctx.lineWidth =
+        2;
+
+
+    ctx.stroke();
+
+
+    /*
+       CURRENT POINT
+    */
+
+    const lastPrice =
+        prices[
+            prices.length - 1
+        ];
+
+
+    const lastX2 =
+        left +
+        (prices.length - 1) *
+        step;
+
+
+    const lastY =
+        yForPrice(
+            lastPrice
+        );
+
+
+    ctx.beginPath();
+
+
+    ctx.arc(
+        lastX2,
+        lastY,
+        4,
+        0,
+        Math.PI * 2
+    );
+
+
+    ctx.fillStyle =
+        "#22c55e";
+
+
+    ctx.fill();
+
+
+    ctx.beginPath();
+
+
+    ctx.arc(
+        lastX2,
+        lastY,
+        7,
+        0,
+        Math.PI * 2
+    );
+
+
+    ctx.strokeStyle =
+        "rgba(34,197,94,.25)";
+
+
+    ctx.lineWidth =
+        2;
+
+
+    ctx.stroke();
+}
+
+
+/* =====================================================
+   CANDLESTICK
+===================================================== */
+
+function drawCandles(
+    ctx,
+    prices,
+    left,
+    top,
+    chartWidth,
+    chartHeight,
+    yForPrice
+){
+
+    /*
+       5 ticks = 1 candle.
+
+       All candles are created
+       from the same selected
+       market price data.
+    */
+
+   const candleSize =
+    10;
+
+
+    const candles = [];
+
+
+    for(
+        let i = 0;
+        i < prices.length;
+        i += candleSize
+    ){
+
+        const group =
+            prices.slice(
+                i,
+                i + candleSize
+            );
+
+
+        if(!group.length){
+
+            continue;
+        }
+
+
+        const open =
+            group[0];
+
+
+        const close =
+            group[
+                group.length - 1
+            ];
+
+
+        const high =
+            Math.max(
+                ...group
+            );
+
+
+        const low =
+            Math.min(
+                ...group
+            );
+
+
+        candles.push({
+
+            open,
+
+            close,
+
+            high,
+
+            low
+
+        });
+    }
+
+
+    if(!candles.length){
+
+        return;
+    }
+
+
+    const spacing =
+        chartWidth /
+        candles.length;
+
+
+    const candleWidth =
+        Math.max(
+            3,
+            Math.min(
+                18,
+                spacing * .58
+            )
+        );
+
+
+    candles.forEach(
+        (candle,index) => {
+
+            const x =
+                left +
+                index *
+                spacing +
+                spacing / 2;
+
+
+            const openY =
+                yForPrice(
+                    candle.open
+                );
+
+
+            const closeY =
+                yForPrice(
+                    candle.close
+                );
+
+
+            const highY =
+                yForPrice(
+                    candle.high
+                );
+
+
+            const lowY =
+                yForPrice(
+                    candle.low
+                );
+
+
+            const bullish =
+                candle.close >=
+                candle.open;
+
+
+            const bodyTop =
+                Math.min(
+                    openY,
+                    closeY
+                );
+
+
+            const bodyBottom =
+                Math.max(
+                    openY,
+                    closeY
+                );
+
+
+            const bodyHeight =
+                Math.max(
+                    2,
+                    bodyBottom -
+                    bodyTop
+                );
+
+
+            /*
+               Wick
+            */
+
+            ctx.beginPath();
+
+
+            ctx.moveTo(
+                x,
+                highY
+            );
+
+
+            ctx.lineTo(
+                x,
+                lowY
+            );
+
+
+            ctx.strokeStyle =
+                bullish
+                    ? "#22c55e"
+                    : "#ef4444";
+
+
+            ctx.lineWidth =
+                1;
+
+
+            ctx.stroke();
+
+
+            /*
+               Body
+            */
+
+            ctx.fillStyle =
+                bullish
+                    ? "#22c55e"
+                    : "#ef4444";
+
+
+            ctx.fillRect(
+                x -
+                candleWidth / 2,
+                bodyTop,
+                candleWidth,
+                bodyHeight
+            );
+
+        }
+    );
+}
+
+
+/* =====================================================
+   ROUNDED RECT
+===================================================== */
+
+function roundRect(
+    ctx,
+    x,
+    y,
+    width,
+    height,
+    radius
+){
+
+    ctx.beginPath();
+
+
+    ctx.moveTo(
+        x + radius,
+        y
+    );
+
+
+    ctx.lineTo(
+        x + width - radius,
+        y
+    );
+
+
+    ctx.quadraticCurveTo(
+        x + width,
+        y,
+        x + width,
+        y + radius
+    );
+
+
+    ctx.lineTo(
+        x + width,
+        y + height - radius
+    );
+
+
+    ctx.quadraticCurveTo(
+        x + width,
+        y + height,
+        x + width - radius,
+        y + height
+    );
+
+
+    ctx.lineTo(
+        x + radius,
+        y + height
+    );
+
+
+    ctx.quadraticCurveTo(
+        x,
+        y + height,
+        x,
+        y + height - radius
+    );
+
+
+    ctx.lineTo(
+        x,
+        y + radius
+    );
+
+
+    ctx.quadraticCurveTo(
+        x,
+        y,
+        x + radius,
+        y
+    );
+
+
+    ctx.closePath();
+}
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+function showStatus(
+    message,
+    error = false
+){
+
+    const el =
+        $("statusMessage");
+
+
+    el.textContent =
+        message;
+
+
+    el.className =
+        "status-message show" +
+        (
+            error
+                ? " error"
+                : ""
+        );
+}
+
+
+function hideStatus(){
+
+    $("statusMessage")
+        .className =
+        "status-message";
+}
+
+
+/* =====================================================
+   REFRESH LOOPS
+===================================================== */
+
+function startRefreshLoops(){
+
+    if(priceTimer){
+
+        clearInterval(
+            priceTimer
+        );
+    }
+
+
+    if(historyTimer){
+
+        clearInterval(
+            historyTimer
+        );
+    }
+
+
+    /*
+       Live price every second.
+    */
+
+   priceTimer =
+    setInterval(
+        loadLivePrice,
+        500
+    );
+
+
+  /*
+   History backup every 10 seconds.
+
+   Live ticks are received through
+   loadLivePrice().
+*/
+
+historyTimer =
+    setInterval(
+        loadDashboardHistory,
+        10000
+    );
+}
+
+
+/* =====================================================
+   EVENTS
+===================================================== */
+
+$("marketSelect")
+    .addEventListener(
+        "change",
+        async event => {
+
+            await selectMarket(
+                event.target.value
+            );
+
+        }
+    );
+
+
+$("logout")
+    .addEventListener(
+        "click",
+        async () => {
+
+            try{
+
+                await supabaseClient.auth.signOut();
+
+            }finally{
+
+                localStorage.removeItem(
+                    "kmf_selected_account"
+                );
+
+                window.location.href =
+                    "login.html";
+            }
+
+        }
+    );
+
+
+window.addEventListener(
+    "resize",
+    () => {
+
+        clearTimeout(
+            resizeTimer
+        );
+
+
+        resizeTimer =
+            setTimeout(
+                resizeCanvas,
+                120
+            );
+
+    }
+);
+
+
+/* =====================================================
+   SUPABASE AUTH LISTENER
+===================================================== */
+
+supabaseClient.auth.onAuthStateChange(
+    (
+        event,
+        session
+    ) => {
+
+        if(session){
+
+            currentSession =
+                session;
+
+
+            $("userEmail").textContent =
+                session.user?.email ||
+                "Authenticated";
+        }
+
+
+        if(
+            event ===
+            "SIGNED_OUT"
+        ){
+
+            window.location.href =
+                "login.html";
+        }
+
+    }
+);
+
+
+/* =====================================================
+   REFERRAL PROGRAM
+===================================================== */
+
+function setReferralMessage(message, isError = false) {
+    const el = $("referralMessage");
+    if (!el) return;
+
+    el.textContent = message;
+    el.classList.toggle("error", isError);
+}
+
+function setApplyReferralMessage(message, isError = false) {
+    const el = $("applyReferralMessage");
+    if (!el) return;
+
+    el.textContent = message;
+    el.classList.toggle("error", isError);
+}
+
+async function copyReferralText(value, label) {
+    if (!value || value === "Loading...") {
+        setReferralMessage("Referral details are not loaded yet.", true);
+        return;
+    }
+
+    try {
+        await navigator.clipboard.writeText(value);
+        setReferralMessage(label + " copied successfully.");
+    } catch (error) {
+        // Fallback for browsers where Clipboard API is unavailable.
+        const input = document.createElement("textarea");
+        input.value = value;
+        input.style.position = "fixed";
+        input.style.opacity = "0";
+        document.body.appendChild(input);
+        input.select();
+
+        const copied = document.execCommand("copy");
+        input.remove();
+
+        setReferralMessage(
+            copied ? label + " copied successfully." :
+                "Copy failed. Please copy it manually.",
+            !copied
+        );
+    }
+}
+
+window.copyReferralCode = async function () {
+    const code = $("referralCode")?.textContent?.trim();
+    await copyReferralText(code, "Referral code");
+};
+
+window.copyReferralLink = async function () {
+    const link = $("referralLink")?.textContent?.trim();
+    await copyReferralText(link, "Referral link");
+};
+
+function formatReferralMoney(value) {
+    const amount = Number(value);
+    return Number.isFinite(amount)
+        ? "$" + amount.toFixed(2)
+        : "$0.00";
+}
+
+function formatReferralDate(value) {
+    if (!value) return "—";
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "—";
+
+    return date.toLocaleDateString();
+}
+
+function renderReferralUsers(users) {
+    const body = $("referralUsersBody");
+    if (!body) return;
+
+    body.replaceChildren();
+
+    if (!Array.isArray(users) || users.length === 0) {
+        const row = body.insertRow();
+        const cell = row.insertCell();
+
+        cell.colSpan = 3;
+        cell.className = "referral-empty";
+        cell.textContent = "No referrals yet.";
+
+        return;
+    }
+
+    users.forEach(user => {
+        const row = body.insertRow();
+
+        const dateCell = row.insertCell();
+        dateCell.textContent = formatReferralDate(
+            user.created_at || user.registered_at
+        );
+
+        const depositCell = row.insertCell();
+        depositCell.textContent = formatReferralMoney(
+            user.successful_deposit_total
+        );
+
+        const statusCell = row.insertCell();
+        statusCell.textContent = user.commission_status || user.status || "Pending";
+    });
+}
+
+function renderReferralPromotions(promotions) {
+    const container = $("referralPromotions");
+    if (!container) return;
+
+    container.replaceChildren();
+
+    if (!Array.isArray(promotions) || promotions.length === 0) {
+        container.textContent = "No promotions are available right now.";
+        return;
+    }
+
+    promotions.forEach(promotion => {
+        const item = document.createElement("div");
+        item.className = "referral-promotion-item";
+
+        const name = document.createElement("strong");
+        name.textContent = promotion.name || "Deposit promotion";
+
+        const details = document.createElement("div");
+        const percent = Number(promotion.bonus_percent) || 0;
+        const minimum = Number(promotion.min_deposit) || 0;
+        const maximum = Number(promotion.max_bonus);
+
+        details.textContent =
+            percent + "% bonus · Minimum deposit " +
+            formatReferralMoney(minimum) +
+            (Number.isFinite(maximum)
+                ? " · Maximum bonus " + formatReferralMoney(maximum)
+                : "");
+
+        const status = document.createElement("div");
+        status.className = "referral-promotion-status";
+        status.textContent = promotion.status === "active"
+            ? "Active"
+            : "Inactive";
+
+        item.append(name, details, status);
+        container.appendChild(item);
+    });
+}
+
+async function loadReferralDashboard() {
+    try {
+        const data = await dashboardFetch("/api/referrals/dashboard");
+
+        const code = data.referralCode || data.referral_code || "";
+        const link = data.referralLink || data.referral_link || "";
+
+        $("referralCode").textContent = code || "Unavailable";
+        $("referralLink").textContent = link || "Unavailable";
+
+        const stats = data.stats || {};
+
+        $("referralTotal").textContent =
+            Number(stats.total ?? stats.totalReferrals ?? 0);
+
+        $("referralDepositing").textContent =
+            Number(stats.depositing ?? stats.depositingReferrals ?? 0);
+
+        $("referralEarned").textContent =
+            formatReferralMoney(stats.earned ?? stats.commissionsEarned ?? 0);
+
+        $("referralPending").textContent =
+            formatReferralMoney(stats.pending ?? stats.pendingCommissions ?? 0);
+
+        renderReferralUsers(
+            data.referredUsers || data.referred_users || []
+        );
+
+        renderReferralPromotions(data.promotions || []);
+
+        setReferralMessage("");
+    } catch (error) {
+        console.error("Referral dashboard error:", error);
+        setReferralMessage(
+            "Could not load referrals: " + error.message,
+            true
+        );
+    }
+}
+
+window.submitReferralCode = async function () {
+    const input = $("applyReferralCode");
+    const button = $("applyReferralButton");
+    const code = input?.value?.trim().toUpperCase();
+
+    if (!code) {
+        setApplyReferralMessage("Enter a referral code first.", true);
+        return;
+    }
+
+    if (button) button.disabled = true;
+
+    try {
+        const result = await dashboardFetch(
+            "/api/referrals/apply",
+            {
+                method: "POST",
+                body: JSON.stringify({ referralCode: code })
+            }
+        );
+
+        setApplyReferralMessage(
+            result.message || "Referral code applied successfully."
+        );
+
+        if (input) input.value = "";
+
+        await loadReferralDashboard();
+    } catch (error) {
+        console.error("Apply referral code error:", error);
+        setApplyReferralMessage(error.message, true);
+    } finally {
+        if (button) button.disabled = false;
+    }
+};
+/* =====================================================
+   INITIALIZE
+===================================================== */
+
+async function initialize(){
+
+    /*
+       Validate account.
+    */
+
+    if(
+        currentAccount !== "demo" &&
+        currentAccount !== "real"
+    ){
+
+        currentAccount =
+            "demo";
+
+
+        localStorage.setItem(
+            "kmf_account_mode",
+            "demo"
+        );
+    }
+
+
+    /*
+       Apply account UI.
+    */
+
+    applyAccountUI();
+
+
+    /*
+       Chart type.
+    */
+
+    setChartType(
+        currentChartType
+    );
+
+
+    /*
+       Market.
+    */
+
+    setMarketUI();
+
+
+    /*
+       Authentication.
+    */
+
+    const session =
+        await requireAuth();
+
+
+    if(!session){
+
+        return;
+    }
+await loadReferralDashboard();
+
+    /*
+       Wallet.
+    */
+
+    await loadWallet();
+
+
+    /*
+       History.
+    */
+
+    await loadDashboardHistory();
+
+
+    /*
+       Current price.
+    */
+
+    await loadLivePrice();
+
+
+    /*
+       Canvas.
+    */
+
+    resizeCanvas();
+
+
+    /*
+       Refresh.
+    */
+
+    startRefreshLoops();
+}
+
+
+/*
+   Start only once.
+*/
+
+initialize();
+
+</script>
+
+</body>
+</html>

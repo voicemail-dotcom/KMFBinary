@@ -1,0 +1,22 @@
+
+# Environment files and secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Logs and local backups
+*.log
+*.bak
+*.dump
+backend/server.backup.js
+
+# Local payment test responses
+backend/b2c-test.json
+backend/callback-test.json
+backend/status-test.json
+
+# Local editor settings
+.vscode/

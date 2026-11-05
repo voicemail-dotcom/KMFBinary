@@ -3137,7 +3137,7 @@ async function loadTradeWallet(options = {}) {
             result = await apiRequest("/api/wallet");
         } else {
             const response = await fetch(
-                "http://localhost:3000/api/wallet"
+                window.location.origin + "/api/wallet"
             );
 
             if (!response.ok) {
@@ -5802,7 +5802,7 @@ async function getTradeById(
 
     const response =
         await fetch(
-            "http://localhost:3000/api/trades/" +
+            window.location.origin + "/api/trades/" +
             encodeURIComponent(
                 tradeId
             )
@@ -5851,7 +5851,7 @@ async function loadMarkets() {
 
             const response =
                 await fetch(
-                    "http://localhost:3000/api/markets"
+                    window.location.origin + "/api/markets"
                 );
 
             if (!response.ok) {
@@ -6253,7 +6253,7 @@ async function loadSelectedMarket(
 
             const response =
                 await fetch(
-                    "http://localhost:3000/api/markets"
+                    window.location.origin + "/api/markets"
                 );
 
             if (!response.ok) {
@@ -6358,7 +6358,7 @@ async function updateLivePrice() {
 
             const response =
                 await fetch(
-                    "http://localhost:3000/api/prices"
+                    window.location.origin + "/api/prices"
                 );
 
             if (!response.ok) {
@@ -7340,7 +7340,7 @@ async function loadMarketChart({
 
             const response =
                 await fetch(
-                    "http://localhost:3000" +
+                    window.location.origin +
                     query
                 );
 
@@ -7795,7 +7795,7 @@ const query =
 
             const response =
                 await fetch(
-                    "http://localhost:3000" +
+                    window.location.origin +
                     query
                 );
 

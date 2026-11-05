@@ -1832,14 +1832,7 @@ const supabaseClient =
         SUPABASE_URL,
         SUPABASE_KEY
     );
-
-const API_BASE =
-    ["localhost", "127.0.0.1"].includes(
-        window.location.hostname
-    )
-        ? "http://localhost:3000"
-        : "http://192.168.2.2:3000";
-
+const API_BASE = window.location.origin;
 /* =========================================================
    API
 ========================================================= */

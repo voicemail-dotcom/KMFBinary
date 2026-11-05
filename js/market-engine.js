@@ -9,7 +9,7 @@
 // =====================================================
 
 const KMF_API_URL =
-    "http://localhost:3000/api/prices";
+    `${window.location.origin}/api/prices`;
 
 
 // =====================================================

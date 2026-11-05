@@ -53,10 +53,7 @@ const WALLET_REFRESH_INTERVAL = 5000;
    directly to the Express backend.
 */
 
-const WALLET_API_BASE_URL = window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1"
-    ? "http://localhost:3000"
-    : "https://kmfbinary.site";
+const WALLET_API_BASE_URL = window.location.origin;
 
 /* ============================================================
    BASIC HELPERS

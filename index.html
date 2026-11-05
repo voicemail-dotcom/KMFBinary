@@ -1,357 +1,932 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KMFBinary - Smart Trading Platform</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#071225">
+  <meta name="description" content="KMFBinary — explore synthetic markets and learn trading with virtual demo funds.">
+  <title>KMFBinary | Learn. Analyse. Practise.</title>
 
-    <link rel="stylesheet" href="css/global.css">
-    <link rel="stylesheet" href="css/landing.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #071225;
+      --bg2: #0a1930;
+      --card: #0e203b;
+      --card2: #102644;
+      --blue: #3988ff;
+      --cyan: #37d5e8;
+      --green: #35d69a;
+      --text: #f4f7ff;
+      --muted: #94a8c5;
+      --border: rgba(148,168,197,.14);
+      --radius: 20px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: "DM Sans", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 80% 5%, rgba(37,112,218,.17), transparent 35%),
+        radial-gradient(ellipse at 5% 35%, rgba(27,191,207,.08), transparent 30%),
+        var(--bg);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    button { font: inherit; }
+
+    .container {
+      width: min(1160px, calc(100% - 40px));
+      margin: auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(7,18,37,.88);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav {
+      height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -.8px;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 21px;
+      background: linear-gradient(135deg, #3988ff, #24c6d9);
+      box-shadow: 0 7px 25px rgba(57,136,255,.3);
+    }
+
+    .brand span:last-child { color: var(--cyan); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .nav-links a:hover { color: white; }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      min-height: 45px;
+      padding: 0 20px;
+      border-radius: 11px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+
+    .btn-primary {
+      color: white;
+      background: linear-gradient(110deg, #347ff0, #2871e5);
+      box-shadow: 0 8px 25px rgba(42,116,231,.24);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 12px 30px rgba(42,116,231,.38);
+    }
+
+    .btn-outline {
+      border-color: var(--border);
+      color: white;
+      background: rgba(255,255,255,.025);
+    }
+
+    .btn-outline:hover { background: rgba(255,255,255,.08); }
+
+    .menu-toggle {
+      display: none;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: white;
+      width: 43px;
+      height: 43px;
+      border-radius: 10px;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .hero {
+      padding: 92px 0 75px;
+      position: relative;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 65px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: #9bd9ff;
+      border: 1px solid rgba(55,213,232,.22);
+      background: rgba(55,213,232,.07);
+      border-radius: 30px;
+      padding: 8px 13px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .7px;
+      text-transform: uppercase;
+      margin-bottom: 25px;
+    }
+
+    .eyebrow-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+      box-shadow: 0 0 12px var(--green);
+    }
+
+    h1, h2, h3 {
+      font-family: "Space Grotesk", sans-serif;
+      line-height: 1.13;
+      letter-spacing: -1.3px;
+    }
+
+    h1 {
+      font-size: clamp(42px, 5.5vw, 67px);
+      max-width: 650px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(100deg, #55a1ff, #42dce5);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-description {
+      max-width: 530px;
+      margin: 23px 0 29px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.85;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 13px;
+      flex-wrap: wrap;
+    }
+
+    .hero-note {
+      color: #8196b2;
+      font-size: 12px;
+      margin-top: 20px;
+    }
+
+    .hero-visual {
+      position: relative;
+      padding: 22px;
+      border: 1px solid rgba(108,159,226,.2);
+      border-radius: 25px;
+      background: linear-gradient(145deg, rgba(19,48,83,.94), rgba(8,23,44,.96));
+      box-shadow: 0 30px 90px rgba(0,0,0,.28);
+    }
+
+    .visual-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 23px;
+    }
+
+    .visual-label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .demo-tag {
+      color: var(--green);
+      background: rgba(53,214,154,.1);
+      border: 1px solid rgba(53,214,154,.2);
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .visual-price {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 35px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .visual-change {
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 3px;
+    }
+
+    .chart {
+      height: 175px;
+      margin: 20px 0;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 42px,
+        rgba(148,168,197,.08) 43px
+      );
+    }
+
+    .chart svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .chart-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .chart-stat {
+      background: rgba(255,255,255,.035);
+      padding: 12px;
+      border-radius: 12px;
+    }
+
+    .chart-stat small {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .chart-stat strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 14px;
+    }
+
+    .floating-note {
+      position: absolute;
+      right: -25px;
+      bottom: 38px;
+      padding: 13px 17px;
+      border: 1px solid rgba(53,214,154,.22);
+      background: #102c36;
+      border-radius: 13px;
+      box-shadow: 0 12px 35px rgba(0,0,0,.25);
+      font-size: 12px;
+    }
+
+    .floating-note strong {
+      color: var(--green);
+      display: block;
+      font-size: 16px;
+    }
+
+    .section { padding: 80px 0; }
+
+    .section-heading {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 42px;
+    }
+
+    .section-heading .eyebrow { margin-bottom: 15px; }
+
+    h2 {
+      font-size: clamp(30px, 4vw, 43px);
+      margin-bottom: 15px;
+    }
+
+    .section-heading p {
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .markets-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 17px;
+    }
+
+    .market-card {
+      padding: 23px;
+      background: linear-gradient(145deg, #102440, #0b1a30);
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      transition: .25s ease;
+    }
+
+    .market-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(57,136,255,.55);
+    }
+
+    .market-icon {
+      width: 43px;
+      height: 43px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      color: #8bc4ff;
+      background: rgba(57,136,255,.13);
+      font-size: 20px;
+      margin-bottom: 18px;
+    }
+
+    .market-card h3 {
+      font-size: 19px;
+      margin-bottom: 7px;
+      letter-spacing: -.3px;
+    }
+
+    .market-card p {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .risk {
+      display: inline-block;
+      margin-top: 18px;
+      padding: 5px 9px;
+      border-radius: 7px;
+      font-size: 10px;
+      font-weight: 800;
+      background: rgba(55,213,232,.09);
+      color: #74d9e9;
+    }
+
+    .features {
+      background: linear-gradient(180deg, rgba(13,32,58,.25), rgba(13,32,58,.65));
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 17px;
+    }
+
+    .feature-card {
+      padding: 25px;
+      border-radius: 17px;
+      background: rgba(15,35,62,.78);
+      border: 1px solid var(--border);
+    }
+
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      color: #76b9ff;
+      background: rgba(57,136,255,.13);
+      margin-bottom: 18px;
+    }
+
+    .feature-card h3 {
+      font-size: 17px;
+      letter-spacing: -.3px;
+      margin-bottom: 9px;
+    }
+
+    .feature-card p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.75;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 25px;
+    }
+
+    .step {
+      text-align: center;
+      padding: 25px;
+    }
+
+    .step-number {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      margin: 0 auto 19px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #347ff0, #24c6d9);
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 21px;
+      font-weight: 700;
+      box-shadow: 0 9px 25px rgba(57,136,255,.2);
+    }
+
+    .step h3 {
+      font-size: 18px;
+      margin-bottom: 9px;
+      letter-spacing: -.3px;
+    }
+
+    .step p {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .demo-banner {
+      padding: 45px;
+      border-radius: 23px;
+      border: 1px solid rgba(57,136,255,.25);
+      background:
+        radial-gradient(circle at 90% 20%, rgba(55,213,232,.13), transparent 30%),
+        linear-gradient(120deg, #102c51, #0d203b);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .demo-banner h2 {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    .demo-banner p {
+      max-width: 600px;
+      color: #a7bad4;
+      font-size: 14px;
+    }
+
+    .demo-amount {
+      color: var(--green);
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 27px;
+      font-weight: 700;
+      margin-top: 13px;
+    }
+
+    footer {
+      padding: 45px 0 0;
+      border-top: 1px solid var(--border);
+      background: #050e1c;
+    }
+
+    .footer-main {
+      display: flex;
+      justify-content: space-between;
+      gap: 30px;
+      padding-bottom: 35px;
+    }
+
+    .footer-description {
+      color: var(--muted);
+      max-width: 370px;
+      font-size: 13px;
+      margin-top: 14px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 22px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer-links a:hover { color: white; }
+
+    .copyright {
+      border-top: 1px solid var(--border);
+      padding: 20px 0;
+      color: #71849f;
+      font-size: 12px;
+    }
+
+    .disclaimer {
+      border-top: 1px solid rgba(255,180,80,.2);
+      background: rgba(255,157,50,.055);
+      padding: 22px 0 25px;
+      color: #c9b99f;
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    .disclaimer strong {
+      color: #ffcc83;
+      display: block;
+      font-size: 12px;
+      margin-bottom: 5px;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 45px; }
+      .hero-copy { text-align: center; }
+      .hero-description { margin-left: auto; margin-right: auto; }
+      .hero-buttons { justify-content: center; }
+      .hero-visual { max-width: 570px; width: 100%; margin: auto; }
+      .markets-grid { grid-template-columns: repeat(2, 1fr); }
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .floating-note { right: -8px; }
+    }
+
+    @media (max-width: 650px) {
+      .container { width: min(100% - 30px, 1160px); }
+      .nav { height: 67px; }
+      .brand { font-size: 19px; }
+      .menu-toggle { display: block; }
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 67px;
+        left: 0;
+        right: 0;
+        padding: 20px;
+        background: #0a1930;
+        border-bottom: 1px solid var(--border);
+        flex-direction: column;
+        align-items: stretch;
+        gap: 18px;
+      }
+      .nav-links.open { display: flex; }
+      .nav-actions .btn-outline { display: none; }
+      .nav-actions .btn { min-height: 40px; padding: 0 12px; font-size: 12px; }
+      .hero { padding: 65px 0 45px; }
+      h1 { font-size: 43px; }
+      .hero-description { font-size: 14px; }
+      .hero-visual { padding: 16px; }
+      .visual-price { font-size: 29px; }
+      .chart { height: 145px; }
+      .floating-note { right: 5px; bottom: 15px; }
+      .section { padding: 60px 0; }
+      .markets-grid, .features-grid { grid-template-columns: 1fr 1fr; gap: 11px; }
+      .market-card, .feature-card { padding: 17px; }
+      .market-card h3 { font-size: 16px; }
+      .market-card p, .feature-card p { font-size: 11px; }
+      .steps { grid-template-columns: 1fr; gap: 5px; }
+      .step { padding: 17px; }
+      .demo-banner { padding: 28px 22px; flex-direction: column; align-items: flex-start; }
+      .demo-banner h2 { font-size: 27px; }
+      .footer-main { flex-direction: column; }
+      .footer-links { gap: 15px; }
+    }
+
+    @media (max-width: 380px) {
+      .markets-grid, .features-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 37px; }
+    }
+  </style>
 </head>
 
 <body>
 
-<header class="landing-header">
+  <header class="topbar">
+    <div class="container nav">
+      <a class="brand" href="index.html" aria-label="KMFBinary home">
+        <span class="brand-icon">K</span>
+        <span>KMF<span>Binary</span></span>
+      </a>
 
-    <div class="logo">
-        <span>KMF</span>Binary
-    </div>
-
-    <nav>
+      <nav class="nav-links" id="navLinks">
         <a href="#markets">Markets</a>
         <a href="#features">Features</a>
-        <a href="#how">How It Works</a>
-    </nav>
+        <a href="#how-it-works">How it works</a>
+      </nav>
 
-    <div class="header-buttons">
-        <a href="login.html" class="btn btn-outline">Sign In</a>
-        <a href="register.html" class="btn btn-primary">Create Account</a>
+      <div class="nav-actions">
+        <a class="btn btn-outline" href="login.html">Sign in</a>
+        <a class="btn btn-primary" href="register.html">Create account</a>
+        <button class="menu-toggle" id="menuToggle" aria-label="Open navigation" aria-expanded="false">☰</button>
+      </div>
     </div>
+  </header>
 
-</header>
-
-
-<main>
-
-    <!-- HERO -->
-
+  <main>
     <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow-dot"></span> Educational trading platform</div>
 
-        <div class="hero-content">
+          <h1>
+            Learn the markets.<br>
+            Practise with <span class="gradient-text">confidence.</span>
+          </h1>
 
-            <div class="badge">
-                ● DEMO TRADING AVAILABLE
-            </div>
+          <p class="hero-description">
+            Explore synthetic markets, understand price movements and practise
+            trading strategies in a simulated environment using virtual demo funds.
+          </p>
 
-            <h1>
-                Trade smarter.<br>
-                <span>Understand the market.</span>
-            </h1>
+          <div class="hero-buttons">
+            <a class="btn btn-primary" href="register.html">Create free account <span>→</span></a>
+            <a class="btn btn-outline" href="login.html">Sign in to practise</a>
+          </div>
 
-            <p>
-                Explore the KMFBinary trading platform with a powerful
-                proprietary market engine, real-time statistics,
-                flexible expiries and intelligent analysis tools.
-            </p>
-
-            <div class="hero-buttons">
-
-                <a href="register.html" class="btn btn-primary btn-large">
-                    Start Trading
-                </a>
-
-                <a href="dashboard.html" class="btn btn-outline btn-large">
-                    Try Demo
-                </a>
-
-            </div>
-
-            <div class="hero-note">
-                $10,000 virtual demo balance included
-            </div>
-
+          <p class="hero-note">Virtual demo environment only. No real-money trading.</p>
         </div>
 
-
-        <div class="hero-card">
-
-            <div class="mini-header">
-                <span>KMF100</span>
-                <span class="green">+0.42%</span>
+        <div class="hero-visual">
+          <div class="visual-top">
+            <div>
+              <div class="visual-label">Illustrative market preview</div>
+              <div class="visual-price">10,482.37</div>
+              <div class="visual-change">＋0.82% <span style="color:#8ba3c0">simulated movement</span></div>
             </div>
+            <span class="demo-tag">DEMO PREVIEW</span>
+          </div>
 
-            <div class="mini-price">
-                10,482.37
+          <div class="chart">
+            <svg viewBox="0 0 500 180" preserveAspectRatio="none" role="img" aria-label="Illustrative price movement chart">
+              <defs>
+                <linearGradient id="areaGradient" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#3988ff" stop-opacity=".32"/>
+                  <stop offset="100%" stop-color="#3988ff" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M0 140 L25 132 L50 145 L75 112 L100 122 L125 95 L150 108 L175 83 L200 98 L225 67 L250 81 L275 57 L300 73 L325 43 L350 59 L375 35 L400 49 L425 24 L450 39 L475 15 L500 25 L500 180 L0 180 Z" fill="url(#areaGradient)"/>
+              <path d="M0 140 L25 132 L50 145 L75 112 L100 122 L125 95 L150 108 L175 83 L200 98 L225 67 L250 81 L275 57 L300 73 L325 43 L350 59 L375 35 L400 49 L425 24 L450 39 L475 15 L500 25" fill="none" stroke="#43a4ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="500" cy="25" r="5" fill="#37d5e8"/>
+            </svg>
+          </div>
+
+          <div class="chart-stats">
+            <div class="chart-stat">
+              <small>Market</small>
+              <strong>KMF 100</strong>
             </div>
-
-            <div class="mini-chart">
-
-                <svg viewBox="0 0 500 180" preserveAspectRatio="none">
-
-                    <polyline
-                        points="0,145 30,130 60,140 90,110 120,125 150,90 180,105 210,80 240,95 270,70 300,83 330,55 360,70 390,45 420,60 450,30 500,45"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="4"
-                    />
-
-                </svg>
-
+            <div class="chart-stat">
+              <small>Environment</small>
+              <strong>Demo</strong>
             </div>
-
-            <div class="mini-stats">
-
-                <div>
-                    <small>Ticks</small>
-                    <strong>1,284</strong>
-                </div>
-
-                <div>
-                    <small>Odd</small>
-                    <strong>51%</strong>
-                </div>
-
-                <div>
-                    <small>Even</small>
-                    <strong>49%</strong>
-                </div>
-
+            <div class="chart-stat">
+              <small>Movement</small>
+              <strong style="color:#35d69a">Illustrative</strong>
             </div>
+          </div>
 
+          <div class="floating-note">
+            <span style="color:#9bb1c9">Practice balance</span>
+            <strong>$10,000 virtual</strong>
+          </div>
         </div>
-
+      </div>
     </section>
 
-
-    <!-- MARKETS -->
-
-    <section id="markets" class="section">
-
+    <section class="section" id="markets">
+      <div class="container">
         <div class="section-heading">
-
-            <span class="section-label">MARKETS</span>
-
-            <h2>
-                Explore KMF markets
-            </h2>
-
-            <p>
-                Monitor different volatility levels from one trading terminal.
-            </p>
-
+          <div class="eyebrow">Explore the platform</div>
+          <h2>Discover different <span class="gradient-text">markets</span></h2>
+          <p>Explore different simulated volatility levels and practise analysing market movements.</p>
         </div>
 
+        <div class="markets-grid">
+          <article class="market-card">
+            <div class="market-icon">⌁</div>
+            <h3>KMF 15</h3>
+            <p>Lower simulated volatility for practising basic market observation.</p>
+            <span class="risk">LOW</span>
+          </article>
 
-        <div class="market-grid">
+          <article class="market-card">
+            <div class="market-icon">⌁</div>
+            <h3>KMF 25</h3>
+            <p>A moderate simulated market environment for learning consistency.</p>
+            <span class="risk">MODERATE</span>
+          </article>
 
-            <div class="market-card">
-                <div class="market-top">
-                    <strong>KMF10</strong>
-                    <span>Low</span>
-                </div>
-                <h3>10,021.42</h3>
-                <p class="green">+0.18%</p>
-            </div>
+          <article class="market-card">
+            <div class="market-icon">⌁</div>
+            <h3>KMF 50</h3>
+            <p>Explore a medium-volatility simulated price environment.</p>
+            <span class="risk">MEDIUM</span>
+          </article>
 
-
-            <div class="market-card">
-                <div class="market-top">
-                    <strong>KMF25</strong>
-                    <span>Moderate</span>
-                </div>
-                <h3>10,184.67</h3>
-                <p class="green">+0.31%</p>
-            </div>
-
-
-            <div class="market-card">
-                <div class="market-top">
-                    <strong>KMF50</strong>
-                    <span>Medium</span>
-                </div>
-                <h3>10,352.81</h3>
-                <p class="red">-0.14%</p>
-            </div>
-
-
-            <div class="market-card">
-                <div class="market-top">
-                    <strong>KMF100</strong>
-                    <span>High</span>
-                </div>
-                <h3>10,482.37</h3>
-                <p class="green">+0.42%</p>
-            </div>
-
+          <article class="market-card">
+            <div class="market-icon">⌁</div>
+            <h3>KMF 100</h3>
+            <p>Practise analysing larger simulated price movements.</p>
+            <span class="risk">VERY HIGH</span>
+          </article>
         </div>
-
+      </div>
     </section>
 
-
-    <!-- FEATURES -->
-
-    <section id="features" class="section dark-section">
-
+    <section class="section features" id="features">
+      <div class="container">
         <div class="section-heading">
-
-            <span class="section-label">FEATURES</span>
-
-            <h2>
-                Everything in one platform
-            </h2>
-
+          <div class="eyebrow">Platform tools</div>
+          <h2>Everything you need to <span class="gradient-text">learn</span></h2>
+          <p>Explore educational tools designed to help you understand simulated markets and trading concepts.</p>
         </div>
-
 
         <div class="features-grid">
+          <article class="feature-card">
+            <div class="feature-icon">⌁</div>
+            <h3>Market charts</h3>
+            <p>Observe simulated price movements and learn how to read market charts.</p>
+          </article>
 
-            <div class="feature">
-                <div class="feature-icon">◈</div>
-                <h3>Live Market Engine</h3>
-                <p>
-                    Follow continuously generated KMF market prices
-                    and tick movements.
-                </p>
-            </div>
+          <article class="feature-card">
+            <div class="feature-icon">▥</div>
+            <h3>Market statistics</h3>
+            <p>Explore market information and practise interpreting available statistics.</p>
+          </article>
 
+          <article class="feature-card">
+            <div class="feature-icon">◷</div>
+            <h3>Flexible expiries</h3>
+            <p>Learn how different simulated time periods affect trading decisions.</p>
+          </article>
 
-            <div class="feature">
-                <div class="feature-icon">◫</div>
-                <h3>Candlestick Charts</h3>
-                <p>
-                    Analyse price movement using candles, line charts
-                    and tick charts.
-                </p>
-            </div>
+          <article class="feature-card">
+            <div class="feature-icon">✧</div>
+            <h3>AI analysis tools</h3>
+            <p>Explore analytical assistance as an educational tool, not a guarantee of outcomes.</p>
+          </article>
 
+          <article class="feature-card">
+            <div class="feature-icon">⌘</div>
+            <h3>Practice automation</h3>
+            <p>Explore automated demo strategies and understand how trading rules work.</p>
+          </article>
 
-            <div class="feature">
-                <div class="feature-icon">◉</div>
-                <h3>Market Statistics</h3>
-                <p>
-                    View Odd/Even and digit-frequency statistics
-                    from recent market data.
-                </p>
-            </div>
-
-
-            <div class="feature">
-                <div class="feature-icon">⚡</div>
-                <h3>Fast Execution</h3>
-                <p>
-                    Designed for quick trade placement and expiry
-                    processing.
-                </p>
-            </div>
-
-
-            <div class="feature">
-                <div class="feature-icon">AI</div>
-                <h3>AI Analysis</h3>
-                <p>
-                    Analyse observed market behaviour and statistics
-                    with intelligent tools.
-                </p>
-            </div>
-
-
-            <div class="feature">
-                <div class="feature-icon">↻</div>
-                <h3>Automation</h3>
-                <p>
-                    Build automated trading rules for the demo environment.
-                </p>
-            </div>
-
+          <article class="feature-card">
+            <div class="feature-icon">▣</div>
+            <h3>Demo wallet</h3>
+            <p>Practise with virtual funds without depositing real money.</p>
+          </article>
         </div>
-
+      </div>
     </section>
 
-
-    <!-- HOW IT WORKS -->
-
-    <section id="how" class="section">
-
+    <section class="section" id="how-it-works">
+      <div class="container">
         <div class="section-heading">
-
-            <span class="section-label">HOW IT WORKS</span>
-
-            <h2>
-                Start in three steps
-            </h2>
-
+          <div class="eyebrow">Getting started</div>
+          <h2>Start learning in <span class="gradient-text">three steps</span></h2>
+          <p>Getting started with the KMFBinary educational environment is simple.</p>
         </div>
-
 
         <div class="steps">
+          <article class="step">
+            <div class="step-number">01</div>
+            <h3>Create an account</h3>
+            <p>Register to access the platform's educational features.</p>
+          </article>
 
-            <div class="step">
-                <span>01</span>
-                <h3>Create your account</h3>
-                <p>
-                    Register and access your KMFBinary dashboard.
-                </p>
-            </div>
+          <article class="step">
+            <div class="step-number">02</div>
+            <h3>Explore a market</h3>
+            <p>Choose a simulated market and observe its price movements.</p>
+          </article>
 
+          <article class="step">
+            <div class="step-number">03</div>
+            <h3>Practise with demo funds</h3>
+            <p>Test your understanding using virtual funds in the demo environment.</p>
+          </article>
+        </div>
+      </div>
+    </section>
 
-            <div class="step">
-                <span>02</span>
-                <h3>Choose a market</h3>
-                <p>
-                    Select a KMF market and analyse its movement.
-                </p>
-            </div>
+    <section class="section">
+      <div class="container">
+        <div class="demo-banner">
+          <div>
+            <div class="eyebrow">Virtual practice environment</div>
+            <h2>Your learning starts here.</h2>
+            <p>
+              Explore the platform, practise analysing simulated markets and
+              develop your understanding without using real money.
+            </p>
+            <div class="demo-amount">$10,000 virtual demo balance</div>
+          </div>
 
+          <a href="register.html" class="btn btn-primary">Create your account →</a>
+        </div>
+      </div>
+    </section>
+  </main>
 
-            <div class="step">
-                <span>03</span>
-                <h3>Place a demo trade</h3>
-                <p>
-                    Select your contract, expiry and stake before
-                    placing the trade.
-                </p>
-            </div>
-
+  <footer>
+    <div class="container">
+      <div class="footer-main">
+        <div>
+          <a class="brand" href="index.html">
+            <span class="brand-icon">K</span>
+            <span>KMF<span>Binary</span></span>
+          </a>
+          <p class="footer-description">
+            An educational platform for exploring simulated markets and practising
+            trading concepts with virtual funds.
+          </p>
         </div>
 
-    </section>
+        <div class="footer-links">
+          <a href="index.html">Home</a>
+          <a href="#markets">Markets</a>
+          <a href="#features">Features</a>
+          <a href="#how-it-works">How it works</a>
+          <a href="login.html">Sign in</a>
+        </div>
+      </div>
 
-
-    <!-- CTA -->
-
-    <section class="cta">
-
-        <h2>
-            Ready to explore KMFBinary?
-        </h2>
-
-        <p>
-            Start with virtual funds and learn how the platform works.
-        </p>
-
-        <a href="register.html" class="btn btn-primary btn-large">
-            Create Free Account
-        </a>
-
-    </section>
-
-</main>
-
-
-<footer>
-
-    <div class="logo">
-        <span>KMF</span>Binary
+      <div class="copyright">
+        © <span id="year"></span> KMFBinary. Educational demonstration platform.
+      </div>
     </div>
 
-    <p>
-        © 2026 KMFBinary. Demo platform.
-    </p>
+    <div class="disclaimer">
+      <div class="container">
+        <strong>Important educational-use warning</strong>
+        KMFBinary is an unlicensed educational test website developed by a learning
+        developer. It is not licensed or authorised to provide real-money trading
+        or investment services. Do not deposit or trade real money on this website.
+        Use virtual demo funds only. The developer cannot guarantee results or
+        accept responsibility for financial losses arising from use of this test
+        platform.
+      </div>
+    </div>
+  </footer>
 
-</footer>
+  <script>
+    const menuToggle = document.getElementById("menuToggle");
+    const navLinks = document.getElementById("navLinks");
 
+    menuToggle.addEventListener("click", () => {
+      const isOpen = navLinks.classList.toggle("open");
+      menuToggle.setAttribute("aria-expanded", String(isOpen));
+      menuToggle.textContent = isOpen ? "×" : "☰";
+    });
 
-<script src="js/app.js"></script>
+    navLinks.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", () => {
+        navLinks.classList.remove("open");
+        menuToggle.setAttribute("aria-expanded", "false");
+        menuToggle.textContent = "☰";
+      });
+    });
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 
 </body>
 </html>

@@ -1,1481 +1,2149 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Identity Verification - KMFBinary</title>
+    <meta name="theme-color" content="#07111f">
+    <title>Identity Verification | KMFBinary</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/api.js"></script>
 
     <style>
-        * {
-            box-sizing: border-box;
+        :root {
+            --bg: #07111f;
+            --sidebar: #0b1728;
+            --panel: #101f34;
+            --border: #22344c;
+            --text: #f4f7fb;
+            --muted: #91a3bb;
+            --blue: #3b82f6;
+            --green: #22c55e;
+            --red: #ef4444;
+            --radius: 15px;
         }
+
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
+            background: var(--bg);
+            color: var(--text);
             font-family: Arial, Helvetica, sans-serif;
-            background: #0f172a;
-            color: #e5e7eb;
         }
 
-        .page {
-            min-height: 100vh;
-        }
+        button, input, select, textarea { font: inherit; }
+        a { color: inherit; text-decoration: none; }
+        button { -webkit-tap-highlight-color: transparent; }
 
-        .topbar {
-            height: 70px;
-            background: #111827;
-            border-bottom: 1px solid #263244;
+        .app { min-height: 100vh; display: flex; }
+
+        .sidebar {
+            width: 245px;
+            flex-shrink: 0;
+            background: var(--sidebar);
+            border-right: 1px solid var(--border);
+            padding: 24px 15px;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 28px;
-            position: sticky;
-            top: 0;
-            z-index: 20;
+            flex-direction: column;
         }
 
         .brand {
-            font-size: 21px;
-            font-weight: 800;
-            color: #22c55e;
+            font-size: 23px;
+            font-weight: 900;
+            padding: 0 12px 28px;
         }
 
-        .brand span {
-            color: #f8fafc;
+        .brand span { color: var(--green); }
+
+        .user-summary {
+            padding: 14px;
+            background: #101f34;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 24px;
+            overflow-wrap: anywhere;
         }
 
-        .back-btn {
-            border: 1px solid #334155;
-            background: #1e293b;
-            color: #e5e7eb;
-            padding: 10px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .back-btn:hover {
-            background: #263449;
-        }
-
-        .container {
-            width: min(900px, calc(100% - 30px));
-            margin: 35px auto 60px;
-        }
-
-        .header-card {
-            background: #111827;
-            border: 1px solid #263244;
-            border-radius: 14px;
-            padding: 28px;
-            margin-bottom: 20px;
-        }
-
-        .header-card h1 {
-            margin: 0 0 10px;
-            font-size: 27px;
-            color: #f8fafc;
-        }
-
-        .header-card p {
-            margin: 0;
-            color: #94a3b8;
-            line-height: 1.6;
-        }
-
-        .security-note {
-            margin-top: 18px;
-            padding: 14px 16px;
-            border-radius: 9px;
-            background: rgba(34, 197, 94, 0.08);
-            border: 1px solid rgba(34, 197, 94, 0.25);
-            color: #bbf7d0;
-            line-height: 1.5;
-            font-size: 14px;
-        }
-
-        .card {
-            background: #111827;
-            border: 1px solid #263244;
-            border-radius: 14px;
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-
-        .card h2 {
-            margin: 0 0 20px;
-            font-size: 19px;
-            color: #f8fafc;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 18px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 7px;
-        }
-
-        .form-group.full {
-            grid-column: 1 / -1;
-        }
-
-        label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #cbd5e1;
-        }
-
-        input,
-        select,
-        textarea {
-            width: 100%;
-            border: 1px solid #334155;
-            background: #0f172a;
-            color: #f8fafc;
-            border-radius: 8px;
-            padding: 12px 13px;
-            font-size: 14px;
-            outline: none;
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-            border-color: #22c55e;
-        }
-
-        textarea {
-            min-height: 95px;
-            resize: vertical;
-        }
-
-        input[type="file"] {
-            padding: 10px;
-        }
-
-        .help-text {
-            color: #64748b;
-            font-size: 12px;
-            line-height: 1.4;
-        }
-
-        .document-box {
-            border: 1px dashed #475569;
-            border-radius: 10px;
-            padding: 16px;
-            background: #0f172a;
-        }
-
-        .document-box label {
+        .user-summary small {
             display: block;
-            margin-bottom: 10px;
+            color: var(--muted);
+            margin-bottom: 7px;
         }
 
-        .required {
-            color: #ef4444;
+        .user-summary strong { font-size: 13px; }
+
+        .menu-title {
+            color: #71849e;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            padding: 0 12px 10px;
         }
 
-        .optional {
-            color: #64748b;
-            font-weight: normal;
-        }
-
-        .declaration {
+        .nav-link {
             display: flex;
-            align-items: flex-start;
-            gap: 10px;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 9px;
+            color: #a9b8cc;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: white;
+            background: #172b45;
+        }
+
+        .nav-link.active { border: 1px solid #294568; }
+        .nav-icon { width: 22px; text-align: center; }
+
+        .sidebar-bottom { margin-top: auto; padding-top: 25px; }
+
+        .account-status {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 13px;
+            margin-bottom: 12px;
+        }
+
+        .account-status strong {
+            display: block;
+            font-size: 11px;
+            color: var(--green);
+        }
+
+        .account-status span {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
             margin-top: 5px;
         }
 
-        .declaration input {
-            width: 18px;
-            height: 18px;
-            margin-top: 2px;
-            flex-shrink: 0;
-            accent-color: #22c55e;
-        }
-
-        .declaration label {
-            font-weight: normal;
-            line-height: 1.5;
+        .logout {
+            width: 100%;
+            border: 1px solid #56303a;
+            background: #281923;
+            color: #fca5a5;
+            padding: 11px;
+            border-radius: 9px;
             cursor: pointer;
         }
 
-        .submit-area {
-            margin-top: 24px;
-            display: flex;
-            justify-content: flex-end;
-        }
+        .main { min-width: 0; flex: 1; }
 
-        .submit-btn {
-            border: 0;
-            background: #22c55e;
-            color: #052e16;
-            padding: 13px 25px;
-            border-radius: 9px;
-            font-size: 15px;
-            font-weight: 800;
-            cursor: pointer;
-            min-width: 190px;
-        }
-
-        .submit-btn:hover {
-            background: #16a34a;
-        }
-
-        .submit-btn:disabled {
-            opacity: 0.55;
-            cursor: not-allowed;
-        }
-
-        .message {
-            display: none;
-            padding: 14px 16px;
-            border-radius: 9px;
-            margin-bottom: 20px;
-            line-height: 1.5;
-            font-size: 14px;
-        }
-
-        .message.success {
-            display: block;
-            background: rgba(34, 197, 94, 0.10);
-            border: 1px solid rgba(34, 197, 94, 0.35);
-            color: #bbf7d0;
-        }
-
-        .message.error {
-            display: block;
-            background: rgba(239, 68, 68, 0.10);
-            border: 1px solid rgba(239, 68, 68, 0.35);
-            color: #fecaca;
-        }
-
-        .message.info {
-            display: block;
-            background: rgba(59, 130, 246, 0.10);
-            border: 1px solid rgba(59, 130, 246, 0.35);
-            color: #bfdbfe;
-        }
-
-        .status-card {
-            text-align: center;
-            padding: 45px 25px;
-        }
-
-        .status-icon {
-            width: 65px;
-            height: 65px;
-            border-radius: 50%;
-            margin: 0 auto 18px;
+        .topbar {
+            min-height: 70px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 28px;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 16px 28px;
+            background: var(--sidebar);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .topbar h1 { font-size: 20px; margin: 0; }
+
+        .topbar-email {
+            color: var(--muted);
+            font-size: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .content {
+            max-width: 1050px;
+            padding: 28px;
+            margin: auto;
+        }
+
+        .welcome { margin-bottom: 24px; }
+
+        .eyebrow {
+            color: #60a5fa;
+            text-transform: uppercase;
+            font-size: 10px;
             font-weight: 800;
-        }
-
-        .status-icon.success {
-            background: rgba(34, 197, 94, 0.12);
-            color: #22c55e;
-        }
-
-        .status-icon.pending {
-            background: rgba(234, 179, 8, 0.12);
-            color: #eab308;
-        }
-
-        .status-icon.error {
-            background: rgba(239, 68, 68, 0.12);
-            color: #ef4444;
-        }
-
-        .status-card h2 {
+            letter-spacing: 1.5px;
             margin-bottom: 10px;
         }
 
-        .status-card p {
-            color: #94a3b8;
-            line-height: 1.6;
-            max-width: 600px;
-            margin: 0 auto;
+        .welcome h2 { font-size: 27px; margin: 0 0 9px; }
+
+        .welcome p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.8;
+            max-width: 680px;
         }
 
-        .status-badge {
-            display: inline-block;
-            margin-bottom: 15px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            background: #1e293b;
-            color: #cbd5e1;
+        .panel {
+            background: var(--sidebar);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 18px;
+        }
+
+        .panel h3 { font-size: 17px; margin: 0 0 8px; }
+
+        .panel-description {
+            color: var(--muted);
             font-size: 12px;
+            line-height: 1.8;
+            margin: 0 0 22px;
+        }
+
+        .notice {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            border: 1px solid #284866;
+            background: #10243a;
+            color: #bfdbfe;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 12px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .notice-icon { font-size: 20px; }
+
+        .status {
+            display: inline-block;
+            padding: 7px 11px;
+            border-radius: 20px;
+            background: #172b45;
+            color: #bfdbfe;
+            font-size: 10px;
             font-weight: 800;
             text-transform: uppercase;
         }
 
-        .rejection {
-            margin: 20px auto 0;
-            max-width: 600px;
-            padding: 13px 15px;
-            background: rgba(239, 68, 68, 0.08);
-            border: 1px solid rgba(239, 68, 68, 0.25);
+        .status.approved { background: #103b25; color: #86efac; }
+        .status.pending { background: #453514; color: #fde68a; }
+        .status.rejected { background: #481f28; color: #fca5a5; }
+        .status.error { background: #481f28; color: #fca5a5; }
+
+        /* Progress tracker */
+
+        .progress-panel {
+            padding: 22px 24px;
+            background: #0b1728;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 18px;
+        }
+
+        .progress-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .progress-heading strong { font-size: 13px; }
+        .progress-heading span { color: var(--muted); font-size: 11px; }
+
+        .progress-track {
+            height: 5px;
+            background: #24364d;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 22px;
+        }
+
+        .progress-fill {
+            width: 25%;
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #22c55e);
+            border-radius: inherit;
+            transition: width .25s ease;
+        }
+
+        .step-list {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-width: 0;
+            color: #71849e;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            border: 1px solid #34465e;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .step-label { min-width: 0; }
+
+        .step-label strong {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .step-label small {
+            display: block;
+            font-size: 10px;
+            margin-top: 4px;
+            color: #71849e;
+        }
+
+        .step-item.active { color: white; }
+
+        .step-item.active .step-number {
+            background: var(--blue);
+            border-color: var(--blue);
+            color: white;
+            box-shadow: 0 0 0 4px #3b82f61c;
+        }
+
+        .step-item.completed .step-number {
+            background: #103b25;
+            border-color: #166534;
+            color: #86efac;
+        }
+
+        .step-item.completed { color: #c4d2e4; }
+
+        /* Form */
+
+        .step-panel { display: none; }
+        .step-panel.active { display: block; animation: fadeIn .2s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: .5; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-title-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 13px;
+            margin-bottom: 22px;
+        }
+
+        .step-icon {
+            display: grid;
+            place-items: center;
+            width: 42px;
+            height: 42px;
+            flex-shrink: 0;
+            border-radius: 12px;
+            background: #172f50;
+            border: 1px solid #294568;
+            font-size: 19px;
+        }
+
+        .step-title-row h3 { margin: 0 0 7px; }
+
+        .step-title-row p {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0 16px;
+        }
+
+        .field { margin-bottom: 18px; min-width: 0; }
+        .field.full-width { grid-column: 1 / -1; }
+
+        .field label {
+            display: block;
+            color: #c0cddd;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .required-mark { color: #60a5fa; }
+
+        .input {
+            width: 100%;
+            min-height: 45px;
+            padding: 12px;
+            background: #07111f;
+            border: 1px solid #2a3c55;
+            border-radius: 9px;
+            color: white;
+            outline: none;
+            transition: border-color .15s, box-shadow .15s;
+        }
+
+        .input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px #3b82f61a;
+        }
+
+        .input::placeholder { color: #62748b; }
+
+        textarea.input { resize: vertical; min-height: 95px; }
+
+        input[type="file"].input {
+            min-height: 46px;
+            padding: 8px;
+            max-width: 100%;
+        }
+
+        input[type="file"]::file-selector-button {
+            background: #172b45;
+            color: white;
+            border: 1px solid #304763;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .help-text {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.7;
+            margin-top: 8px;
+        }
+
+        .document-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 15px;
+        }
+
+        .document-card {
+            min-width: 0;
+            padding: 17px;
+            border: 1px solid var(--border);
+            background: #0d1b2e;
+            border-radius: 12px;
+        }
+
+        .document-card h4 { font-size: 13px; margin: 0 0 7px; }
+
+        .document-card p {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.7;
+            margin: 0 0 15px;
+        }
+
+        .document-card .field { margin-bottom: 0; }
+
+        .file-state {
+            display: block;
+            color: #91a3bb;
+            font-size: 11px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+            margin-top: 10px;
+        }
+
+        .file-state.selected { color: #86efac; }
+
+        .checkbox-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 11px;
+            color: #c0cddd;
+            font-size: 12px;
+            line-height: 1.8;
+            margin: 22px 0;
+        }
+
+        .checkbox-row input {
+            margin-top: 5px;
+            accent-color: var(--blue);
+            flex-shrink: 0;
+        }
+
+        .review-box {
+            padding: 18px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #0d1b2e;
+            margin: 18px 0;
+        }
+
+        .review-box h4 { font-size: 13px; margin: 0 0 15px; }
+
+        .review-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 17px;
+        }
+
+        .review-item { min-width: 0; }
+
+        .review-item small {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+            margin-bottom: 6px;
+        }
+
+        .review-item strong {
+            display: block;
+            font-size: 12px;
+            line-height: 1.7;
+            overflow-wrap: anywhere;
+            font-weight: 600;
+        }
+
+        .review-document-list { display: grid; gap: 10px; }
+
+        .review-document {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 1px solid #263950;
+            background: #091625;
+            border-radius: 9px;
+            min-width: 0;
+        }
+
+        .review-document-icon {
+            width: 35px;
+            height: 35px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            background: #172b45;
+            border-radius: 9px;
+        }
+
+        .review-document-info { min-width: 0; flex: 1; }
+
+        .review-document-info strong {
+            display: block;
+            font-size: 11px;
+            overflow-wrap: anywhere;
+        }
+
+        .review-document-info small {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+            margin-top: 5px;
+        }
+
+        .review-check {
+            color: #86efac;
+            font-size: 17px;
+            flex-shrink: 0;
+        }
+
+        .notice.warning {
+            background: #302613;
+            border-color: #5d4821;
+            color: #fde68a;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 44px;
+            border: 1px solid transparent;
+            border-radius: 9px;
+            padding: 11px 17px;
+            background: var(--blue);
+            color: white;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background .15s, transform .15s;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #172b45;
+            border-color: #304763;
+        }
+
+        .btn-secondary:hover:not(:disabled) { background: #203b5d; }
+
+        .btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+        .button-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            border-top: 1px solid var(--border);
+            margin-top: 24px;
+            padding-top: 20px;
+        }
+
+        .button-group { display: flex; flex-wrap: wrap; gap: 10px; }
+
+        .step-hint {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .message {
+            display: none;
+            margin-top: 14px;
+            padding: 12px;
+            border-radius: 9px;
+            font-size: 12px;
+            line-height: 1.8;
+            overflow-wrap: anywhere;
+        }
+
+        .message.show { display: block; }
+        .message.info { background: #122943; color: #bfdbfe; }
+        .message.success { background: #103b25; color: #86efac; }
+        .message.error { background: #481f28; color: #fca5a5; }
+
+        .status-card {
+            background: #0d1b2e;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            margin: 16px 0;
+        }
+
+        .status-card p {
+            color: #b5c2d3;
+            font-size: 12px;
+            line-height: 1.8;
+            overflow-wrap: anywhere;
+        }
+
+        .success-mark {
+            display: grid;
+            place-items: center;
+            width: 66px;
+            height: 66px;
+            border-radius: 50%;
+            background: #103b25;
+            border: 1px solid #166534;
+            color: #86efac;
+            font-size: 29px;
+            margin-bottom: 20px;
+        }
+
+        .success-step { max-width: 600px; }
+
+        .mobile-menu {
+            display: none;
+            background: #172b45;
+            color: white;
+            border: 1px solid var(--border);
             border-radius: 8px;
-            color: #fecaca;
-            text-align: left;
+            padding: 9px 11px;
+            cursor: pointer;
         }
 
-        .hidden {
-            display: none !important;
-        }
+        @media (max-width: 950px) {
+            .sidebar {
+                position: fixed;
+                z-index: 50;
+                inset: 0 auto 0 0;
+                transform: translateX(-100%);
+                transition: transform .2s ease;
+                overflow-y: auto;
+            }
 
-        .loading {
-            text-align: center;
-            padding: 60px 20px;
-            color: #94a3b8;
+            .sidebar.open { transform: translateX(0); }
+            .mobile-menu { display: inline-block; }
+            .topbar { padding: 14px 18px; }
+            .content { padding: 18px; }
         }
 
         @media (max-width: 700px) {
-            .topbar {
-                padding: 0 15px;
-            }
+            .step-list { gap: 5px; }
+            .step-item { flex-direction: column; align-items: flex-start; gap: 7px; }
+            .step-label small { display: none; }
+            .step-label strong { font-size: 10px; }
+            .step-number { width: 29px; height: 29px; }
+            .progress-panel { padding: 18px; }
+            .document-grid { grid-template-columns: 1fr; }
+        }
 
-            .container {
-                width: min(100% - 20px, 900px);
-                margin-top: 20px;
-            }
+        @media (max-width: 600px) {
+            .content { padding: 13px; }
+            .panel { padding: 17px; }
+            .welcome h2 { font-size: 23px; }
+            .topbar-email { max-width: 145px; text-align: right; }
+            .form-grid, .review-grid { grid-template-columns: 1fr; }
+            .field.full-width { grid-column: auto; }
+            .button-row { align-items: stretch; }
+            .button-row > .button-group { width: 100%; }
+            .button-group .btn { flex: 1; }
+            .button-row > .btn { width: 100%; }
+            .step-hint { width: 100%; }
+        }
 
-            .header-card,
-            .card {
-                padding: 20px;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .form-group.full {
-                grid-column: auto;
-            }
-
-            .submit-area {
-                justify-content: stretch;
-            }
-
-            .submit-btn {
-                width: 100%;
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: .01ms !important;
+                transition-duration: .01ms !important;
+                scroll-behavior: auto !important;
             }
         }
     </style>
 </head>
 
 <body>
+<div class="app">
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">KMF<span>Binary</span></div>
 
-<div class="page">
-
-    <header class="topbar">
-        <div class="brand">
-            KMF<span>Binary</span>
+        <div class="user-summary">
+            <small>Signed in as</small>
+            <strong id="sidebarEmail">Checking session...</strong>
         </div>
 
-        <button
-            type="button"
-            class="back-btn"
-            onclick="window.location.href='wallet.html'"
-        >
-            ← Back to Wallet
-        </button>
-    </header>
+        <div class="menu-title">WORKSPACE</div>
 
-    <main class="container">
+        <a class="nav-link" href="dashboard.html"><span class="nav-icon">⌂</span>Dashboard</a>
+        <a class="nav-link" href="markets.html"><span class="nav-icon">◈</span>Markets</a>
+        <a class="nav-link" href="trade.html"><span class="nav-icon">↗</span>Trade</a>
+        <a class="nav-link" href="history.html"><span class="nav-icon">◷</span>Trade History</a>
+        <a class="nav-link" href="wallet.html"><span class="nav-icon">▣</span>Wallet</a>
+        <a class="nav-link" href="profile.html"><span class="nav-icon">♙</span>My Profile</a>
+        <a class="nav-link" href="ai.html"><span class="nav-icon">✧</span>AI Analysis</a>
+        <a class="nav-link" href="automation.html"><span class="nav-icon">⚡</span>Automation</a>
 
-        <div id="loadingState" class="card loading">
-            Checking verification status...
+        <div class="menu-title" style="margin-top:20px">ACCOUNT</div>
+
+        <a class="nav-link active" href="verification.html" aria-current="page">
+            <span class="nav-icon">✓</span>Identity Verification
+        </a>
+        <a class="nav-link" href="index.html"><span class="nav-icon">↩</span>Exit</a>
+
+        <div class="sidebar-bottom">
+            <div class="account-status">
+                <strong id="sidebarAccount">DEMO ACCOUNT</strong>
+                <span id="sidebarAccountDescription">Virtual funds</span>
+            </div>
+            <button class="logout" id="logoutButton" type="button">↩ Logout</button>
         </div>
+    </aside>
 
-        <div id="pageContent" class="hidden">
-
-            <section class="header-card">
+    <main class="main">
+        <header class="topbar">
+            <div style="display:flex;align-items:center;gap:12px">
+                <button class="mobile-menu" id="mobileMenu" type="button"
+                    aria-label="Open navigation">☰</button>
                 <h1>Identity Verification</h1>
+            </div>
+            <div class="topbar-email" id="userEmail">Checking login...</div>
+        </header>
 
+        <div class="content">
+            <section class="welcome">
+                <div class="eyebrow">Account security</div>
+                <h2>Let's verify your identity</h2>
                 <p>
-                    Complete your identity verification before withdrawing
-                    funds from your KMFBinary account.
+                    Follow the steps below to complete your verification.
+                    You can review your details before submitting them to KMFBinary.
+                </p>
+            </section>
+
+            <div class="notice">
+                <div class="notice-icon">🔒</div>
+                <div>
+                    <strong>Your information matters</strong><br>
+                    Upload only the requested documents. Your files are sent to the
+                    authenticated KMFBinary backend for private processing.
+                    Never upload your password, PIN, or unrelated financial documents.
+                </div>
+            </div>
+
+            <section class="panel">
+                <h3>Verification status</h3>
+                <p class="panel-description">
+                    Track the latest status of your identity verification here.
                 </p>
 
-                <div class="security-note">
-                    Your information is used to verify your identity and
-                    protect your account. Please provide accurate information
-                    matching your official documents.
+                <span class="status" id="kycStatus">Checking</span>
+
+                <div class="status-card">
+                    <p id="statusDescription">Checking your verification record...</p>
+                    <p id="rejectionReason" hidden></p>
+                    <p id="submittedAt" hidden></p>
                 </div>
-            </section>
 
-            <div id="pageMessage" class="message"></div>
-
-            <section id="statusCard" class="card status-card hidden">
-
-                <div id="statusIcon" class="status-icon"></div>
-
-                <div id="statusBadge" class="status-badge"></div>
-
-                <h2 id="statusTitle"></h2>
-
-                <p id="statusText"></p>
-
-                <div id="rejectionReason" class="rejection hidden"></div>
-
-                <div style="margin-top:25px;">
-                    <button
-                        type="button"
-                        class="back-btn"
-                        onclick="window.location.href='wallet.html'"
-                    >
-                        Return to Wallet
+                <div class="button-group">
+                    <button class="btn btn-secondary" id="refreshStatusButton" type="button">
+                        ↻ Refresh status
                     </button>
+                    <a class="btn btn-secondary" href="profile.html">Back to profile</a>
                 </div>
 
+                <div class="message" id="statusMessage" role="status"></div>
             </section>
 
-            <form id="verificationForm" class="hidden">
+            <section class="progress-panel" id="wizardProgressPanel">
+                <div class="progress-heading">
+                    <strong>Your verification journey</strong>
+                    <span id="progressCount">Step 1 of 4</span>
+                </div>
 
-                <section class="card">
+                <div class="progress-track" aria-label="Verification progress">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
 
-                    <h2>Personal Information</h2>
-
-                    <div class="form-grid">
-
-                        <div class="form-group full">
-                            <label for="fullLegalName">
-                                Full Legal Name
-                                <span class="required">*</span>
-                            </label>
-
-                            <input
-                                type="text"
-                                id="fullLegalName"
-                                name="full_legal_name"
-                                autocomplete="name"
-                                required
-                            >
+                <div class="step-list" aria-label="Verification steps">
+                    <div class="step-item active" data-step-indicator="0">
+                        <div class="step-number">1</div>
+                        <div class="step-label">
+                            <strong>Personal details</strong>
+                            <small>Your information</small>
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <label for="dateOfBirth">
-                                Date of Birth
-                                <span class="required">*</span>
-                            </label>
-
-                            <input
-                                type="date"
-                                id="dateOfBirth"
-                                name="date_of_birth"
-                                required
-                            >
+                    <div class="step-item" data-step-indicator="1">
+                        <div class="step-number">2</div>
+                        <div class="step-label">
+                            <strong>Documents</strong>
+                            <small>Upload files</small>
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <label for="countryOfResidence">
-                                Country of Residence
-                                <span class="required">*</span>
-                            </label>
-
-                            <select
-                                id="countryOfResidence"
-                                name="country_of_residence"
-                                required
-                            >
-                                <option value="">Select country</option>
-                                <option value="Kenya">Kenya</option>
-                                <option value="Uganda">Uganda</option>
-                                <option value="Tanzania">Tanzania</option>
-                                <option value="Rwanda">Rwanda</option>
-                                <option value="Nigeria">Nigeria</option>
-                                <option value="Ghana">Ghana</option>
-                                <option value="South Africa">South Africa</option>
-                                <option value="United States">United States</option>
-                                <option value="United Kingdom">United Kingdom</option>
-                                <option value="Other">Other</option>
-                            </select>
+                    <div class="step-item" data-step-indicator="2">
+                        <div class="step-number">3</div>
+                        <div class="step-label">
+                            <strong>Review</strong>
+                            <small>Check details</small>
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <label for="phoneNumber">
-                                Phone Number
-                                <span class="required">*</span>
-                            </label>
+                    <div class="step-item" data-step-indicator="3">
+                        <div class="step-number">4</div>
+                        <div class="step-label">
+                            <strong>Complete</strong>
+                            <small>Track status</small>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-                            <input
-                                type="tel"
-                                id="phoneNumber"
-                                name="phone_number"
-                                placeholder="2547XXXXXXXX"
-                                required
-                            >
+            <section class="panel" id="submissionPanel">
+                <form id="verificationForm" enctype="multipart/form-data" novalidate>
 
-                            <div class="help-text">
-                                Use your active phone number.
+                    <!-- STEP 1: PERSONAL DETAILS -->
+                    <section class="step-panel active" data-step="0">
+                        <div class="step-title-row">
+                            <div class="step-icon">♙</div>
+                            <div>
+                                <h3>Personal details</h3>
+                                <p>
+                                    Enter your legal details exactly as they appear
+                                    on your official documents.
+                                </p>
                             </div>
                         </div>
 
-                        <div class="form-group full">
-                            <label for="residentialAddress">
-                                Residential Address
-                                <span class="required">*</span>
-                            </label>
-
-                            <textarea
-                                id="residentialAddress"
-                                name="residential_address"
-                                placeholder="Enter your current residential address"
-                                required
-                            ></textarea>
-                        </div>
-
-                    </div>
-
-                </section>
-
-                <section class="card">
-
-                    <h2>Government Identification</h2>
-
-                    <div class="form-grid">
-
-                        <div class="form-group">
-                            <label for="governmentIdType">
-                                ID Type
-                                <span class="required">*</span>
-                            </label>
-
-                            <select
-                                id="governmentIdType"
-                                name="government_id_type"
-                                required
-                            >
-                                <option value="">Select ID type</option>
-                                <option value="National ID">National ID</option>
-                                <option value="Passport">Passport</option>
-                                <option value="Driving Licence">Driving Licence</option>
-                                <option value="Other Government ID">Other Government ID</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="governmentIdNumber">
-                                ID Number
-                                <span class="required">*</span>
-                            </label>
-
-                            <input
-                                type="text"
-                                id="governmentIdNumber"
-                                name="government_id_number"
-                                autocomplete="off"
-                                required
-                            >
-                        </div>
-
-                    </div>
-
-                </section>
-
-                <section class="card">
-
-                    <h2>Identity Documents</h2>
-
-                    <div class="form-grid">
-
-                        <div class="form-group full">
-                            <div class="document-box">
-
-                                <label for="idFront">
-                                    ID Front
-                                    <span class="required">*</span>
+                        <div class="form-grid">
+                            <div class="field full-width">
+                                <label for="fullLegalName">
+                                    Full legal name <span class="required-mark">*</span>
                                 </label>
-
-                                <input
-                                    type="file"
-                                    id="idFront"
-                                    name="id_front"
-                                    accept="image/*,.pdf"
-                                    required
-                                >
-
+                                <input class="input" id="fullLegalName"
+                                    name="full_legal_name" type="text"
+                                    maxlength="150" autocomplete="name"
+                                    placeholder="Enter your full legal name" required>
                                 <div class="help-text">
-                                    Upload a clear image or PDF of the front
-                                    of your identification document.
+                                    Use your official name, not a nickname.
                                 </div>
+                            </div>
 
+                            <div class="field">
+                                <label for="dateOfBirth">
+                                    Date of birth <span class="required-mark">*</span>
+                                </label>
+                                <input class="input" id="dateOfBirth"
+                                    name="date_of_birth" type="date"
+                                    autocomplete="bday" required>
+                            </div>
+
+                            <div class="field">
+                                <label for="country">
+                                    Country of residence <span class="required-mark">*</span>
+                                </label>
+                                <input class="input" id="country"
+                                    name="country_of_residence" type="text"
+                                    maxlength="100" autocomplete="country-name"
+                                    placeholder="e.g. Kenya" required>
+                            </div>
+
+                            <div class="field full-width">
+                                <label for="phoneNumber">
+                                    Phone number <span class="required-mark">*</span>
+                                </label>
+                                <input class="input" id="phoneNumber"
+                                    name="phone_number" type="tel"
+                                    maxlength="30" autocomplete="tel"
+                                    placeholder="Enter your phone number" required>
+                            </div>
+
+                            <div class="field full-width">
+                                <label for="address">
+                                    Residential address <span class="required-mark">*</span>
+                                </label>
+                                <textarea class="input" id="address"
+                                    name="residential_address" maxlength="500"
+                                    autocomplete="street-address"
+                                    placeholder="Enter your current residential address"
+                                    required></textarea>
+                                <div class="help-text">
+                                    Include enough detail to identify where you live.
+                                </div>
                             </div>
                         </div>
 
-                        <div class="form-group full">
-                            <div class="document-box">
+                        <div class="button-row">
+                            <span class="step-hint">Step 1 · Personal information</span>
+                            <button class="btn" type="button" data-next>
+                                Continue to documents →
+                            </button>
+                        </div>
+                    </section>
 
-                                <label for="idBack">
-                                    ID Back
-                                    <span class="optional">
-                                        (required where applicable)
+                    <!-- STEP 2: DOCUMENTS -->
+                    <section class="step-panel" data-step="1">
+                        <div class="step-title-row">
+                            <div class="step-icon">▤</div>
+                            <div>
+                                <h3>Upload your documents</h3>
+                                <p>
+                                    Provide all four required documents. Make sure the
+                                    images are clear and the important details are readable.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="notice">
+                            <div class="notice-icon">ℹ️</div>
+                            <div>
+                                <strong>File requirements</strong><br>
+                                Maximum 5 MB per file. KRA report: PDF only.
+                                ID and proof of residence: JPEG, PNG, or WebP.
+                            </div>
+                        </div>
+
+                        <div class="document-grid">
+                            <div class="document-card">
+                                <h4>KRA report <span class="required-mark">*</span></h4>
+                                <p>Upload your official KRA report in PDF format.</p>
+                                <div class="field">
+                                    <label for="kraReport">Choose PDF file</label>
+                                    <input class="input" id="kraReport" name="kra_report"
+                                        type="file" accept=".pdf,application/pdf" required>
+                                    <div class="help-text">PDF · Maximum 5 MB</div>
+                                    <span class="file-state" id="kraReportState">
+                                        No file selected
                                     </span>
-                                </label>
-
-                                <input
-                                    type="file"
-                                    id="idBack"
-                                    name="id_back"
-                                    accept="image/*,.pdf"
-                                >
-
-                                <div class="help-text">
-                                    Upload the back of your ID if your document
-                                    has information on both sides.
                                 </div>
-
                             </div>
-                        </div>
 
-                        <div class="form-group full">
-                            <div class="document-box">
-
-                                <label for="selfie">
-                                    Selfie / Identity Photo
-                                    <span class="required">*</span>
-                                </label>
-
-                                <input
-                                    type="file"
-                                    id="selfie"
-                                    name="selfie"
-                                    accept="image/*"
-                                    required
-                                >
-
-                                <div class="help-text">
-                                    Upload a clear recent photo of yourself.
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <div class="form-group full">
-                            <div class="document-box">
-
-                                <label for="proofOfAddress">
-                                    Proof of Address
-                                    <span class="optional">
-                                        (optional)
+                            <div class="document-card">
+                                <h4>ID front <span class="required-mark">*</span></h4>
+                                <p>Upload a clear image of the front of your government ID.</p>
+                                <div class="field">
+                                    <label for="idFront">Choose front image</label>
+                                    <input class="input" id="idFront" name="id_front"
+                                        type="file"
+                                        accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                                        required>
+                                    <div class="help-text">JPEG, PNG, WebP · Maximum 5 MB</div>
+                                    <span class="file-state" id="idFrontState">
+                                        No file selected
                                     </span>
-                                </label>
-
-                                <input
-                                    type="file"
-                                    id="proofOfAddress"
-                                    name="proof_of_address"
-                                    accept="image/*,.pdf"
-                                >
-
-                                <div class="help-text">
-                                    Examples include a recent utility bill,
-                                    bank statement, or other accepted proof
-                                    of residence.
                                 </div>
+                            </div>
 
+                            <div class="document-card">
+                                <h4>ID back <span class="required-mark">*</span></h4>
+                                <p>Upload a clear image of the back of your government ID.</p>
+                                <div class="field">
+                                    <label for="idBack">Choose back image</label>
+                                    <input class="input" id="idBack" name="id_back"
+                                        type="file"
+                                        accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                                        required>
+                                    <div class="help-text">JPEG, PNG, WebP · Maximum 5 MB</div>
+                                    <span class="file-state" id="idBackState">
+                                        No file selected
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="document-card">
+                                <h4>Proof of residence <span class="required-mark">*</span></h4>
+                                <p>
+                                    Upload an accepted document showing your residential
+                                    address. Ensure the relevant details are readable.
+                                </p>
+                                <div class="field">
+                                    <label for="proofOfAddress">Choose proof document</label>
+                                    <input class="input" id="proofOfAddress"
+                                        name="proof_of_address" type="file"
+                                        accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                                        required>
+                                    <div class="help-text">JPEG, PNG, WebP · Maximum 5 MB</div>
+                                    <span class="file-state" id="proofOfAddressState">
+                                        No file selected
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
-                    </div>
+                        <div class="button-row">
+                            <button class="btn btn-secondary" type="button" data-back>
+                                ← Back
+                            </button>
+                            <button class="btn" type="button" data-next>
+                                Review information →
+                            </button>
+                        </div>
+                    </section>
 
-                </section>
+                    <!-- STEP 3: REVIEW -->
+                    <section class="step-panel" data-step="2">
+                        <div class="step-title-row">
+                            <div class="step-icon">✓</div>
+                            <div>
+                                <h3>Review your application</h3>
+                                <p>
+                                    Check the details and files below before submitting
+                                    your verification request.
+                                </p>
+                            </div>
+                        </div>
 
-                <section class="card">
+                        <div class="notice">
+                            <div class="notice-icon">🔎</div>
+                            <div>
+                                <strong>Please check carefully</strong><br>
+                                You are responsible for ensuring your information is accurate
+                                and the uploaded documents belong to you.
+                            </div>
+                        </div>
 
-                    <h2>Declaration</h2>
+                        <div class="review-box">
+                            <h4>Personal information</h4>
+                            <div class="review-grid">
+                                <div class="review-item">
+                                    <small>Full legal name</small>
+                                    <strong id="reviewName">—</strong>
+                                </div>
+                                <div class="review-item">
+                                    <small>Date of birth</small>
+                                    <strong id="reviewDob">—</strong>
+                                </div>
+                                <div class="review-item">
+                                    <small>Country of residence</small>
+                                    <strong id="reviewCountry">—</strong>
+                                </div>
+                                <div class="review-item">
+                                    <small>Phone number</small>
+                                    <strong id="reviewPhone">—</strong>
+                                </div>
+                                <div class="review-item" style="grid-column:1/-1">
+                                    <small>Residential address</small>
+                                    <strong id="reviewAddress">—</strong>
+                                </div>
+                            </div>
+                        </div>
 
-                    <div class="declaration">
+                        <div class="review-box">
+                            <h4>Documents selected</h4>
+                            <div class="review-document-list" id="reviewDocuments"></div>
+                        </div>
 
-                        <input
-                            type="checkbox"
-                            id="declarationAccepted"
-                            required
-                        >
-
-                        <label for="declarationAccepted">
-                            I confirm that the information I have provided is
-                            true, accurate, and belongs to me. I understand
-                            that KMFBinary may review the information and
-                            documents before approving withdrawals.
+                        <label class="checkbox-row" for="declaration">
+                            <input id="declaration" name="declaration_accepted"
+                                type="checkbox" value="true" required>
+                            <span>
+                                I confirm that the information provided is accurate and
+                                belongs to me, and I consent to its processing by KMFBinary
+                                for identity verification and compliance purposes.
+                            </span>
                         </label>
 
-                    </div>
+                        <div class="button-row">
+                            <button class="btn btn-secondary" type="button" data-back>
+                                ← Back and edit
+                            </button>
+                            <button class="btn" id="submitButton" type="submit" disabled>
+                                Submit for verification →
+                            </button>
+                        </div>
 
-                    <div class="submit-area">
+                        <div class="message" id="submitMessage" role="status"></div>
+                    </section>
 
-                        <button
-                            type="submit"
-                            id="submitButton"
-                            class="submit-btn"
-                        >
-                            Submit Verification
-                        </button>
+                    <!-- STEP 4: SUBMISSION TRACKER -->
+                    <section class="step-panel" data-step="3">
+                        <div class="success-step">
+                            <div class="success-mark" id="completionMark">✓</div>
+                            <div class="eyebrow">Verification tracking</div>
+                            <h3 id="completionTitle">Application submitted</h3>
+                            <p class="panel-description" id="completionDescription">
+                                Your application status is shown below.
+                            </p>
 
-                    </div>
+                            <div class="status-card">
+                                <span class="status pending" id="completionStatus">
+                                    Pending review
+                                </span>
+                                <p id="completionStatusDescription">
+                                    Your verification is awaiting review.
+                                </p>
+                                <p id="completionSubmittedAt" hidden></p>
+                            </div>
 
-                </section>
+                            <div class="notice">
+                                <div class="notice-icon">🛡️</div>
+                                <div>
+                                    <strong>What happens next?</strong><br>
+                                    KMFBinary will review your submitted information and
+                                    documents. Use Refresh status to check for updates.
+                                    If more information is needed, follow the review note
+                                    displayed above.
+                                </div>
+                            </div>
 
-            </form>
+                            <div class="button-group">
+                                <button class="btn btn-secondary" id="completionRefresh"
+                                    type="button">↻ Refresh status</button>
+                                <a class="btn btn-secondary" href="profile.html">
+                                    Back to profile
+                                </a>
+                            </div>
 
+                            <div class="message" id="completionMessage" role="status"></div>
+                        </div>
+                    </section>
+
+                </form>
+            </section>
+
+            <div class="message info show" id="pageNotice" role="status">
+                Checking your login session. Please wait.
+            </div>
         </div>
-
     </main>
-
 </div>
 
 <script>
 "use strict";
 
 /*
-    KMFBinary Identity Verification
+ * Frontend: http://localhost:5500
+ * Express API: http://localhost:3000
+ *
+ * KYC records use the existing backend and Neon PostgreSQL.
+ * KYC files are uploaded to the backend, not Supabase Storage.
+ * Existing API endpoints and multipart field names are preserved.
+ */
 
-    IMPORTANT:
-    Supabase is already initialized by js/api.js.
-    We reuse window.supabaseClient here.
-*/
+const SUPABASE_URL = "https://nugufikdivanyzmghofq.supabase.co";
+const SUPABASE_KEY = "sb_publishable_NfsjmPephsaJrRB6vLXglw_G6yTdPTl";
+const API_BASE = "http://localhost:3000";
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-const API_BASE =
-    "http://localhost:3000";
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
 
-const loadingState =
-    document.getElementById("loadingState");
+let currentSession = null;
+let currentKycStatus = "unknown";
+let statusLoadedSuccessfully = false;
+let isSubmitting = false;
+let currentStep = 0;
+let submissionCompleted = false;
 
-const pageContent =
-    document.getElementById("pageContent");
+const $ = id => document.getElementById(id);
 
-const pageMessage =
-    document.getElementById("pageMessage");
+const steps = Array.from(
+    document.querySelectorAll(".step-panel")
+);
 
-const statusCard =
-    document.getElementById("statusCard");
+const stepIndicators = Array.from(
+    document.querySelectorAll("[data-step-indicator]")
+);
 
-const verificationForm =
-    document.getElementById("verificationForm");
-
-const statusIcon =
-    document.getElementById("statusIcon");
-
-const statusBadge =
-    document.getElementById("statusBadge");
-
-const statusTitle =
-    document.getElementById("statusTitle");
-
-const statusText =
-    document.getElementById("statusText");
-
-const rejectionReason =
-    document.getElementById("rejectionReason");
-
-const submitButton =
-    document.getElementById("submitButton");
-
-
-function showPageMessage(message, type = "info") {
-
-    pageMessage.textContent = message;
-
-    pageMessage.className =
-        "message " + type;
-}
-
-
-function hidePageMessage() {
-
-    pageMessage.textContent = "";
-
-    pageMessage.className =
-        "message";
-}
-
-
-function setLoading(loading) {
-
-    if (loading) {
-
-        loadingState.classList.remove("hidden");
-
-        pageContent.classList.add("hidden");
-
-    } else {
-
-        loadingState.classList.add("hidden");
-
-        pageContent.classList.remove("hidden");
+const fileFields = [
+    {
+        id: "kraReport",
+        stateId: "kraReportState",
+        label: "KRA report",
+        allowedExtensions: ["pdf"],
+        type: "PDF"
+    },
+    {
+        id: "idFront",
+        stateId: "idFrontState",
+        label: "ID front",
+        allowedExtensions: ["jpg", "jpeg", "png", "webp"],
+        type: "JPEG, PNG, or WebP image"
+    },
+    {
+        id: "idBack",
+        stateId: "idBackState",
+        label: "ID back",
+        allowedExtensions: ["jpg", "jpeg", "png", "webp"],
+        type: "JPEG, PNG, or WebP image"
+    },
+    {
+        id: "proofOfAddress",
+        stateId: "proofOfAddressState",
+        label: "Proof of residence",
+        allowedExtensions: ["jpg", "jpeg", "png", "webp"],
+        type: "JPEG, PNG, or WebP image"
     }
+];
+
+function showMessage(id, text, type = "info") {
+    const element = $(id);
+    if (!element) return;
+
+    element.textContent = String(text || "");
+    element.className = "message show " + type;
 }
 
+function clearMessage(id) {
+    const element = $(id);
+    if (!element) return;
 
-async function getSession() {
-
-    const client =
-        window.supabaseClient;
-
-    if (!client) {
-
-        throw new Error(
-            "Authentication service is unavailable."
-        );
-    }
-
-    const {
-        data,
-        error
-    } = await client.auth.getSession();
-
-    if (error) {
-        throw error;
-    }
-
-    return data?.session || null;
+    element.textContent = "";
+    element.className = "message";
 }
 
+function setAccountMode(value) {
+    const normalized = String(value || "demo").toLowerCase();
+    const mode = ["real", "live"].includes(normalized) ? "real" : "demo";
+
+    $("sidebarAccount").textContent =
+        mode === "real" ? "LIVE ACCOUNT" : "DEMO ACCOUNT";
+
+    $("sidebarAccountDescription").textContent =
+        mode === "real" ? "Real funds" : "Virtual funds";
+}
 
 async function apiRequest(endpoint, options = {}) {
-
-    const session =
-        await getSession();
-
-    if (!session?.access_token) {
-
+    if (!currentSession?.access_token) {
         throw new Error(
-            "Your session has expired. Please log in again."
+            "Your login session is unavailable. Please sign in again."
         );
     }
 
-    const headers = {
-        "Authorization":
-            "Bearer " + session.access_token
-    };
+    const headers = new Headers(options.headers || {});
+    headers.set("Authorization", "Bearer " + currentSession.access_token);
 
-    if (!(options.body instanceof FormData)) {
+    const hasBody = options.body !== undefined && options.body !== null;
 
-        headers["Content-Type"] =
-            "application/json";
+    if (
+        hasBody &&
+        !(options.body instanceof FormData) &&
+        !headers.has("Content-Type")
+    ) {
+        headers.set("Content-Type", "application/json");
     }
 
-    const response =
-        await fetch(
-            API_BASE + endpoint,
-            {
-                ...options,
+    const response = await fetch(API_BASE + endpoint, {
+        ...options,
+        headers,
+        mode: "cors",
+        cache: "no-store"
+    });
 
-                headers: {
-                    ...headers,
-                    ...(options.headers || {})
-                }
-            }
-        );
+    const contentType = response.headers.get("content-type") || "";
+    let data = {};
 
-    let data = null;
-
-    try {
-
-        data =
-            await response.json();
-
-    } catch (_) {
-
-        data = null;
+    if (contentType.includes("application/json")) {
+        data = await response.json();
+    } else {
+        const responseText = await response.text();
+        data = responseText ? { message: responseText } : {};
     }
 
     if (!response.ok) {
-
         throw new Error(
-            data?.message ||
-            data?.error ||
-            "Request failed."
+            data.message ||
+            data.error ||
+            `Request failed (${response.status}).`
         );
     }
 
     return data;
 }
 
+function humanStatus(status) {
+    const normalized = String(status || "unknown").toLowerCase();
 
-async function checkCompletedDeposit() {
+    const labels = {
+        approved: "Approved",
+        verified: "Approved",
+        pending: "Pending review",
+        rejected: "Rejected",
+        not_submitted: "Not submitted",
+        required: "Required",
+        unknown: "Status unavailable"
+    };
 
-    const data =
-        await apiRequest(
-            "/api/wallet/withdrawal-status"
-        );
-
-    return data;
+    return labels[normalized] || normalized.replace(/_/g, " ");
 }
 
+function isApproved(status) {
+    return ["approved", "verified"].includes(
+        String(status || "").toLowerCase()
+    );
+}
 
-function showStatus(
-    status,
-    title,
-    text,
-    icon,
-    rejection = null
-) {
+function isLockedStatus(status) {
+    return [
+        "approved",
+        "verified",
+        "pending"
+    ].includes(String(status || "").toLowerCase());
+}
 
-    verificationForm.classList.add("hidden");
+function formatDate(value) {
+    if (!value) return "";
 
-    statusCard.classList.remove("hidden");
+    const date = new Date(value);
 
-    statusIcon.textContent =
-        icon;
+    return Number.isNaN(date.getTime())
+        ? String(value)
+        : date.toLocaleString();
+}
 
-    statusIcon.className =
-        "status-icon " +
-        (
-            status === "approved"
-                ? "success"
-                : status === "rejected"
-                    ? "error"
-                    : "pending"
-        );
+function updateStatus(status, rejectionReason = "", createdAt = "") {
+    const normalized = String(status || "not_submitted").toLowerCase();
+    currentKycStatus = normalized;
 
-    statusBadge.textContent =
-        status;
+    const statusElement = $("kycStatus");
+    statusElement.textContent = humanStatus(normalized);
 
-    statusTitle.textContent =
-        title;
+    const cssClass =
+        isApproved(normalized) ? "approved" :
+        normalized === "pending" ? "pending" :
+        normalized === "rejected" ? "rejected" :
+        normalized === "unknown" ? "error" : "";
 
-    statusText.textContent =
-        text;
+    statusElement.className = "status " + cssClass;
 
-    if (rejection) {
+    $("statusDescription").textContent =
+        isApproved(normalized)
+            ? "Your verification has been approved."
+            : normalized === "pending"
+                ? "Your submission is awaiting review. Please wait for the review result."
+                : normalized === "rejected"
+                    ? "Your previous submission was rejected. Review the note below before resubmitting."
+                    : normalized === "not_submitted" || normalized === "required"
+                        ? "No verification submission is currently recorded for your account."
+                        : "The verification status could not be confirmed. Refresh the status before continuing.";
 
-        rejectionReason.textContent =
-            "Reason: " + rejection;
+    $("rejectionReason").hidden = !rejectionReason;
+    $("rejectionReason").textContent = rejectionReason
+        ? "Review note: " + rejectionReason
+        : "";
 
-        rejectionReason.classList.remove(
-            "hidden"
-        );
+    $("submittedAt").hidden = !createdAt;
+    $("submittedAt").textContent = createdAt
+        ? "Last submission: " + formatDate(createdAt)
+        : "";
 
+    const canSubmit =
+        statusLoadedSuccessfully &&
+        !isLockedStatus(normalized) &&
+        !isSubmitting;
+
+    $("submitButton").disabled = !canSubmit;
+
+    if (isSubmitting) {
+        $("submitButton").textContent = "Submitting...";
+    } else if (normalized === "pending") {
+        $("submitButton").textContent = "Submission pending review";
+    } else if (isApproved(normalized)) {
+        $("submitButton").textContent = "Verification approved";
+    } else if (normalized === "rejected") {
+        $("submitButton").textContent = "Resubmit verification →";
+    } else if (!statusLoadedSuccessfully) {
+        $("submitButton").textContent = "Status check required";
     } else {
-
-        rejectionReason.textContent =
-            "";
-
-        rejectionReason.classList.add(
-            "hidden"
-        );
+        $("submitButton").textContent = "Submit for verification →";
     }
+
+    updateCompletionPanel(normalized, rejectionReason, createdAt);
 }
 
+function updateCompletionPanel(status, rejectionReason = "", createdAt = "") {
+    const normalized = String(status || "unknown").toLowerCase();
+    const submitted = submissionCompleted || isLockedStatus(normalized);
 
-function showVerificationForm() {
+    $("completionStatus").textContent = humanStatus(normalized);
 
-    statusCard.classList.add(
-        "hidden"
-    );
+    $("completionStatus").className =
+        "status " +
+        (isApproved(normalized) ? "approved" :
+        normalized === "pending" ? "pending" :
+        normalized === "rejected" ? "rejected" : "");
 
-    verificationForm.classList.remove(
-        "hidden"
-    );
+    $("completionMark").textContent = isApproved(normalized) ? "✓" :
+        normalized === "rejected" ? "!" :
+        normalized === "unknown" ? "?" : "✓";
+
+    $("completionTitle").textContent =
+        isApproved(normalized) ? "Identity verified" :
+        normalized === "pending" ? "Application under review" :
+        normalized === "rejected" ? "Review required" :
+        submitted ? "Application submitted" : "Verification status";
+
+    $("completionDescription").textContent =
+        isApproved(normalized)
+            ? "Your identity verification has been approved."
+            : normalized === "pending"
+                ? "Your application has been received and is waiting for review."
+                : normalized === "rejected"
+                    ? "Your application needs attention. Check the review note and refresh your status."
+                    : "Your latest verification status is displayed below.";
+
+    $("completionStatusDescription").textContent =
+        isApproved(normalized)
+            ? "Your verification is approved."
+            : normalized === "pending"
+                ? "Your application is awaiting review by KMFBinary."
+                : normalized === "rejected"
+                    ? "Your application was rejected. Follow the review note before resubmitting."
+                    : normalized === "not_submitted"
+                        ? "No active submission is recorded."
+                        : "Refresh the status to check your application.";
+
+    if (rejectionReason) {
+        $("completionStatusDescription").textContent +=
+            " Review note: " + rejectionReason;
+    }
+
+    $("completionSubmittedAt").hidden = !createdAt;
+    $("completionSubmittedAt").textContent = createdAt
+        ? "Last submission: " + formatDate(createdAt)
+        : "";
 }
 
+function updateProgress() {
+    $("progressCount").textContent = `Step ${currentStep + 1} of 4`;
+    $("progressFill").style.width = `${((currentStep + 1) / 4) * 100}%`;
 
-async function loadExistingStatus() {
+    steps.forEach((step, index) => {
+        step.classList.toggle("active", index === currentStep);
+    });
 
-    try {
+    stepIndicators.forEach((indicator, index) => {
+        indicator.classList.toggle("active", index === currentStep);
+        indicator.classList.toggle("completed", index < currentStep);
 
-        const data =
-            await apiRequest(
-                "/api/kyc/status"
-            );
+        const number = indicator.querySelector(".step-number");
 
-        const status =
-            String(
-                data?.status ||
-                data?.kycStatus ||
-                "unverified"
-            ).toLowerCase();
-
-        if (status === "approved") {
-
-            showStatus(
-                "approved",
-                "Verification Approved",
-                "Your identity has been verified. You can now withdraw funds from your approved account.",
-                "✓"
-            );
-
-            return true;
+        if (number) {
+            number.textContent = index < currentStep
+                ? "✓"
+                : String(index + 1);
         }
+    });
 
-        if (status === "pending") {
+    $("wizardProgressPanel").hidden = currentStep === 3;
+    $("submissionPanel").scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+}
 
-            showStatus(
-                "pending",
-                "Verification Under Review",
-                "Your verification documents have been submitted and are currently being reviewed. You will be able to withdraw once your verification is approved.",
-                "⏳"
-            );
+function goToStep(index) {
+    if (index < 0 || index >= steps.length) return;
 
-            return true;
+    currentStep = index;
+    updateProgress();
+
+    if (currentStep === 2) {
+        renderReview();
+    }
+
+    clearMessage("submitMessage");
+}
+
+function setMaximumDateOfBirth() {
+    const today = new Date();
+    const localDate = new Date(
+        today.getTime() - today.getTimezoneOffset() * 60000
+    ).toISOString().slice(0, 10);
+
+    $("dateOfBirth").max = localDate;
+}
+
+function validatePersonalDetails() {
+    const fields = [
+        {
+            id: "fullLegalName",
+            label: "full legal name"
+        },
+        {
+            id: "dateOfBirth",
+            label: "date of birth"
+        },
+        {
+            id: "country",
+            label: "country of residence"
+        },
+        {
+            id: "phoneNumber",
+            label: "phone number"
+        },
+        {
+            id: "address",
+            label: "residential address"
         }
+    ];
 
-        if (status === "rejected") {
+    for (const field of fields) {
+        const element = $(field.id);
+        const value = element.value.trim();
 
-            showStatus(
-                "rejected",
-                "Verification Rejected",
-                "Your previous verification submission was rejected. Please review the reason below and submit your information again.",
-                "!",
-                data?.rejection_reason ||
-                data?.rejectionReason ||
-                "No rejection reason was provided."
+        if (!value) {
+            showMessage(
+                "submitMessage",
+                `Please enter your ${field.label}.`,
+                "error"
             );
 
-            verificationForm.classList.remove(
-                "hidden"
-            );
-
-            statusCard.classList.remove(
-                "hidden"
-            );
-
+            element.focus();
             return false;
         }
 
-        return false;
+        if (!element.checkValidity()) {
+            showMessage(
+                "submitMessage",
+                `Please check your ${field.label}.`,
+                "error"
+            );
 
-    } catch (error) {
-
-        console.error(
-            "KYC status error:",
-            error
-        );
-
-        throw error;
+            element.focus();
+            return false;
+        }
     }
-}
 
-
-async function verifyDepositEligibility() {
-
-    /*
-        The withdrawal-status endpoint checks
-        whether the user has a COMPLETED deposit.
-
-        A pending deposit does NOT unlock verification.
-    */
-
-    const data =
-        await checkCompletedDeposit();
+    const dob = new Date($("dateOfBirth").value + "T00:00:00");
 
     if (
-        data?.reason === "no_deposit" ||
-        data?.hasCompletedDeposit === false
+        Number.isNaN(dob.getTime()) ||
+        dob >= new Date(new Date().toDateString())
     ) {
-
-        showStatus(
-            "pending",
-            "Make a Deposit First",
-            "Identity verification becomes available after you have made at least one completed deposit. Please return to your wallet and make a deposit first.",
-            "$"
+        showMessage(
+            "submitMessage",
+            "Please enter a valid date of birth in the past.",
+            "error"
         );
 
+        $("dateOfBirth").focus();
         return false;
     }
 
     return true;
 }
 
+function validateFile(fileConfig) {
+    const input = $(fileConfig.id);
+    const file = input.files && input.files[0];
 
-function populateExistingValues() {
+    if (!file) {
+        return {
+            valid: false,
+            message: `Please select ${fileConfig.label}.`
+        };
+    }
 
-    const fullName =
-        document.getElementById(
-            "fullLegalName"
-        );
+    if (file.size <= 0) {
+        return {
+            valid: false,
+            message: `${fileConfig.label} is empty. Select another file.`
+        };
+    }
 
-    const phone =
-        document.getElementById(
-            "phoneNumber"
-        );
+    if (file.size > MAX_FILE_SIZE) {
+        return {
+            valid: false,
+            message: `${fileConfig.label} must not exceed 5 MB.`
+        };
+    }
 
-    if (!fullName.value) {
+    const extension = file.name.includes(".")
+        ? file.name.split(".").pop().toLowerCase()
+        : "";
 
-        const storedName =
-            localStorage.getItem(
-                "kmf_full_name"
-            );
+    if (!fileConfig.allowedExtensions.includes(extension)) {
+        return {
+            valid: false,
+            message: `${fileConfig.label} must be ${fileConfig.type}.`
+        };
+    }
 
-        if (storedName) {
+    if (extension === "pdf") {
+        if (file.type && file.type.toLowerCase() !== "application/pdf") {
+            return {
+                valid: false,
+                message: `${fileConfig.label} must be a PDF file.`
+            };
+        }
+    } else {
+        const acceptedTypes = {
+            jpg: ["image/jpeg"],
+            jpeg: ["image/jpeg"],
+            png: ["image/png"],
+            webp: ["image/webp"]
+        };
 
-            fullName.value =
-                storedName;
+        const validTypes = acceptedTypes[extension] || [];
+
+        if (file.type && !validTypes.includes(file.type.toLowerCase())) {
+            return {
+                valid: false,
+                message: `${fileConfig.label} must be a JPEG, PNG, or WebP image.`
+            };
         }
     }
 
-    if (!phone.value) {
-
-        const storedPhone =
-            localStorage.getItem(
-                "kmf_phone"
-            );
-
-        if (storedPhone) {
-
-            phone.value =
-                storedPhone;
-        }
-    }
+    return { valid: true, file };
 }
 
+function validateAllDocuments() {
+    for (const config of fileFields) {
+        const result = validateFile(config);
 
-async function initializeVerification() {
+        if (!result.valid) {
+            return result;
+        }
+    }
 
+    return { valid: true };
+}
+
+function validateDocumentStep(showError = true) {
+    const result = validateAllDocuments();
+
+    if (!result.valid && showError) {
+        showMessage("submitMessage", result.message, "error");
+
+        const missingField = fileFields.find(config => {
+            const check = validateFile(config);
+            return !check.valid;
+        });
+
+        if (missingField) {
+            $(missingField.id).focus();
+        }
+    }
+
+    return result.valid;
+}
+
+function formatFileSize(bytes) {
+    if (bytes < 1024 * 1024) {
+        return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+    }
+
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+}
+
+function updateFileState(config) {
+    const input = $(config.id);
+    const file = input.files && input.files[0];
+    const state = $(config.stateId);
+
+    if (!file) {
+        state.textContent = "No file selected";
+        state.classList.remove("selected");
+        return;
+    }
+
+    state.textContent = `${file.name} · ${formatFileSize(file.size)}`;
+    state.classList.add("selected");
+}
+
+function safeText(value) {
+    return String(value || "").trim() || "Not provided";
+}
+
+function renderReview() {
+    $("reviewName").textContent = safeText($("fullLegalName").value);
+    $("reviewDob").textContent = safeText($("dateOfBirth").value);
+    $("reviewCountry").textContent = safeText($("country").value);
+    $("reviewPhone").textContent = safeText($("phoneNumber").value);
+    $("reviewAddress").textContent = safeText($("address").value);
+
+    const container = $("reviewDocuments");
+    container.replaceChildren();
+
+    fileFields.forEach(config => {
+        const file = $(config.id).files?.[0];
+
+        const row = document.createElement("div");
+        row.className = "review-document";
+
+        const icon = document.createElement("div");
+        icon.className = "review-document-icon";
+        icon.textContent = config.id === "kraReport" ? "PDF" : "IMG";
+
+        const info = document.createElement("div");
+        info.className = "review-document-info";
+
+        const name = document.createElement("strong");
+        name.textContent = config.label;
+
+        const details = document.createElement("small");
+        details.textContent = file
+            ? `${file.name} · ${formatFileSize(file.size)}`
+            : "No file selected";
+
+        const check = document.createElement("div");
+        check.className = "review-check";
+        check.textContent = file ? "✓" : "!";
+
+        info.append(name, details);
+        row.append(icon, info, check);
+        container.append(row);
+    });
+
+    $("submitButton").disabled =
+        !statusLoadedSuccessfully ||
+        isLockedStatus(currentKycStatus) ||
+        isSubmitting;
+}
+
+async function loadKycStatus() {
     try {
+        const data = await apiRequest("/api/kyc/status");
+        const kyc = data.kyc || data.verification || data;
 
-        setLoading(true);
-
-        const session =
-            await getSession();
-
-        if (!session) {
-
-            window.location.href =
-                "login.html";
-
-            return;
+        if (!kyc || typeof kyc !== "object") {
+            throw new Error("The backend returned an invalid verification status.");
         }
 
-        const depositStatus =
-            await verifyDepositEligibility();
+        statusLoadedSuccessfully = true;
 
-        if (!depositStatus) {
-
-            setLoading(false);
-
-            return;
-        }
-
-        const hasFinalStatus =
-            await loadExistingStatus();
-
-        if (!hasFinalStatus) {
-
-            if (
-                verificationForm.classList.contains(
-                    "hidden"
-                )
-            ) {
-
-                verificationForm.classList.remove(
-                    "hidden"
-                );
-            }
-        }
-
-        populateExistingValues();
-
-        setLoading(false);
-
-    } catch (error) {
-
-        console.error(
-            "Verification initialization error:",
-            error
+        updateStatus(
+            kyc.status || "not_submitted",
+            kyc.rejection_reason || kyc.rejectionReason || "",
+            kyc.created_at || kyc.createdAt || ""
         );
 
-        showPageMessage(
-            error.message ||
-            "Unable to load verification information.",
+        clearMessage("statusMessage");
+        clearMessage("completionMessage");
+
+        return true;
+    } catch (error) {
+        console.error("KYC status error:", error);
+
+        statusLoadedSuccessfully = false;
+        currentKycStatus = "unknown";
+
+        $("kycStatus").textContent = "Status unavailable";
+        $("kycStatus").className = "status error";
+
+        $("statusDescription").textContent =
+            "Could not confirm your verification status. Refresh the status before submitting.";
+
+        $("submitButton").disabled = true;
+        $("submitButton").textContent = "Status check required";
+
+        showMessage(
+            "statusMessage",
+            "Could not load verification status. " +
+            (error.message || "Check your backend connection."),
             "error"
         );
 
-        setLoading(false);
+        updateCompletionPanel("unknown");
+
+        return false;
     }
 }
 
+async function initializeVerification() {
+    try {
+        const { data, error } = await supabaseClient.auth.getSession();
 
-async function submitVerification(event) {
+        if (error) throw error;
 
+        currentSession = data.session || null;
+
+        if (!currentSession) {
+            window.location.replace("login.html");
+            return;
+        }
+
+        const email = currentSession.user?.email || "Authenticated user";
+
+        $("userEmail").textContent = email;
+        $("sidebarEmail").textContent = email;
+
+        setAccountMode(
+            localStorage.getItem("kmf_account_mode") ||
+            localStorage.getItem("kmf_selected_account") ||
+            "demo"
+        );
+
+        setMaximumDateOfBirth();
+
+        $("pageNotice").className = "message";
+        $("pageNotice").textContent = "";
+
+        await loadKycStatus();
+    } catch (error) {
+        console.error("Verification initialization error:", error);
+
+        statusLoadedSuccessfully = false;
+        currentKycStatus = "unknown";
+
+        $("submitButton").disabled = true;
+        $("submitButton").textContent = "Status check required";
+
+        showMessage(
+            "pageNotice",
+            "Unable to confirm your login session. " +
+            (error.message || "Check your connection."),
+            "error"
+        );
+    }
+}
+
+/* Step navigation */
+
+document.querySelectorAll("[data-next]").forEach(button => {
+    button.addEventListener("click", () => {
+        clearMessage("submitMessage");
+
+        if (currentStep === 0) {
+            if (!validatePersonalDetails()) return;
+            goToStep(1);
+            return;
+        }
+
+        if (currentStep === 1) {
+            if (!validateDocumentStep()) return;
+            goToStep(2);
+        }
+    });
+});
+
+document.querySelectorAll("[data-back]").forEach(button => {
+    button.addEventListener("click", () => {
+        clearMessage("submitMessage");
+        goToStep(currentStep - 1);
+    });
+});
+
+/* Update selected-file names immediately */
+
+fileFields.forEach(config => {
+    $(config.id).addEventListener("change", () => {
+        updateFileState(config);
+        clearMessage("submitMessage");
+
+        const file = $(config.id).files?.[0];
+
+        if (file && file.size > MAX_FILE_SIZE) {
+            showMessage(
+                "submitMessage",
+                `${config.label} must not exceed 5 MB.`,
+                "error"
+            );
+        }
+    });
+});
+
+/* Final submission: same API endpoint and multipart field names */
+
+$("verificationForm").addEventListener("submit", async event => {
     event.preventDefault();
 
-    hidePageMessage();
+    if (isSubmitting) return;
 
-    if (
-        !document.getElementById(
-            "declarationAccepted"
-        ).checked
-    ) {
+    clearMessage("submitMessage");
 
-        showPageMessage(
+    if (!currentSession?.access_token) {
+        showMessage(
+            "submitMessage",
+            "Your login session is unavailable. Sign in again before submitting.",
+            "error"
+        );
+        return;
+    }
+
+    if (!statusLoadedSuccessfully) {
+        showMessage(
+            "submitMessage",
+            "Refresh your verification status before submitting.",
+            "error"
+        );
+        return;
+    }
+
+    if (isLockedStatus(currentKycStatus)) {
+        showMessage(
+            "submitMessage",
+            "Your verification is already approved or pending review.",
+            "info"
+        );
+        return;
+    }
+
+    if (!validatePersonalDetails()) {
+        goToStep(0);
+        return;
+    }
+
+    if (!validateDocumentStep()) {
+        goToStep(1);
+        return;
+    }
+
+    if (!$("declaration").checked) {
+        showMessage(
+            "submitMessage",
             "Please accept the declaration before submitting.",
             "error"
         );
-
         return;
     }
 
-    /*
-        Check again immediately before submission.
-    */
+    const documentValidation = validateAllDocuments();
+
+    if (!documentValidation.valid) {
+        goToStep(1);
+        showMessage("submitMessage", documentValidation.message, "error");
+        return;
+    }
+
+    isSubmitting = true;
+    $("submitButton").disabled = true;
+    $("submitButton").textContent = "Submitting...";
 
     try {
+        const formData = new FormData();
 
-        const depositStatus =
-            await checkCompletedDeposit();
+        formData.append("full_legal_name", $("fullLegalName").value.trim());
+        formData.append("date_of_birth", $("dateOfBirth").value);
+        formData.append("country_of_residence", $("country").value.trim());
+        formData.append("phone_number", $("phoneNumber").value.trim());
+        formData.append("residential_address", $("address").value.trim());
+        formData.append("declaration_accepted", "true");
 
-        if (
-            depositStatus?.reason === "no_deposit" ||
-            depositStatus?.hasCompletedDeposit === false
-        ) {
+        /*
+         * Keep these field names in sync with the existing Multer fields.
+         * Do not set Content-Type manually; the browser adds the multipart boundary.
+         */
+        formData.append("kra_report", $("kraReport").files[0]);
+        formData.append("id_front", $("idFront").files[0]);
+        formData.append("id_back", $("idBack").files[0]);
+        formData.append("proof_of_address", $("proofOfAddress").files[0]);
 
-            showPageMessage(
-                "Please make a completed deposit before submitting identity verification.",
-                "error"
-            );
+        const data = await apiRequest("/api/kyc/submit", {
+            method: "POST",
+            body: formData
+        });
 
-            return;
-        }
+        submissionCompleted = true;
 
-    } catch (error) {
-
-        showPageMessage(
-            error.message ||
-            "Unable to confirm your deposit status.",
-            "error"
-        );
-
-        return;
-    }
-
-    const form =
-        document.getElementById(
-            "verificationForm"
-        );
-
-    if (!form.checkValidity()) {
-
-        form.reportValidity();
-
-        return;
-    }
-
-    submitButton.disabled =
-        true;
-
-    submitButton.textContent =
-        "Submitting...";
-
-    try {
-
-        const formData =
-            new FormData();
-
-        formData.append(
-            "full_legal_name",
-            document.getElementById(
-                "fullLegalName"
-            ).value.trim()
-        );
-
-        formData.append(
-            "date_of_birth",
-            document.getElementById(
-                "dateOfBirth"
-            ).value
-        );
-
-        formData.append(
-            "country_of_residence",
-            document.getElementById(
-                "countryOfResidence"
-            ).value
-        );
-
-        formData.append(
-            "phone_number",
-            document.getElementById(
-                "phoneNumber"
-            ).value.trim()
-        );
-
-        formData.append(
-            "residential_address",
-            document.getElementById(
-                "residentialAddress"
-            ).value.trim()
-        );
-
-        formData.append(
-            "government_id_type",
-            document.getElementById(
-                "governmentIdType"
-            ).value
-        );
-
-        formData.append(
-            "government_id_number",
-            document.getElementById(
-                "governmentIdNumber"
-            ).value.trim()
-        );
-
-        const idFront =
-            document.getElementById(
-                "idFront"
-            ).files[0];
-
-        const idBack =
-            document.getElementById(
-                "idBack"
-            ).files[0];
-
-        const selfie =
-            document.getElementById(
-                "selfie"
-            ).files[0];
-
-        const proofOfAddress =
-            document.getElementById(
-                "proofOfAddress"
-            ).files[0];
-
-        if (idFront) {
-
-            formData.append(
-                "id_front",
-                idFront
-            );
-        }
-
-        if (idBack) {
-
-            formData.append(
-                "id_back",
-                idBack
-            );
-        }
-
-        if (selfie) {
-
-            formData.append(
-                "selfie",
-                selfie
-            );
-        }
-
-        if (proofOfAddress) {
-
-            formData.append(
-                "proof_of_address",
-                proofOfAddress
-            );
-        }
-
-        formData.append(
-            "declaration_accepted",
-            "true"
-        );
-
-        const result =
-            await apiRequest(
-                "/api/kyc/submit",
-                {
-                    method: "POST",
-                    body: formData
-                }
-            );
-
-        console.log(
-            "KYC submission result:",
-            result
-        );
-
-        showStatus(
-            "pending",
-            "Verification Submitted",
-            "Your identity verification has been submitted successfully. Our team will review your information. Withdrawals will become available after your verification is approved.",
-            "✓"
-        );
-
-        showPageMessage(
-            "Verification submitted successfully.",
+        showMessage(
+            "submitMessage",
+            data.message || "Your verification application was submitted successfully.",
             "success"
         );
 
-        verificationForm.classList.add(
-            "hidden"
+        const statusLoaded = await loadKycStatus();
+
+        if (!statusLoaded) {
+            /*
+             * The submission endpoint succeeded, but status refresh failed.
+             * Keep the success feedback and allow a manual refresh.
+             */
+            showMessage(
+                "completionMessage",
+                "Your submission request succeeded, but the latest status could not be loaded. Use Refresh status to check for updates.",
+                "info"
+            );
+        }
+
+        goToStep(3);
+
+        /*
+         * Clear the form only after the backend confirms submission.
+         * The step 4 screen then becomes the user's status tracker.
+         */
+        $("verificationForm").reset();
+
+        fileFields.forEach(updateFileState);
+
+        isSubmitting = false;
+        updateStatus(
+            currentKycStatus,
+            $("rejectionReason").textContent.replace(/^Review note:\s*/, ""),
+            ""
         );
-
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
-
     } catch (error) {
+        console.error("KYC submission error:", error);
 
-        console.error(
-            "KYC submission error:",
-            error
-        );
-
-        showPageMessage(
-            error.message ||
-            "Unable to submit verification.",
+        showMessage(
+            "submitMessage",
+            "Submission failed. Your details and selected files have been kept so you can try again. " +
+            (error.message || "Check your backend connection."),
             "error"
         );
-
     } finally {
+        isSubmitting = false;
 
-        submitButton.disabled =
-            false;
+        if (statusLoadedSuccessfully) {
+            $("submitButton").disabled = isLockedStatus(currentKycStatus);
+        } else {
+            $("submitButton").disabled = true;
+        }
 
-        submitButton.textContent =
-            "Submit Verification";
+        if (!isLockedStatus(currentKycStatus) && statusLoadedSuccessfully) {
+            $("submitButton").textContent = "Submit for verification →";
+        }
+    }
+});
+
+/* Refresh status */
+
+async function refreshStatus(buttonId) {
+    const button = $(buttonId);
+    const originalText = button.textContent;
+
+    button.disabled = true;
+    button.textContent = "Refreshing...";
+
+    try {
+        await loadKycStatus();
+
+        if (currentStep === 3) {
+            updateCompletionPanel(
+                currentKycStatus,
+                $("rejectionReason").textContent.replace(/^Review note:\s*/, ""),
+                ""
+            );
+        }
+    } finally {
+        button.disabled = false;
+        button.textContent = originalText;
     }
 }
 
+$("refreshStatusButton").addEventListener("click", () => {
+    refreshStatus("refreshStatusButton");
+});
 
-document
-    .getElementById(
-        "verificationForm"
-    )
-    .addEventListener(
-        "submit",
-        submitVerification
-    );
+$("completionRefresh").addEventListener("click", () => {
+    refreshStatus("completionRefresh");
+});
 
+/* Clear-form button is intentionally not provided; Back preserves entries. */
+
+/* Mobile navigation */
+
+$("mobileMenu").addEventListener("click", () => {
+    $("sidebar").classList.toggle("open");
+});
+
+document.addEventListener("click", event => {
+    if (window.innerWidth > 950) return;
+
+    const sidebar = $("sidebar");
+
+    if (
+        !sidebar.contains(event.target) &&
+        event.target !== $("mobileMenu")
+    ) {
+        sidebar.classList.remove("open");
+    }
+});
+
+/* Logout */
+
+$("logoutButton").addEventListener("click", async () => {
+    const button = $("logoutButton");
+
+    button.disabled = true;
+    button.textContent = "Signing out...";
+
+    try {
+        const { error } = await supabaseClient.auth.signOut();
+
+        if (error) throw error;
+
+        localStorage.removeItem("kmf_account_mode");
+        localStorage.removeItem("kmf_selected_account");
+
+        window.location.replace("login.html");
+    } catch (error) {
+        console.error("Logout error:", error);
+
+        showMessage(
+            "pageNotice",
+            "Logout failed: " + (error.message || ""),
+            "error"
+        );
+
+        button.disabled = false;
+        button.textContent = "↩ Logout";
+    }
+});
 
 /*
-    Reuse the Supabase client already
-    initialized by js/api.js.
-*/
+ * Only redirect on an actual sign-out event.
+ * A backend/API failure must not redirect the user.
+ */
+supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === "SIGNED_OUT" && currentSession) {
+        currentSession = null;
+        window.location.replace("login.html");
+    } else if (session) {
+        currentSession = session;
+    }
+});
 
-if (window.supabaseClient) {
+/* Start */
 
-    window.supabaseClient.auth.onAuthStateChange(
-        (event, session) => {
-
-            if (
-                event === "SIGNED_OUT" ||
-                !session
-            ) {
-
-                window.location.href =
-                    "login.html";
-            }
-        }
-    );
-}
-
-
+updateProgress();
+fileFields.forEach(updateFileState);
 initializeVerification();
 </script>
-
 </body>
 </html>

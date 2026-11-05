@@ -683,6 +683,72 @@
                 padding: 14px;
             }
 
+  /* Mobile navigation */
+  .topbar {
+      flex-wrap: wrap;
+      gap: 10px;
+      height: auto;
+      min-width: 0;
+  }
+
+  .topbar > * {
+      min-width: 0;
+  }
+
+  .brand {
+      max-width: 100%;
+      overflow-wrap: anywhere;
+  }
+
+  .account-area {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      max-width: 100%;
+  }
+
+  .account-area a,
+  .account-area button {
+      max-width: 100%;
+      white-space: normal;
+  }
+
+  /* Prevent page-wide horizontal overflow */
+  html,
+  body {
+      max-width: 100%;
+      overflow-x: hidden;
+  }
+
+  .main-grid,
+  .content,
+  .panel {
+      min-width: 0;
+      max-width: 100%;
+  }
+
+  canvas {
+      max-width: 100%;
+  }
+
+  /* Mobile trading controls */
+  input,
+  select,
+  button {
+      max-width: 100%;
+      box-sizing: border-box;
+  }
+
+  .main-grid {
+      grid-template-columns: minmax(0, 1fr);
+  }
+
+  .chart-container {
+      min-width: 0;
+      max-width: 100%;
+  }
+
         }
        img[src*="us-flag.svg"],
 img[src*="kenya-flag.svg"],
@@ -694,6 +760,361 @@ img[src*="kenya-flag.svg"],
     vertical-align: middle;
     flex-shrink: 0;
 } 
+
+/* =========================================
+   KMFBINARY - PROFESSIONAL MOBILE LAYOUT
+   CSS ONLY
+========================================= */
+
+@media (max-width: 600px) {
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        -webkit-text-size-adjust: 100%;
+    }
+
+    .page {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    /* Header */
+    .topbar {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+        padding: 16px;
+    }
+
+    .brand {
+        font-size: 22px;
+        line-height: 1.3;
+    }
+
+    /* Balances and account controls */
+    .top-balance {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        width: 100%;
+        margin: 0;
+    }
+
+    .top-balance-item {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        min-width: 0;
+    }
+
+    .top-balance-info {
+        min-width: 0;
+    }
+
+    .top-balance-label {
+        font-size: 11px;
+    }
+
+    .top-balance-value {
+        font-size: 13px;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+    }
+
+    .account-area {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 9px;
+        width: 100%;
+    }
+
+    .account-select,
+    .back-btn {
+        width: 100%;
+        max-width: 100%;
+        min-height: 44px;
+        border-radius: 10px;
+    }
+
+    /* Main content */
+    .content {
+        padding: 12px;
+        width: 100%;
+    }
+
+    .market-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+
+    .market-title {
+        min-width: 0;
+    }
+
+    .price-box {
+        max-width: 100%;
+        text-align: right;
+    }
+
+    .price {
+        font-size: clamp(20px, 6vw, 28px);
+        overflow-wrap: anywhere;
+    }
+
+    /* Chart card */
+    .main-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
+        width: 100%;
+    }
+
+    .chart-card,
+    .chart-wrap,
+    .panel,
+    .position-card {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .chart-card {
+        overflow: hidden;
+        border-radius: 14px;
+    }
+
+    .chart-top {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 12px;
+    }
+
+    .chart-wrap {
+        width: 100%;
+        height: 320px;
+        overflow: hidden;
+    }
+
+    #chart {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    /* Trading panel */
+    .panel {
+        padding: 16px;
+        border-radius: 14px;
+    }
+
+    .panel h2 {
+        margin-top: 0;
+        margin-bottom: 18px;
+        font-size: 19px;
+    }
+
+    .field {
+        margin-bottom: 16px;
+    }
+
+    .field label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 13px;
+    }
+
+    .currency,
+    .stake-input,
+    .duration-select,
+    .tp-select,
+    .mode-select {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    .stake-input,
+    .duration-select,
+    .tp-select,
+    .mode-select {
+        min-height: 46px;
+        font-size: 16px;
+        border-radius: 10px;
+    }
+
+    .tp-info {
+        line-height: 1.6;
+        overflow-wrap: anywhere;
+    }
+
+    /* BUY and SELL */
+    .buttons {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .trade-btn {
+        width: 100%;
+        min-width: 0;
+        min-height: 54px;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 800;
+        touch-action: manipulation;
+    }
+
+    .cashout-btn {
+        width: 100%;
+        min-height: 48px;
+        border-radius: 10px;
+    }
+
+    /* Position and P/L */
+    .position-card {
+        margin-top: 18px;
+        padding: 14px;
+        border-radius: 12px;
+    }
+
+    .position-title {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px 10px;
+    }
+
+    .stat {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .stat-label {
+        font-size: 11px;
+    }
+
+    .stat-value {
+        font-size: 14px;
+        overflow-wrap: anywhere;
+    }
+
+    .pnl {
+        font-size: clamp(26px, 8vw, 36px);
+        font-weight: 800;
+        overflow-wrap: anywhere;
+    }
+
+    /* Trading journal */
+    .journal-section {
+        width: 100%;
+        min-width: 0;
+        margin-top: 18px;
+        overflow: hidden;
+        border-radius: 14px;
+    }
+
+    .journal-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px;
+    }
+
+    .journal-title {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .journal-title h2 {
+        font-size: 18px;
+    }
+
+    .journal-clear {
+        min-height: 40px;
+        max-width: 100%;
+        border-radius: 9px;
+    }
+
+    .journal-table-wrap {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .journal-table {
+        min-width: 1000px;
+    }
+
+    /* Keep controls within the viewport */
+    input,
+    select,
+    button {
+        max-width: 100%;
+    }
+}
+
+/* Extra-small phones */
+@media (max-width: 380px) {
+
+    .content {
+        padding: 9px;
+    }
+
+    .topbar {
+        padding: 12px;
+    }
+
+    .chart-wrap {
+        height: 270px;
+    }
+
+    .panel {
+        padding: 12px;
+    }
+
+    .stats {
+        gap: 12px 8px;
+    }
+
+    .buttons {
+        gap: 8px;
+    }
+
+    .trade-btn {
+        min-height: 49px;
+    }
+}
+
     </style>
 </head>
 
@@ -1413,7 +1834,11 @@ const supabaseClient =
     );
 
 const API_BASE =
-    "http://localhost:3000";
+    ["localhost", "127.0.0.1"].includes(
+        window.location.hostname
+    )
+        ? "http://localhost:3000"
+        : "http://192.168.2.2:3000";
 
 /* =========================================================
    API
@@ -1666,7 +2091,7 @@ let cashoutInProgress = false;
 let positionPollingTimer = null;
 
 let positionClosed = false;
-
+let marketRefreshInProgress = false;
 /* =========================================================
    LOCAL STORAGE KEYS
 ========================================================= */
@@ -4330,13 +4755,14 @@ function updatePosition() {
        OPEN
     ===================================================== */
 
-    const pnl =
-        calculatePnl(
-            position.side,
-            entry,
-            currentPrice,
-            stake
-        );
+  const livePrice = Number(currentPrice);
+
+const pnl = calculatePnl(
+    position.side,
+    entry,
+    livePrice,
+    stake
+);
 
     const expires =
         new Date(
@@ -4362,9 +4788,8 @@ function updatePosition() {
     entryPriceEl.textContent =
         entry.toFixed(2);
 
-    positionPriceEl.textContent =
-        currentPrice.toFixed(2);
-
+   positionPriceEl.textContent =
+    livePrice.toFixed(2);
     timeLeftEl.textContent =
         (
             remaining / 1000
@@ -4618,16 +5043,10 @@ async function openTrade(
             "success"
         );
 
-        updatePosition();
-
-        updateCashoutUI();
-
-        drawChart();
-
-        startPositionPolling();
-        drawChart();
-
-        startPositionPolling();
+updatePosition();
+updateCashoutUI();
+drawChart();
+startPositionPolling();
 
     } catch (error) {
 
@@ -4779,18 +5198,19 @@ function handleClosedPosition(
 /* =========================================================
    CHECK POSITION
 ========================================================= */
-
+let positionCheckInProgress = false;
 async function checkPosition() {
 
     if (
+        positionCheckInProgress ||
         !position ||
         positionClosed ||
         position.status !== "open"
     ) {
-
         return;
-
     }
+
+    positionCheckInProgress = true;
 
     try {
 
@@ -4811,35 +5231,51 @@ async function checkPosition() {
 
         }
 
-        const trade =
-            data.trade;
+       
+const trade = data.trade;
 
-        position =
-            trade;
+const tradeStatus = String(
+    trade.status || ""
+).toLowerCase();
 
-        if (
-            trade.status === "open"
-        ) {
+if (tradeStatus === "open") {
 
-            updatePosition();
+    position = {
+        ...position,
+        ...trade,
+        status: "open"
+    };
 
-            return;
-
-        }
-
-        handleClosedPosition(
-            trade
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Position check error:",
-            error
-        );
-
+    if (!positionClosed) {
+        updatePosition();
+        updateCashoutUI();
     }
 
+    return;
+}
+
+const finalStatuses = [
+    "won",
+    "loss",
+    "expired",
+    "cashed_out",
+    "closed"
+];
+
+if (finalStatuses.includes(tradeStatus)) {
+    handleClosedPosition({
+        ...position,
+        ...trade,
+        status: tradeStatus
+    });
+}
+
+
+       } catch (error) {
+        console.error("Position check error:", error);
+    } finally {
+        positionCheckInProgress = false;
+    }
 }
 
 /* =========================================================
@@ -4853,7 +5289,7 @@ function startPositionPolling() {
     positionPollingTimer =
         setInterval(
             checkPosition,
-            100
+            700
         );
 
 }
@@ -4863,6 +5299,10 @@ function startPositionPolling() {
 ========================================================= */
 
 async function refreshMarket() {
+
+    if (marketRefreshInProgress) return;
+
+    marketRefreshInProgress = true;
 
     try {
 
@@ -4895,16 +5335,12 @@ async function refreshMarket() {
 
         }
 
-    } catch (error) {
-
-        console.error(
-            "Price refresh error:",
-            error
-        );
-
+      } catch (error) {
+        console.error("Price refresh error:", error);
+    } finally {
+        marketRefreshInProgress = false;
     }
-
-}
+} 
 
 /* =========================================================
    REFRESH CANDLES
@@ -5132,7 +5568,7 @@ async function initialize() {
 
     setInterval(
         refreshMarket,
-        150
+        500
     );
 
     /*
@@ -5141,7 +5577,7 @@ async function initialize() {
 
     setInterval(
         refreshCandles,
-        500
+        3000
     );
 
 }

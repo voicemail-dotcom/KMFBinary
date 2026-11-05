@@ -645,64 +645,67 @@ function checkBarrier(
     symbol,
     barrier,
     direction,
-    startTime
+    startTime,
+    endTime = Date.now()
 ) {
-
     if (!state[symbol]) {
         return false;
     }
 
-
-    const target =
-        Number(barrier);
-
+    const target = Number(barrier);
+    const start = Number(startTime);
+    const end = Number(endTime);
 
     if (
-        !Number.isFinite(target)
+        !Number.isFinite(target) ||
+        !Number.isFinite(start) ||
+        !Number.isFinite(end) ||
+        end < start
     ) {
-
         return false;
     }
 
+    const normalizedDirection = String(
+        direction || ""
+    ).trim().toLowerCase();
 
-    const prices =
-        getPricePath(
-            symbol,
-            startTime || 0,
-            Date.now()
-        );
-
-
-    for (
-        const item of prices
+    if (
+        normalizedDirection !== "above" &&
+        normalizedDirection !== "below"
     ) {
+        return false;
+    }
 
-        const price =
-            Number(item.price);
+    const prices = getPricePath(
+        symbol,
+        start,
+        end
+    );
 
+    for (const item of prices) {
+        const price = Number(item.price);
+
+        if (!Number.isFinite(price)) {
+            continue;
+        }
 
         if (
-            direction === "above" &&
+            normalizedDirection === "above" &&
             price >= target
         ) {
-
             return true;
         }
 
-
         if (
-            direction === "below" &&
+            normalizedDirection === "below" &&
             price <= target
         ) {
-
             return true;
         }
     }
 
-
     return false;
 }
-
 
 // ==========================================
 // GET ALL PRICES

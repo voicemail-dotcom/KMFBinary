@@ -53,8 +53,10 @@ const WALLET_REFRESH_INTERVAL = 5000;
    directly to the Express backend.
 */
 
-const WALLET_API_BASE_URL = "http://localhost:3000";
-
+const WALLET_API_BASE_URL = window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+    ? "http://localhost:3000"
+    : "https://kmfbinary.site";
 
 /* ============================================================
    BASIC HELPERS
@@ -1310,174 +1312,100 @@ function updateWithdrawPhoneField() {
 /* ============================================================
    DEPOSIT
 ============================================================ */
-
-async function handleDeposit(
-    event
-) {
-
+async function handleDeposit(event) {
     event.preventDefault();
-
     clearMessage();
 
     if (!isLiveAccount()) {
-
         showMessage(
             "Deposits are available only on the Live Account.",
             "error"
         );
-
         return;
     }
 
-    const amount =
-        numberValue(
-            document.getElementById(
-                "depositAmount"
-            )?.value
-        );
+    const amount = numberValue(
+        document.getElementById("depositAmount")?.value
+    );
 
     const method =
-        document.getElementById(
-            "depositMethod"
-        )?.value ||
-        "mpesa";
+        document.getElementById("depositMethod")?.value || "mpesa";
 
     const phone =
-        document.getElementById(
-            "mpesaPhone"
-        )?.value ||
-        "";
+        document.getElementById("mpesaPhone")?.value || "";
 
-    if (
-        !Number.isFinite(amount) ||
-        amount <= 0
-    ) {
-
-        showMessage(
-            "Enter a valid deposit amount.",
-            "error"
-        );
-
+    if (!Number.isFinite(amount) || amount <= 0) {
+        showMessage("Enter a valid deposit amount.", "error");
         return;
     }
 
-    if (
-        method === "mpesa" &&
-        !isValidKenyanPhone(phone)
-    ) {
-
-        showMessage(
-            "Enter a valid Kenyan M-Pesa number.",
-            "error"
-        );
-
+    if (method === "mpesa" && !isValidKenyanPhone(phone)) {
+        showMessage("Enter a valid Kenyan M-Pesa number.", "error");
         return;
     }
 
-    const button =
-        document.getElementById(
-            "depositButton"
-        );
+    const button = document.getElementById("depositButton");
 
     if (button) {
         button.disabled = true;
-        button.textContent =
-            "Processing...";
+        button.textContent = "Processing...";
     }
 
     try {
-
         if (method === "mpesa") {
+            const normalizedPhone = normalizeKenyanPhone(phone);
 
-            const normalizedPhone =
-                normalizeKenyanPhone(
-                    phone
-                );
-
-            const kesAmount =
-                Math.round(
-                    amount *
-                    USD_KES_DEPOSIT_RATE
-                );
-
-            const result =
-                await walletApi(
-                    "/api/mpesa/stkpush",
-                    {
-                        method: "POST",
-                        body: JSON.stringify({
-                            phoneNumber:
-                                normalizedPhone,
-                            amount:
-                                kesAmount,
-                            usdAmount:
-                                amount
-                        })
-                    }
-                );
+            const result = await walletApi("/api/mpesa/stkpush", {
+                method: "POST",
+                body: JSON.stringify({
+                    phoneNumber: normalizedPhone,
+                    amount: amount,
+                    usdAmount: amount
+                })
+            });
 
             showMessage(
                 result?.message ||
-                "M-Pesa payment request sent. Check your phone and complete the payment.",
+                "M-Pesa payment request sent. Check your phone.",
                 "success"
             );
-
         } else {
-
-            const result =
-                await walletApi(
-                    "/api/wallet/deposit",
-                    {
-                        method: "POST",
-                        body: JSON.stringify({
-                            amount,
-                            paymentMethod:
-                                method
-                        })
-                    }
-                );
+            const result = await walletApi("/api/wallet/deposit", {
+                method: "POST",
+                body: JSON.stringify({
+                    amount,
+                    paymentMethod: method
+                })
+            });
 
             showMessage(
-                result?.message ||
-                "Deposit request submitted.",
+                result?.message || "Deposit request submitted.",
                 "success"
             );
         }
 
-        const amountInput =
-            document.getElementById(
-                "depositAmount"
-            );
+        const amountInput = document.getElementById("depositAmount");
 
         if (amountInput) {
             amountInput.value = "";
         }
 
-        await loadWallet();
+        await loadWallet(true);
 
     } catch (error) {
-
-        console.error(
-            "handleDeposit error:",
-            error
-        );
+        console.error("handleDeposit error:", error);
 
         showMessage(
-            error.message ||
-            "Deposit request failed.",
+            error.message || "Deposit request failed.",
             "error"
         );
-
     } finally {
-
         if (button) {
             button.disabled = false;
-            button.textContent =
-                "Deposit";
+            button.textContent = "Deposit";
         }
     }
 }
-
 
 /* ============================================================
    WITHDRAWAL INPUT CHANGE

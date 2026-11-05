@@ -1,3235 +1,1388 @@
+
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Profile - KMFBinary</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #0b1120;
-    color: #ffffff;
-    min-height: 100vh;
-}
-
-.app {
-    display: flex;
-    min-height: 100vh;
-}
-
-/* =========================
-   SIDEBAR
-========================= */
-
-.sidebar {
-    width: 250px;
-    background: #111827;
-    border-right: 1px solid #263244;
-    padding: 25px 15px;
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-}
-
-.logo {
-    font-size: 25px;
-    font-weight: bold;
-    color: #ffffff;
-    padding: 0 15px 30px;
-}
-
-.logo span {
-    color: #22c55e;
-}
-
-.nav {
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-}
-
-.nav a {
-    text-decoration: none;
-    color: #9ca3af;
-    padding: 13px 15px;
-    border-radius: 8px;
-    display: block;
-    transition: 0.2s;
-}
-
-.nav a:hover {
-    background: #1f2937;
-    color: #ffffff;
-}
-
-.nav a.active {
-    background: #1f2937;
-    color: #22c55e;
-    font-weight: bold;
-}
-
-.nav .exit {
-    color: #ef4444;
-    margin-top: 15px;
-}
-
-/* =========================
-   MAIN
-========================= */
-
-.main {
-    margin-left: 250px;
-    width: calc(100% - 250px);
-    padding: 30px;
-}
-
-.topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-}
-
-.page-title {
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.account-badge {
-    background: #111827;
-    border: 1px solid #263244;
-    padding: 9px 15px;
-    border-radius: 20px;
-    color: #9ca3af;
-}
-
-.account-badge strong {
-    color: #22c55e;
-}
-
-/* =========================
-   PROFILE HERO
-========================= */
-
-.profile-hero {
-    background: linear-gradient(
-        135deg,
-        #111827,
-        #162033
-    );
-    border: 1px solid #263244;
-    border-radius: 14px;
-    padding: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-}
-
-.profile-left {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-}
-
-.avatar {
-    width: 75px;
-    height: 75px;
-    border-radius: 50%;
-    background: #22c55e;
-    color: #06100a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    font-weight: bold;
-}
-
-.profile-name {
-    font-size: 23px;
-    font-weight: bold;
-    margin-bottom: 6px;
-}
-
-.profile-email {
-    color: #9ca3af;
-    margin-bottom: 8px;
-}
-
-.status {
-    display: inline-block;
-    background: rgba(34, 197, 94, 0.12);
-    color: #22c55e;
-    padding: 5px 9px;
-    border-radius: 20px;
-    font-size: 12px;
-}
-
-.account-id {
-    color: #6b7280;
-    font-size: 12px;
-    margin-top: 7px;
-    word-break: break-all;
-}
-
-/* =========================
-   ACCOUNT SWITCHER
-========================= */
-
-.account-section {
-    background: #111827;
-    border: 1px solid #263244;
-    border-radius: 14px;
-    padding: 22px;
-    margin-bottom: 20px;
-}
-
-.section-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 17px;
-}
-
-.accounts {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-}
-
-.account-card {
-    border: 1px solid #374151;
-    background: #0f172a;
-    border-radius: 12px;
-    padding: 18px;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.account-card:hover {
-    border-color: #22c55e;
-}
-
-.account-card.selected {
-    border: 2px solid #22c55e;
-    background: rgba(34, 197, 94, 0.06);
-}
-
-.account-type {
-    color: #9ca3af;
-    font-size: 13px;
-    margin-bottom: 7px;
-}
-
-.account-balance {
-    font-size: 25px;
-    font-weight: bold;
-}
-
-.demo-balance {
-    color: #38bdf8;
-}
-
-.live-balance {
-    color: #22c55e;
-}
-
-.account-note {
-    color: #6b7280;
-    font-size: 12px;
-    margin-top: 7px;
-}
-
-/* =========================
-   GRID
-========================= */
-
-.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
-.card {
-    background: #111827;
-    border: 1px solid #263244;
-    border-radius: 14px;
-    padding: 22px;
-}
-
-.info-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 0;
-    border-bottom: 1px solid #263244;
-    gap: 20px;
-}
-
-.info-row:last-child {
-    border-bottom: none;
-}
-
-.info-label {
-    color: #6b7280;
-    font-size: 12px;
-    text-transform: uppercase;
-    margin-bottom: 5px;
-}
-
-.info-value {
-    color: #ffffff;
-    font-size: 15px;
-    word-break: break-word;
-}
-
-.info-right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-button {
-    border: none;
-    cursor: pointer;
-    font-family: inherit;
-}
-
-.edit-btn,
-.add-btn {
-    background: transparent;
-    color: #22c55e;
-    font-weight: bold;
-}
-
-.verified {
-    color: #22c55e;
-    font-size: 13px;
-}
-
-.pending {
-    color: #f59e0b;
-    font-size: 13px;
-}
-
-/* =========================
-   SECURITY / FINANCE
-========================= */
-
-.security-item,
-.finance-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 15px 0;
-    border-bottom: 1px solid #263244;
-}
-
-.security-item:last-child,
-.finance-item:last-child {
-    border-bottom: none;
-}
-
-.muted {
-    color: #9ca3af;
-}
-
-.value {
-    font-weight: bold;
-}
-
-/* =========================
-   CUSTOMER CARE
-========================= */
-
-.customer-care-card {
-    margin-top: 20px;
-    background: #111827;
-    border: 1px solid #263244;
-    border-radius: 14px;
-    padding: 22px;
-}
-
-.customer-care-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-}
-
-.customer-care-text h3 {
-    font-size: 18px;
-    margin-bottom: 7px;
-}
-
-.customer-care-text p {
-    color: #9ca3af;
-    font-size: 13px;
-    line-height: 1.5;
-}
-
-.chat-placeholder-btn {
-    background: #22c55e;
-    color: #06100a;
-    padding: 11px 18px;
-    border-radius: 8px;
-    font-weight: bold;
-    white-space: nowrap;
-}
-
-.chat-placeholder-btn:hover {
-    background: #16a34a;
-}
-
-/* =========================
-   CHAT MODAL
-========================= */
-
-.chat-modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.72);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-    padding: 20px;
-}
-
-.chat-modal-overlay.show {
-    display: flex;
-}
-
-.chat-modal {
-    width: 500px;
-    max-width: 100%;
-    height: 650px;
-    max-height: 90vh;
-    background: #111827;
-    border: 1px solid #374151;
-    border-radius: 15px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-}
-
-.chat-header {
-    padding: 17px 20px;
-    border-bottom: 1px solid #263244;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #162033;
-}
-
-.chat-header-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.chat-support-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #22c55e;
-    color: #06100a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-}
-
-.chat-header-title {
-    font-size: 15px;
-    font-weight: bold;
-}
-
-.chat-header-status {
-    color: #22c55e;
-    font-size: 11px;
-    margin-top: 3px;
-}
-
-.chat-close {
-    width: 34px;
-    height: 34px;
-    border-radius: 7px;
-    background: #263244;
-    color: #ffffff;
-    font-size: 20px;
-}
-
-.chat-close:hover {
-    background: #374151;
-}
-
-.chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.chat-empty {
-    margin: auto;
-    text-align: center;
-    color: #6b7280;
-    font-size: 13px;
-    line-height: 1.5;
-}
-
-.chat-message {
-    max-width: 78%;
-    padding: 10px 13px;
-    border-radius: 12px;
-    font-size: 13px;
-    line-height: 1.45;
-    word-break: break-word;
-}
-
-.chat-message.customer {
-    align-self: flex-end;
-    background: #22c55e;
-    color: #06100a;
-    border-bottom-right-radius: 3px;
-}
-
-.chat-message.support {
-    align-self: flex-start;
-    background: #1f2937;
-    color: #ffffff;
-    border: 1px solid #374151;
-    border-bottom-left-radius: 3px;
-}
-
-.chat-message-time {
-    display: block;
-    margin-top: 5px;
-    font-size: 9px;
-    opacity: 0.65;
-}
-
-.chat-input-area {
-    border-top: 1px solid #263244;
-    padding: 12px;
-    background: #0f172a;
-    display: flex;
-    gap: 9px;
-    align-items: flex-end;
-}
-
-.chat-input {
-    flex: 1;
-    resize: none;
-    min-height: 44px;
-    max-height: 110px;
-    padding: 12px;
-    background: #111827;
-    border: 1px solid #374151;
-    border-radius: 9px;
-    color: #ffffff;
-    font-family: inherit;
-    font-size: 13px;
-    outline: none;
-}
-
-.chat-input:focus {
-    border-color: #22c55e;
-}
-
-.chat-send {
-    min-width: 75px;
-    height: 44px;
-    background: #22c55e;
-    color: #06100a;
-    border-radius: 9px;
-    font-weight: bold;
-}
-
-.chat-send:hover {
-    background: #16a34a;
-}
-
-.chat-send:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.chat-error {
-    color: #ef4444;
-    font-size: 11px;
-    padding: 0 13px 10px;
-    display: none;
-}
-
-/* =========================
-   LOGOUT
-========================= */
-
-.logout-btn {
-    margin-top: 20px;
-    width: 100%;
-    padding: 13px;
-    background: #ef4444;
-    color: white;
-    border-radius: 8px;
-    font-weight: bold;
-}
-
-.logout-btn:hover {
-    background: #dc2626;
-}
-
-/* =========================
-   MODALS
-========================= */
-
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.7);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-
-.modal-overlay.show {
-    display: flex;
-}
-
-.modal {
-    width: 420px;
-    max-width: 92%;
-    background: #111827;
-    border: 1px solid #374151;
-    border-radius: 14px;
-    padding: 25px;
-}
-
-.modal h3 {
-    margin-bottom: 8px;
-}
-
-.modal p {
-    color: #9ca3af;
-    font-size: 14px;
-    margin-bottom: 20px;
-}
-
-.modal-option {
-    border: 1px solid #374151;
-    background: #0f172a;
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 10px;
-    cursor: pointer;
-}
-
-.modal-option:hover {
-    border-color: #22c55e;
-}
-
-.modal-option strong {
-    display: block;
-    margin-bottom: 5px;
-}
-
-.modal-option span {
-    color: #9ca3af;
-    font-size: 13px;
-}
-
-.close-modal {
-    width: 100%;
-    margin-top: 10px;
-    padding: 12px;
-    background: #374151;
-    color: white;
-    border-radius: 8px;
-}
-
-/* =========================
-   EDIT MODAL
-========================= */
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    color: #9ca3af;
-    font-size: 13px;
-    margin-bottom: 7px;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 12px;
-    background: #0f172a;
-    border: 1px solid #374151;
-    border-radius: 8px;
-    color: white;
-    outline: none;
-}
-
-.form-group input:focus {
-    border-color: #22c55e;
-}
-
-.save-btn {
-    width: 100%;
-    padding: 12px;
-    background: #22c55e;
-    color: #06100a;
-    border-radius: 8px;
-    font-weight: bold;
-}
-
-.cancel-btn {
-    width: 100%;
-    padding: 12px;
-    margin-top: 8px;
-    background: #374151;
-    color: white;
-    border-radius: 8px;
-}
-
-.message {
-    margin-top: 12px;
-    font-size: 13px;
-    text-align: center;
-}
-
-.message.success {
-    color: #22c55e;
-}
-
-.message.error {
-    color: #ef4444;
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width: 850px) {
-
-    .sidebar {
-        width: 210px;
-    }
-
-    .main {
-        margin-left: 210px;
-        width: calc(100% - 210px);
-    }
-
-    .grid {
-        grid-template-columns: 1fr;
-    }
-
-    .accounts {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 650px) {
-
-    .sidebar {
-        position: relative;
-        width: 100%;
-        height: auto;
-    }
-
-    .app {
-        display: block;
-    }
-
-    .main {
-        margin-left: 0;
-        width: 100%;
-        padding: 15px;
-    }
-
-    .profile-hero {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-    }
-
-    .customer-care-content {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .chat-placeholder-btn {
-        width: 100%;
-    }
-
-    .chat-modal {
-        height: 85vh;
-    }
-
-    .chat-message {
-        max-width: 88%;
-    }
-}
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#07111f">
+    <title>My Profile | KMFBinary</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --bg: #07111f;
+            --sidebar: #0b1728;
+            --panel: #101f34;
+            --border: #22344c;
+            --text: #f4f7fb;
+            --muted: #91a3bb;
+            --blue: #3b82f6;
+            --green: #22c55e;
+            --red: #ef4444;
+            --radius: 13px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        button, input, select { font: inherit; }
+        button, a, select { -webkit-tap-highlight-color: transparent; }
+
+        a { color: inherit; text-decoration: none; }
+
+        .app {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 245px;
+            flex-shrink: 0;
+            background: var(--sidebar);
+            border-right: 1px solid var(--border);
+            padding: 24px 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            font-size: 23px;
+            font-weight: 900;
+            padding: 0 12px 28px;
+        }
+
+        .brand span { color: var(--green); }
+
+        .user-summary {
+            padding: 14px;
+            background: #101f34;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 24px;
+            overflow-wrap: anywhere;
+        }
+
+        .user-summary small {
+            display: block;
+            color: var(--muted);
+            margin-bottom: 7px;
+        }
+
+        .user-summary strong { font-size: 13px; }
+
+        .menu-title {
+            color: #71849e;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            padding: 0 12px 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 9px;
+            color: #a9b8cc;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: white;
+            background: #172b45;
+        }
+
+        .nav-link.active {
+            border: 1px solid #294568;
+        }
+
+        .nav-icon {
+            width: 22px;
+            text-align: center;
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            padding-top: 25px;
+        }
+
+        .account-status {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 13px;
+            margin-bottom: 12px;
+        }
+
+        .account-status strong {
+            display: block;
+            font-size: 11px;
+            color: var(--green);
+        }
+
+        .account-status span {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 5px;
+        }
+
+        .logout {
+            width: 100%;
+            border: 1px solid #56303a;
+            background: #281923;
+            color: #fca5a5;
+            padding: 11px;
+            border-radius: 9px;
+            cursor: pointer;
+        }
+
+        .main {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .topbar {
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 16px 28px;
+            background: var(--sidebar);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .topbar h1 {
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .topbar-email {
+            color: var(--muted);
+            font-size: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .content {
+            max-width: 1250px;
+            padding: 28px;
+            margin: auto;
+        }
+
+        .welcome {
+            margin-bottom: 24px;
+        }
+
+        .welcome h2 {
+            font-size: 25px;
+            margin: 0 0 8px;
+        }
+
+        .welcome p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .card, .panel {
+            background: var(--sidebar);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+
+        .card { padding: 20px; }
+
+        .card-label {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .5px;
+        }
+
+        .card-value {
+            margin-top: 12px;
+            font-size: 25px;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .card-note {
+            color: #71849e;
+            font-size: 11px;
+            margin-top: 8px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.3fr) minmax(280px, .7fr);
+            gap: 18px;
+        }
+
+        .panel { padding: 22px; margin-bottom: 18px; }
+
+        .panel h3 {
+            font-size: 16px;
+            margin: 0 0 7px;
+        }
+
+        .panel-description {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.6;
+            margin: 0 0 20px;
+        }
+
+        .field { margin-bottom: 17px; }
+
+        .field label {
+            display: block;
+            color: #b5c2d3;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .input {
+            width: 100%;
+            min-height: 43px;
+            padding: 11px 12px;
+            background: #07111f;
+            border: 1px solid #2a3c55;
+            border-radius: 8px;
+            color: white;
+            outline: none;
+        }
+
+        .input:focus { border-color: var(--blue); }
+
+        .input[readonly] { color: #9aabc0; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 42px;
+            border: 0;
+            border-radius: 8px;
+            padding: 10px 15px;
+            background: var(--blue);
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn:hover { filter: brightness(1.1); }
+
+        .btn:disabled {
+            opacity: .55;
+            cursor: wait;
+        }
+
+        .btn-secondary {
+            background: #172b45;
+            border: 1px solid #304763;
+        }
+
+        .btn-danger {
+            background: #3a2029;
+            border: 1px solid #633441;
+            color: #fca5a5;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: #172b45;
+            color: #bfdbfe;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .status.approved {
+            background: #103b25;
+            color: #86efac;
+        }
+
+        .status.pending {
+            background: #453514;
+            color: #fde68a;
+        }
+
+        .status.rejected {
+            background: #481f28;
+            color: #fca5a5;
+        }
+
+        .verification-box {
+            border: 1px solid var(--border);
+            background: #0d1b2e;
+            border-radius: 10px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+
+        .verification-box p {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .message {
+            display: none;
+            margin-top: 14px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .message.show { display: block; }
+
+        .message.info {
+            background: #122943;
+            color: #bfdbfe;
+        }
+
+        .message.success {
+            background: #103b25;
+            color: #86efac;
+        }
+
+        .message.error {
+            background: #481f28;
+            color: #fca5a5;
+        }
+
+        .account-select {
+            width: 100%;
+            min-height: 43px;
+            padding: 10px;
+            color: white;
+            background: #07111f;
+            border: 1px solid #2a3c55;
+            border-radius: 8px;
+        }
+
+        .help-text {
+            color: #71849e;
+            font-size: 11px;
+            line-height: 1.6;
+            margin-top: 9px;
+        }
+
+        .mobile-menu {
+            display: none;
+            background: #172b45;
+            color: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 9px 11px;
+            cursor: pointer;
+        }
+
+        /* Customer Care modal */
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            background: rgba(0, 0, 0, .72);
+        }
+
+        .modal.open { display: flex; }
+
+        .chat-panel {
+            width: 100%;
+            max-width: 560px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            background: #0b1728;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 17px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .chat-header h3 { margin: 0; }
+
+        .chat-close {
+            border: 0;
+            color: white;
+            background: transparent;
+            font-size: 23px;
+            cursor: pointer;
+        }
+
+        .chat-messages {
+            flex: 1;
+            min-height: 240px;
+            max-height: 50vh;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .chat-message {
+            margin-bottom: 12px;
+            padding: 11px 12px;
+            max-width: 88%;
+            border-radius: 10px;
+            background: #172b45;
+            font-size: 12px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+            white-space: pre-wrap;
+        }
+
+        .chat-message.mine {
+            margin-left: auto;
+            background: #1d4b83;
+        }
+
+        .chat-time {
+            color: #91a3bb;
+            font-size: 10px;
+            margin-top: 6px;
+        }
+
+        .chat-compose {
+            display: flex;
+            gap: 8px;
+            padding: 13px;
+            border-top: 1px solid var(--border);
+        }
+
+        .chat-compose .input { flex: 1; min-width: 0; }
+
+        .loading {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        @media (max-width: 950px) {
+            .sidebar {
+                position: fixed;
+                z-index: 50;
+                inset: 0 auto 0 0;
+                transform: translateX(-100%);
+                transition: transform .2s ease;
+                overflow-y: auto;
+            }
+
+            .sidebar.open { transform: translateX(0); }
+            .mobile-menu { display: inline-block; }
+            .topbar { padding: 14px 18px; }
+            .content { padding: 18px; }
+            .layout { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 650px) {
+            .cards { grid-template-columns: 1fr; gap: 11px; }
+            .card { padding: 16px; }
+            .card-value { font-size: 22px; }
+            .topbar-email { max-width: 145px; text-align: right; }
+            .content { padding: 13px; }
+            .panel { padding: 17px; }
+            .welcome h2 { font-size: 22px; }
+        }
+    </style>
 </head>
 
 <body>
-
 <div class="app">
 
-<aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">KMF<span>Binary</span></div>
 
-```
-<div class="logo">
-    KMF<span>Binary</span>
-</div>
-
-<nav class="nav">
-
-    <a href="dashboard.html">
-        Dashboard
-    </a>
-
-    <a href="markets.html">
-        Markets
-    </a>
-
-    <a href="trade.html">
-        Trade
-    </a>
-
-    <a href="history.html">
-        History
-    </a>
-
-    <a href="wallet.html">
-        Wallet
-    </a>
-
-    <a href="profile.html" class="active">
-        Profile
-    </a>
-
-    <a href="ai.html">
-        AI Analysis
-    </a>
-
-    <a href="automation.html">
-        Automation
-    </a>
-
-    <a href="#" class="exit" id="logoutNav">
-        Exit
-    </a>
-
-</nav>
-```
-
-</aside>
-
-<main class="main">
-
-```
-<div class="topbar">
-
-    <div class="page-title">
-        Profile
-    </div>
-
-    <div class="account-badge">
-
-        Account:
-
-        <strong id="topAccount">
-            DEMO
-        </strong>
-
-    </div>
-
-</div>
-
-
-<section class="profile-hero">
-
-    <div class="profile-left">
-
-        <div class="avatar" id="avatar">
-            K
+        <div class="user-summary">
+            <small>Signed in as</small>
+            <strong id="sidebarEmail">Loading account...</strong>
         </div>
 
-        <div>
+        <div class="menu-title">WORKSPACE</div>
 
-            <div
-                class="profile-name"
-                id="profileName"
-            >
-                Loading...
+        <a class="nav-link" href="dashboard.html">
+            <span class="nav-icon">⌂</span> Dashboard
+        </a>
+        <a class="nav-link" href="markets.html">
+            <span class="nav-icon">◈</span> Markets
+        </a>
+        <a class="nav-link" href="trade.html">
+            <span class="nav-icon">↗</span> Trade
+        </a>
+        <a class="nav-link" href="history.html">
+            <span class="nav-icon">◷</span> Trade History
+        </a>
+        <a class="nav-link" href="wallet.html">
+            <span class="nav-icon">▣</span> Wallet
+        </a>
+        <a class="nav-link active" href="profile.html" aria-current="page">
+            <span class="nav-icon">♙</span> My Profile
+        </a>
+        <a class="nav-link" href="ai.html">
+            <span class="nav-icon">✧</span> AI Analysis
+        </a>
+        <a class="nav-link" href="automation.html">
+            <span class="nav-icon">⚡</span> Automation
+        </a>
+
+        <div class="menu-title" style="margin-top:20px">ACCOUNT</div>
+        <a class="nav-link" href="verification.html">
+            <span class="nav-icon">✓</span> Identity Verification
+        </a>
+        <a class="nav-link" href="index.html">
+            <span class="nav-icon">↩</span> Exit
+        </a>
+
+        <div class="sidebar-bottom">
+            <div class="account-status">
+                <strong id="sidebarAccount">DEMO ACCOUNT</strong>
+                <span id="sidebarAccountDescription">Virtual funds</span>
             </div>
-
-            <div
-                class="profile-email"
-                id="profileEmail"
-            >
-                Loading...
-            </div>
-
-            <span class="status">
-                ● Account Active
-            </span>
-
-            <div class="account-id">
-
-                ID:
-
-                <span id="accountId">
-                    Loading...
-                </span>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<section class="account-section">
-
-    <div class="section-title">
-        Trading Account
-    </div>
-
-    <div class="accounts">
-
-        <div
-            class="account-card"
-            id="demoAccount"
-            onclick="selectAccount('demo')"
-        >
-
-            <div class="account-type">
-                DEMO ACCOUNT
-            </div>
-
-            <div
-                class="account-balance demo-balance"
-                id="demoBalance"
-            >
-                $10,000.00
-            </div>
-
-            <div class="account-note">
-                Practice trading with virtual funds
-            </div>
-
-        </div>
-
-
-        <div
-            class="account-card"
-            id="liveAccount"
-            onclick="selectAccount('live')"
-        >
-
-            <div class="account-type">
-                LIVE ACCOUNT
-            </div>
-
-            <div
-                class="account-balance live-balance"
-                id="liveBalance"
-            >
-                $0.00
-            </div>
-
-            <div class="account-note">
-                Real-money trading account
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<div class="grid">
-
-    <section class="card">
-
-        <div class="section-title">
-            Personal Information
-        </div>
-
-        <div class="info-row">
-
-            <div>
-
-                <div class="info-label">
-                    Full Name
-                </div>
-
-                <div
-                    class="info-value"
-                    id="displayFullName"
-                >
-                    Loading...
-                </div>
-
-            </div>
-
-            <div class="info-right">
-
-                <button
-                    class="edit-btn"
-                    onclick="openEditModal()"
-                >
-                    Edit
-                </button>
-
-            </div>
-
-        </div>
-
-
-        <div class="info-row">
-
-            <div>
-
-                <div class="info-label">
-                    Email
-                </div>
-
-                <div
-                    class="info-value"
-                    id="displayEmail"
-                >
-                    Loading...
-                </div>
-
-            </div>
-
-            <div class="info-right">
-
-                <span class="verified">
-                    Verified
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <div class="info-row">
-
-            <div>
-
-                <div class="info-label">
-                    Phone Number
-                </div>
-
-                <div
-                    class="info-value"
-                    id="displayPhone"
-                >
-                    Not added
-                </div>
-
-            </div>
-
-            <div class="info-right">
-
-                <button
-                    class="add-btn"
-                    onclick="openEditModal()"
-                    id="phoneAction"
-                >
-                    Add
-                </button>
-
-            </div>
-
-        </div>
-
-
-        <div class="info-row">
-
-            <div>
-
-                <div class="info-label">
-                    Country
-                </div>
-
-                <div
-                    class="info-value"
-                    id="displayCountry"
-                >
-                    Kenya
-                </div>
-
-            </div>
-
-            <div class="info-right">
-
-                <button
-                    class="edit-btn"
-                    onclick="openEditModal()"
-                >
-                    Edit
-                </button>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <section class="card">
-
-        <div class="section-title">
-            Verification
-        </div>
-
-        <div class="info-row">
-
-            <div>
-
-                <div class="info-label">
-                    Email Verification
-                </div>
-
-                <div class="info-value">
-                    Your email is verified
-                </div>
-
-            </div>
-
-            <div class="verified">
-                Verified
-            </div>
-
-        </div>
-
-
-        <div class="info-row">
-
-            <div>
-
-                <div class="info-label">
-                    Phone Verification
-                </div>
-
-                <div class="info-value">
-                    Phone verification
-                </div>
-
-            </div>
-
-            <div
-                class="pending"
-                id="phoneVerification"
-            >
-                Pending
-            </div>
-
-        </div>
-
-
-        <div class="info-row">
-
-            <div>
-
-                <div class="info-label">
-                    Identity Verification
-                </div>
-
-                <div class="info-value">
-                    Identity documents
-                </div>
-
-            </div>
-
-            <div class="pending">
-                Pending
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <section class="card">
-
-        <div class="section-title">
-            Security
-        </div>
-
-        <div class="security-item">
-
-            <span class="muted">
-                Password
-            </span>
-
-            <button
-                class="edit-btn"
-                onclick="resetPassword()"
-            >
-                Reset
+            <button class="logout" id="logoutButton" type="button">
+                ↩ Logout
             </button>
-
         </div>
-
-
-        <div class="security-item">
-
-            <span class="muted">
-                Authentication
-            </span>
-
-            <span class="verified">
-                Active
-            </span>
-
-        </div>
-
-    </section>
-
-
-    <section class="card">
-
-        <div class="section-title">
-            Finance
-        </div>
-
-        <div class="finance-item">
-
-            <span class="muted">
-                Live Balance
-            </span>
-
-            <span
-                class="value"
-                id="financeLiveBalance"
-            >
-                $0.00
-            </span>
-
-        </div>
-
-
-        <div class="finance-item">
-
-            <span class="muted">
-                Demo Balance
-            </span>
-
-            <span
-                class="value"
-                id="financeDemoBalance"
-            >
-                $10,000.00
-            </span>
-
-        </div>
-
-
-        <div class="finance-item">
-
-            <span class="muted">
-                Currency
-            </span>
-
-            <span class="value">
-                USD
-            </span>
-
-        </div>
-
-    </section>
-
-</div>
-
-
-<section class="customer-care-card">
-
-    <div class="customer-care-content">
-
-        <div class="customer-care-text">
-
-            <h3>
-                Customer Care
-            </h3>
-
-            <p>
-                Need help with your account, deposits,
-                withdrawals or trades? Chat directly
-                with KMFBinary Customer Care.
-            </p>
-
-        </div>
-
-        <button
-            type="button"
-            class="chat-placeholder-btn"
-            onclick="openCustomerCare()"
-        >
-            💬 Chat with Customer Care
-        </button>
-
-    </div>
-
-</section>
-
-
-<button
-    class="logout-btn"
-    id="logoutButton"
->
-    Logout
-</button>
-```
-
-</main>
-
-</div>
-
-<!-- =========================
-     ACCOUNT MODAL
-========================= -->
-
-<div
-    class="modal-overlay"
-    id="accountModal"
->
-
-```
-<div class="modal">
-
-    <h3>
-        Switch Account
-    </h3>
-
-    <p>
-        Select the account you want to use for trading.
-        Demo and Live balances remain completely separate.
-    </p>
-
-
-    <div
-        class="modal-option"
-        onclick="confirmAccount('demo')"
-    >
-
-        <strong>
-            Demo Account
-        </strong>
-
-        <span>
-            Uses virtual demo funds.
-        </span>
-
-    </div>
-
-
-    <div
-        class="modal-option"
-        onclick="confirmAccount('live')"
-    >
-
-        <strong>
-            Live Account
-        </strong>
-
-        <span>
-            Uses your real-money balance.
-        </span>
-
-    </div>
-
-
-    <button
-        class="close-modal"
-        onclick="closeAccountModal()"
-    >
-        Cancel
-    </button>
-
-</div>
-```
-
-</div>
-
-<!-- =========================
-     EDIT PROFILE MODAL
-========================= -->
-
-<div
-    class="modal-overlay"
-    id="editModal"
->
-
-```
-<div class="modal">
-
-    <h3>
-        Edit Personal Information
-    </h3>
-
-    <p>
-        Your information will be saved to your KMFBinary account.
-    </p>
-
-
-    <div class="form-group">
-
-        <label for="editFullName">
-            Full Name
-        </label>
-
-        <input
-            type="text"
-            id="editFullName"
-            placeholder="Enter your full name"
-        >
-
-    </div>
-
-
-    <div class="form-group">
-
-        <label for="editPhone">
-            Phone Number
-        </label>
-
-        <input
-            type="tel"
-            id="editPhone"
-            placeholder="e.g. 0712345678"
-        >
-
-    </div>
-
-
-    <div class="form-group">
-
-        <label for="editCountry">
-            Country
-        </label>
-
-        <input
-            type="text"
-            id="editCountry"
-            placeholder="Enter your country"
-        >
-
-    </div>
-
-
-    <button
-        class="save-btn"
-        id="saveProfileButton"
-        onclick="saveProfile()"
-    >
-        Save Changes
-    </button>
-
-
-    <button
-        class="cancel-btn"
-        onclick="closeEditModal()"
-    >
-        Cancel
-    </button>
-
-
-    <div
-        class="message"
-        id="editMessage"
-    ></div>
-
-</div>
-```
-
-</div>
-
-<!-- =========================
-     CUSTOMER CARE CHAT
-========================= -->
-
-<div
-    class="chat-modal-overlay"
-    id="customerCareModal"
->
-
-```
-<div class="chat-modal">
-
-    <div class="chat-header">
-
-        <div class="chat-header-left">
-
-            <div class="chat-support-icon">
-                ?
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div style="display:flex;align-items:center;gap:12px">
+                <button class="mobile-menu" id="mobileMenu" type="button"
+                    aria-label="Open navigation">☰</button>
+                <h1>My Profile</h1>
+            </div>
+            <div class="topbar-email" id="userEmail">Checking login...</div>
+        </header>
+
+        <div class="content">
+            <section class="welcome">
+                <h2>Account overview</h2>
+                <p>Manage your profile, account mode, wallet information and identity verification.</p>
+            </section>
+
+            <section class="cards">
+                <div class="card">
+                    <div class="card-label">LIVE WALLET BALANCE</div>
+                    <div class="card-value" id="realBalance">$0.00</div>
+                    <div class="card-note">Real account funds</div>
+                </div>
+                <div class="card">
+                    <div class="card-label">DEMO WALLET BALANCE</div>
+                    <div class="card-value" id="demoBalance">$10,000.00</div>
+                    <div class="card-note">Virtual funds only</div>
+                </div>
+                <div class="card">
+                    <div class="card-label">IDENTITY VERIFICATION</div>
+                    <div style="margin-top:12px">
+                        <span class="status" id="kycStatus">Checking</span>
+                    </div>
+                    <div class="card-note" id="kycShortNote">Loading verification status</div>
+                </div>
+            </section>
+
+            <div class="layout">
+                <div>
+                    <section class="panel">
+                        <h3>Personal information</h3>
+                        <p class="panel-description">
+                            Review your account details. Changes to sensitive account data
+                            must be verified by the appropriate backend process.
+                        </p>
+
+                        <form id="profileForm">
+                            <div class="field">
+                                <label for="profileFullName">Full name</label>
+                                <input class="input" id="profileFullName"
+                                    name="full_name" maxlength="100"
+                                    autocomplete="name" placeholder="Your full name">
+                            </div>
+
+                            <div class="field">
+                                <label for="profileUsername">Username</label>
+                                <input class="input" id="profileUsername"
+                                    name="username" maxlength="50"
+                                    autocomplete="username" placeholder="Username">
+                            </div>
+
+                            <div class="field">
+                                <label for="profileEmail">Email address</label>
+                                <input class="input" id="profileEmail"
+                                    type="email" readonly>
+                                <div class="help-text">
+                                    Email changes are not made from this form.
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label for="profilePhone">Phone number</label>
+                                <input class="input" id="profilePhone"
+                                    name="phone" maxlength="30"
+                                    autocomplete="tel" placeholder="Phone number">
+                            </div>
+
+                            <div class="field">
+                                <label for="profileCountry">Country</label>
+                                <input class="input" id="profileCountry"
+                                    name="country" maxlength="80"
+                                    autocomplete="country-name" placeholder="Country">
+                            </div>
+
+                            <div class="button-row">
+                                <button class="btn" id="saveProfileButton" type="submit">
+                                    Save profile
+                                </button>
+                                <button class="btn btn-secondary" id="refreshButton" type="button">
+                                    Refresh details
+                                </button>
+                            </div>
+
+                            <div class="message" id="profileMessage" role="status"></div>
+                        </form>
+                    </section>
+
+                    <section class="panel">
+                        <h3>Identity verification</h3>
+                        <p class="panel-description">
+                            Verification status is read from KMFBinary's backend.
+                            Submit a KRA report through the verification page.
+                        </p>
+
+                        <div class="verification-box">
+                            <span class="status" id="kycStatusDetail">Checking</span>
+                            <p id="kycDescription">
+                                Your verification status is being checked.
+                            </p>
+                            <p id="kycRejectionReason" style="display:none"></p>
+                        </div>
+
+                        <div class="button-row">
+                            <a class="btn" href="verification.html">Open verification page</a>
+                            <button class="btn btn-secondary" id="refreshKycButton" type="button">
+                                Refresh status
+                            </button>
+                        </div>
+
+                        <div class="message" id="kycMessage" role="status"></div>
+                    </section>
+                </div>
+
+                <div>
+                    <section class="panel">
+                        <h3>Account mode</h3>
+                        <p class="panel-description">
+                            Select the account mode used by supported KMFBinary trading pages.
+                        </p>
+
+                        <div class="field">
+                            <label for="accountMode">Trading account</label>
+                            <select class="account-select" id="accountMode">
+                                <option value="demo">Demo account</option>
+                                <option value="real">Live account</option>
+                            </select>
+                        </div>
+
+                        <div class="help-text">
+                            Switching the selection does not transfer money between accounts.
+                            Live trades use real funds; demo trades use virtual funds.
+                        </div>
+
+                        <div class="message" id="modeMessage" role="status"></div>
+                    </section>
+
+                    <section class="panel">
+                        <h3>Password and security</h3>
+                        <p class="panel-description">
+                            Request a password-reset email for your signed-in account.
+                        </p>
+
+                        <div class="field">
+                            <label for="resetEmail">Account email</label>
+                            <input class="input" id="resetEmail" type="email" readonly>
+                        </div>
+
+                        <button class="btn" id="passwordResetButton" type="button">
+                            Send password-reset email
+                        </button>
+
+                        <div class="message" id="securityMessage" role="status"></div>
+                    </section>
+
+                    <section class="panel">
+                        <h3>Customer Care</h3>
+                        <p class="panel-description">
+                            Contact support about deposits, withdrawals, trading, verification,
+                            account access or other issues.
+                        </p>
+                        <button class="btn" id="openSupportButton" type="button">
+                            Open Customer Care
+                        </button>
+                        <div class="help-text">
+                            Messages require an authenticated session and an available backend.
+                        </div>
+                    </section>
+                </div>
             </div>
 
+            <div class="message info show" id="pageNotice" role="status">
+                Checking your account session. Temporary API errors will not automatically
+                redirect this page to the dashboard.
+            </div>
+        </div>
+    </main>
+</div>
+
+<div class="modal" id="supportModal" role="dialog" aria-modal="true"
+    aria-labelledby="supportTitle">
+    <section class="chat-panel">
+        <header class="chat-header">
             <div>
-
-                <div class="chat-header-title">
-                    KMFBinary Customer Care
-                </div>
-
-                <div class="chat-header-status">
-                    ● Support chat
-                </div>
-
+                <h3 id="supportTitle">KMFBinary Customer Care</h3>
+                <div class="help-text" id="supportStatus">Connecting...</div>
             </div>
+            <button class="chat-close" id="closeSupportButton"
+                type="button" aria-label="Close Customer Care">×</button>
+        </header>
 
+        <div class="chat-messages" id="supportMessages" aria-live="polite">
+            <div class="loading">Loading your conversation...</div>
         </div>
 
-
-        <button
-            type="button"
-            class="chat-close"
-            onclick="closeCustomerCare()"
-        >
-            ×
-        </button>
-
-    </div>
-
-
-    <div
-        class="chat-messages"
-        id="customerCareMessages"
-    >
-
-        <div class="chat-empty">
-            Loading Customer Care...
-        </div>
-
-    </div>
-
-
-    <div
-        class="chat-error"
-        id="customerCareError"
-    ></div>
-
-
-    <div class="chat-input-area">
-
-        <textarea
-            id="customerCareInput"
-            class="chat-input"
-            maxlength="2000"
-            placeholder="Type your message..."
-            rows="1"
-        ></textarea>
-
-        <button
-            type="button"
-            class="chat-send"
-            id="customerCareSend"
-            onclick="sendCustomerCareMessage()"
-        >
-            Send
-        </button>
-
-    </div>
-
-</div>
-```
-
+        <form class="chat-compose" id="supportForm">
+            <input class="input" id="supportMessageInput"
+                maxlength="2000" autocomplete="off"
+                placeholder="Write your message..." required>
+            <button class="btn" id="sendSupportButton" type="submit">Send</button>
+        </form>
+    </section>
 </div>
 
 <script>
+"use strict";
 
-/* ==========================================
-   SUPABASE
-========================================== */
+/*
+ * Frontend runs on Live Server :5500.
+ * API calls go to the Express backend on :3000.
+ *
+ * Keep the existing Supabase Auth project for login only.
+ * KYC records and KYC file handling are not performed by this page.
+ */
+const SUPABASE_URL = "https://nugufikdivanyzmghofq.supabase.co";
+const SUPABASE_KEY = "sb_publishable_NfsjmPephsaJrRB6vLXglw_G6yTdPTl";
+const API_BASE = "http://localhost:3000";
 
-const SUPABASE_URL =
-    "https://nugufikdivanyzmghofq.supabase.co";
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
 
-const SUPABASE_KEY =
-    "sb_publishable_NfsjmPephsaJrRB6vLXglw_G6yTdPTl";
+let currentSession = null;
+let supportConversationId = null;
+let supportPollingTimer = null;
+let supportPollingBusy = false;
+let supportMessagesSignature = "";
 
-const API_BASE_URL =
-    "http://localhost:3000";
+const $ = id => document.getElementById(id);
 
-const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
+function showMessage(id, text, type = "info") {
+    const element = $(id);
+    if (!element) return;
 
-
-/* ==========================================
-   STATE
-========================================== */
-
-let currentUser = null;
-let walletData = null;
-
-let customerCareConversation = null;
-
-let customerCarePollingTimer = null;
-
-let customerCareLoading = false;
-
-
-/* ==========================================
-   ACCOUNT MODE
-========================================== */
-
-function getSelectedAccount() {
-
-    const mode =
-        String(
-            localStorage.getItem(
-                "kmf_account_mode"
-            ) || "demo"
-        )
-        .trim()
-        .toLowerCase();
-
-    if (
-        mode !== "demo" &&
-        mode !== "live"
-    ) {
-
-        localStorage.setItem(
-            "kmf_account_mode",
-            "demo"
-        );
-
-        return "demo";
-
-    }
-
-    return mode;
-
+    element.textContent = String(text || "");
+    element.className = "message show " + type;
 }
 
-
-function saveSelectedAccount(mode) {
-
-    if (
-        mode !== "demo" &&
-        mode !== "live"
-    ) {
-        return;
+function clearMessage(id) {
+    const element = $(id);
+    if (element) {
+        element.textContent = "";
+        element.className = "message";
     }
-
-    localStorage.setItem(
-        "kmf_account_mode",
-        mode
-    );
-
-    localStorage.setItem(
-        "kmf_selected_account",
-        mode
-    );
-
 }
 
-
-/* ==========================================
-   ACCOUNT DISPLAY
-========================================== */
-
-function updateAccountDisplay() {
-
-    const mode =
-        getSelectedAccount();
-
-    const demo =
-        document.getElementById(
-            "demoAccount"
-        );
-
-    const live =
-        document.getElementById(
-            "liveAccount"
-        );
-
-    const topAccount =
-        document.getElementById(
-            "topAccount"
-        );
-
-
-    if (demo) {
-
-        demo.classList.toggle(
-            "selected",
-            mode === "demo"
-        );
-
-    }
-
-
-    if (live) {
-
-        live.classList.toggle(
-            "selected",
-            mode === "live"
-        );
-
-    }
-
-
-    if (topAccount) {
-
-        topAccount.textContent =
-            mode === "live"
-                ? "LIVE"
-                : "DEMO";
-
-    }
-
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 }
 
-
-/* ==========================================
-   ACCOUNT SELECTION
-========================================== */
-
-function selectAccount(account) {
-
-    if (
-        account !== "demo" &&
-        account !== "live"
-    ) {
-        return;
-    }
-
-    openAccountModal();
-
+function formatMoney(value) {
+    const number = Number(value);
+    return "$" + (Number.isFinite(number) ? number : 0).toFixed(2);
 }
 
+function setAccountMode(value) {
+    const normalized = String(value || "demo").toLowerCase();
+    const mode = ["real", "live"].includes(normalized) ? "real" : "demo";
 
-function confirmAccount(account) {
+    $("accountMode").value = mode;
+    localStorage.setItem("kmf_account_mode", mode);
+    localStorage.setItem("kmf_selected_account", mode);
 
-    if (
-        account !== "demo" &&
-        account !== "live"
-    ) {
-        return;
-    }
-
-    saveSelectedAccount(account);
-
-    updateAccountDisplay();
-
-    closeAccountModal();
-
+    const live = mode === "real";
+    $("sidebarAccount").textContent = live ? "LIVE ACCOUNT" : "DEMO ACCOUNT";
+    $("sidebarAccountDescription").textContent =
+        live ? "Real funds" : "Virtual funds";
 }
 
+function setKycStatus(status, rejectionReason = "") {
+    const normalized = String(status || "not_submitted").toLowerCase();
+    const labels = {
+        approved: "Approved",
+        verified: "Approved",
+        pending: "Pending review",
+        rejected: "Rejected",
+        not_submitted: "Not submitted",
+        required: "Required"
+    };
 
-function openAccountModal() {
+    const label = labels[normalized] || "Not submitted";
+    const cssClass =
+        ["approved", "verified"].includes(normalized) ? "approved" :
+        normalized === "pending" ? "pending" :
+        normalized === "rejected" ? "rejected" : "";
 
-    const modal =
-        document.getElementById(
-            "accountModal"
-        );
-
-    if (modal) {
-
-        modal.classList.add(
-            "show"
-        );
-
+    for (const id of ["kycStatus", "kycStatusDetail"]) {
+        const element = $(id);
+        element.textContent = label;
+        element.className = "status " + cssClass;
     }
 
+    $("kycShortNote").textContent =
+        normalized === "approved" || normalized === "verified"
+            ? "Identity verification approved"
+            : normalized === "pending"
+                ? "Your submission is awaiting review"
+                : normalized === "rejected"
+                    ? "Action is required"
+                    : "Complete verification when ready";
+
+    $("kycDescription").textContent =
+        normalized === "approved" || normalized === "verified"
+            ? "Your identity verification has been approved."
+            : normalized === "pending"
+                ? "Your verification is being reviewed. Please wait for an update."
+                : normalized === "rejected"
+                    ? "Your verification was rejected. Review the reason below and follow the instructions on the verification page."
+                    : "Identity verification has not been approved yet. Open the verification page to review the required steps.";
+
+    const reasonElement = $("kycRejectionReason");
+    if (rejectionReason) {
+        reasonElement.style.display = "block";
+        reasonElement.textContent = "Review note: " + rejectionReason;
+    } else {
+        reasonElement.style.display = "none";
+        reasonElement.textContent = "";
+    }
 }
 
-
-function closeAccountModal() {
-
-    const modal =
-        document.getElementById(
-            "accountModal"
-        );
-
-    if (modal) {
-
-        modal.classList.remove(
-            "show"
-        );
-
-    }
-
+async function getSession() {
+    const { data, error } = await supabaseClient.auth.getSession();
+    if (error) throw error;
+    return data.session || null;
 }
 
-
-/* ==========================================
-   AUTH SESSION
-========================================== */
-
-async function getCustomerCareSession() {
-
-    const {
-        data,
-        error
-    } =
-        await supabaseClient.auth.getSession();
-
-
-    if (error) {
-
-        throw error;
-
+async function apiRequest(endpoint, options = {}) {
+    if (!currentSession) {
+        throw new Error("Your login session is unavailable. Please sign in again.");
     }
 
+    const headers = new Headers(options.headers || {});
+    headers.set("Authorization", "Bearer " + currentSession.access_token);
 
-    if (
-        !data ||
-        !data.session
-    ) {
-
-        window.location.href =
-            "login.html";
-
-        return null;
-
+    const hasBody = options.body !== undefined && options.body !== null;
+    if (hasBody && !(options.body instanceof FormData) &&
+        !headers.has("Content-Type")) {
+        headers.set("Content-Type", "application/json");
     }
 
+    const response = await fetch(API_BASE + endpoint, {
+        ...options,
+        headers,
+        mode: "cors"
+    });
 
-    return data.session;
+    const contentType = response.headers.get("content-type") || "";
+    let data = {};
 
+    if (contentType.includes("application/json")) {
+        data = await response.json();
+    } else {
+        const text = await response.text();
+        data = text ? { message: text } : {};
+    }
+
+    if (!response.ok) {
+        throw new Error(
+            data.message || data.error ||
+            `Request failed (${response.status}).`
+        );
+    }
+
+    return data;
 }
 
+function showApiFailure(area, error) {
+    console.error(area + " error:", error);
+    const text = error?.message || "The request could not be completed.";
 
-/* ==========================================
-   CUSTOMER CARE
-========================================== */
-
-async function openCustomerCare() {
-
-    const modal =
-        document.getElementById(
-            "customerCareModal"
-        );
-
-
-    if (!modal) {
-        return;
+    if (area === "Wallet") {
+        showMessage("pageNotice",
+            "Your profile remains open, but wallet data could not be loaded. " + text,
+            "error");
+    } else if (area === "Profile") {
+        showMessage("profileMessage", text, "error");
+    } else if (area === "Verification") {
+        showMessage("kycMessage",
+            "Your profile remains open, but verification status could not be loaded. " + text,
+            "error");
     }
+}
 
-
-    modal.classList.add(
-        "show"
-    );
-
-
-    const messages =
-        document.getElementById(
-            "customerCareMessages"
-        );
-
-
-    messages.innerHTML =
-        `
-        <div class="chat-empty">
-            Loading Customer Care...
-        </div>
-        `;
-
-
-    clearCustomerCarePolling();
-
-
+/*
+ * This page does not redirect to dashboard on failed API calls.
+ * Only a missing authentication session sends the user to login.
+ */
+async function initializeProfile() {
     try {
+        currentSession = await getSession();
 
-        await loadCustomerCare();
-
-
-        customerCarePollingTimer =
-            setInterval(
-                async () => {
-
-                    if (
-                        customerCareLoading
-                    ) {
-                        return;
-                    }
-
-                    await loadCustomerCareMessages(
-                        false
-                    );
-
-                },
-                5000
-            );
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Customer Care loading error:",
-            error
-        );
-
-
-        showCustomerCareError(
-            error.message ||
-            "Unable to load Customer Care."
-        );
-
-    }
-
-}
-
-
-function closeCustomerCare() {
-
-    const modal =
-        document.getElementById(
-            "customerCareModal"
-        );
-
-
-    if (modal) {
-
-        modal.classList.remove(
-            "show"
-        );
-
-    }
-
-
-    clearCustomerCarePolling();
-
-}
-
-
-function clearCustomerCarePolling() {
-
-    if (
-        customerCarePollingTimer
-    ) {
-
-        clearInterval(
-            customerCarePollingTimer
-        );
-
-        customerCarePollingTimer =
-            null;
-
-    }
-
-}
-
-
-/* ==========================================
-   LOAD CUSTOMER CARE
-========================================== */
-
-async function loadCustomerCare() {
-
-    customerCareLoading =
-        true;
-
-
-    try {
-
-        const session =
-            await getCustomerCareSession();
-
-
-        if (!session) {
+        if (!currentSession) {
+            window.location.replace("login.html");
             return;
         }
 
+        const email = currentSession.user?.email || "Authenticated user";
 
-        const headers = {
+        $("userEmail").textContent = email;
+        $("sidebarEmail").textContent = email;
+        $("profileEmail").value = email;
+        $("resetEmail").value = email;
 
-            "Authorization":
-                "Bearer " +
-                session.access_token,
+        const savedMode =
+            localStorage.getItem("kmf_account_mode") ||
+            localStorage.getItem("kmf_selected_account") ||
+            "demo";
 
-            "Content-Type":
-                "application/json"
+        setAccountMode(savedMode);
 
-        };
+        $("pageNotice").className = "message";
+        $("pageNotice").textContent = "";
 
-
-        const conversationResponse =
-            await fetch(
-                API_BASE_URL +
-                "/api/support/conversation",
-                {
-                    method: "GET",
-                    headers: headers
-                }
-            );
-
-
-        const conversationData =
-            await conversationResponse.json();
-
-
-        if (
-            !conversationResponse.ok ||
-            !conversationData.success
-        ) {
-
-            throw new Error(
-                conversationData.message ||
-                "Unable to load conversation."
-            );
-
-        }
-
-
-        customerCareConversation =
-            conversationData.conversation;
-
-
-        await loadCustomerCareMessages(
-            true
+        /*
+         * Load sections independently. A failure in one area must not
+         * redirect the user or prevent the remaining areas from loading.
+         */
+        await Promise.allSettled([
+            loadProfile(),
+            loadWallet(),
+            loadKycStatus()
+        ]);
+    } catch (error) {
+        console.error("Profile initialization error:", error);
+        showMessage(
+            "pageNotice",
+            "The profile could not finish checking your session. The page has been kept open. " +
+                (error.message || ""),
+            "error"
         );
-
     }
-
-    finally {
-
-        customerCareLoading =
-            false;
-
-    }
-
 }
 
-
-/* ==========================================
-   LOAD MESSAGES
-========================================== */
-
-async function loadCustomerCareMessages(
-    scrollToBottom
-) {
-
+async function loadProfile() {
     try {
+        /*
+         * This endpoint must exist in the Express backend.
+         * If your backend uses a different profile endpoint, this request
+         * will display an error instead of redirecting away.
+         */
+        const data = await apiRequest("/api/profile");
+        const profile = data.profile || data.user || data;
 
-        const session =
-            await getCustomerCareSession();
-
-
-        if (!session) {
-            return;
-        }
-
-
-        const response =
-            await fetch(
-                API_BASE_URL +
-                "/api/support/messages",
-                {
-                    method: "GET",
-
-                    headers: {
-
-                        "Authorization":
-                            "Bearer " +
-                            session.access_token,
-
-                        "Content-Type":
-                            "application/json"
-
-                    }
-                }
-            );
-
-
-        const data =
-            await response.json();
-
-
-        if (
-            !response.ok ||
-            !data.success
-        ) {
-
-            throw new Error(
-                data.message ||
-                "Unable to load messages."
-            );
-
-        }
-
-
-        renderCustomerCareMessages(
-            data.messages || [],
-            scrollToBottom
-        );
-
+        $("profileFullName").value =
+            profile.full_name || profile.fullName || "";
+        $("profileUsername").value =
+            profile.username || "";
+        $("profilePhone").value =
+            profile.phone || profile.phone_number || "";
+        $("profileCountry").value =
+            profile.country || profile.country_of_residence || "";
+    } catch (error) {
+        showApiFailure("Profile", error);
     }
-
-    catch (error) {
-
-        console.error(
-            "Customer Care messages error:",
-            error
-        );
-
-
-        showCustomerCareError(
-            error.message ||
-            "Unable to load messages."
-        );
-
-    }
-
 }
-
-
-/* ==========================================
-   RENDER MESSAGES
-========================================== */
-
-function renderCustomerCareMessages(
-    messages,
-    scrollToBottom
-) {
-
-    const container =
-        document.getElementById(
-            "customerCareMessages"
-        );
-
-
-    if (!container) {
-        return;
-    }
-
-
-    if (
-        !messages ||
-        messages.length === 0
-    ) {
-
-        container.innerHTML =
-            `
-            <div class="chat-empty">
-                No messages yet.<br>
-                How can we help you?
-            </div>
-            `;
-
-        return;
-
-    }
-
-
-    container.innerHTML =
-        "";
-
-
-    messages.forEach(
-        message => {
-
-            const messageElement =
-                document.createElement(
-                    "div"
-                );
-
-
-            const senderType =
-                String(
-                    message.sender_type ||
-                    ""
-                )
-                .trim()
-                .toLowerCase();
-
-
-            const isCustomer =
-                senderType ===
-                "customer";
-
-
-            messageElement.className =
-                "chat-message " +
-                (
-                    isCustomer
-                        ? "customer"
-                        : "support"
-                );
-
-
-            const textElement =
-                document.createElement(
-                    "div"
-                );
-
-
-            textElement.textContent =
-                message.message ||
-                "";
-
-
-            const timeElement =
-                document.createElement(
-                    "span"
-                );
-
-
-            timeElement.className =
-                "chat-message-time";
-
-
-            timeElement.textContent =
-                formatChatTime(
-                    message.created_at
-                );
-
-
-            messageElement.appendChild(
-                textElement
-            );
-
-            messageElement.appendChild(
-                timeElement
-            );
-
-
-            container.appendChild(
-                messageElement
-            );
-
-        }
-    );
-
-
-    if (scrollToBottom) {
-
-        container.scrollTop =
-            container.scrollHeight;
-
-    }
-
-}
-
-
-/* ==========================================
-   CHAT TIME
-========================================== */
-
-function formatChatTime(
-    value
-) {
-
-    if (!value) {
-        return "";
-    }
-
-
-    const date =
-        new Date(
-            value
-        );
-
-
-    if (
-        Number.isNaN(
-            date.getTime()
-        )
-    ) {
-
-        return "";
-
-    }
-
-
-    return date.toLocaleString(
-        [],
-        {
-            hour: "2-digit",
-            minute: "2-digit"
-        }
-    );
-
-}
-
-
-/* ==========================================
-   SEND CUSTOMER CARE MESSAGE
-========================================== */
-
-async function sendCustomerCareMessage() {
-
-    const input =
-        document.getElementById(
-            "customerCareInput"
-        );
-
-    const button =
-        document.getElementById(
-            "customerCareSend"
-        );
-
-
-    if (
-        !input ||
-        !button
-    ) {
-        return;
-    }
-
-
-    const message =
-        input.value.trim();
-
-
-    if (!message) {
-
-        return;
-
-    }
-
-
-    if (
-        message.length > 2000
-    ) {
-
-        showCustomerCareError(
-            "Message is too long."
-        );
-
-        return;
-
-    }
-
-
-    button.disabled =
-        true;
-
-    button.textContent =
-        "Sending...";
-
-
-    hideCustomerCareError();
-
-
-    try {
-
-        const session =
-            await getCustomerCareSession();
-
-
-        if (!session) {
-            return;
-        }
-
-
-        const response =
-            await fetch(
-                API_BASE_URL +
-                "/api/support/messages",
-                {
-                    method: "POST",
-
-                    headers: {
-
-                        "Authorization":
-                            "Bearer " +
-                            session.access_token,
-
-                        "Content-Type":
-                            "application/json"
-
-                    },
-
-                    body:
-                        JSON.stringify({
-                            message:
-                                message
-                        })
-
-                }
-            );
-
-
-        const data =
-            await response.json();
-
-
-        if (
-            !response.ok ||
-            !data.success
-        ) {
-
-            throw new Error(
-                data.message ||
-                "Unable to send message."
-            );
-
-        }
-
-
-        input.value =
-            "";
-
-
-        await loadCustomerCareMessages(
-            true
-        );
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Customer Care send error:",
-            error
-        );
-
-
-        showCustomerCareError(
-            error.message ||
-            "Unable to send message."
-        );
-
-    }
-
-    finally {
-
-        button.disabled =
-            false;
-
-        button.textContent =
-            "Send";
-
-    }
-
-}
-
-
-/* ==========================================
-   CUSTOMER CARE ERRORS
-========================================== */
-
-function showCustomerCareError(
-    message
-) {
-
-    const errorElement =
-        document.getElementById(
-            "customerCareError"
-        );
-
-
-    if (!errorElement) {
-        return;
-    }
-
-
-    errorElement.textContent =
-        message;
-
-
-    errorElement.style.display =
-        "block";
-
-}
-
-
-function hideCustomerCareError() {
-
-    const errorElement =
-        document.getElementById(
-            "customerCareError"
-        );
-
-
-    if (!errorElement) {
-        return;
-    }
-
-
-    errorElement.textContent =
-        "";
-
-
-    errorElement.style.display =
-        "none";
-
-}
-
-
-/* ==========================================
-   AUTH USER
-========================================== */
-
-async function loadUser() {
-
-    const {
-        data,
-        error
-    } =
-        await supabaseClient.auth.getUser();
-
-
-    if (
-        error ||
-        !data.user
-    ) {
-
-        window.location.href =
-            "login.html";
-
-        return;
-
-    }
-
-
-    currentUser =
-        data.user;
-
-    displayUser();
-
-}
-
-
-/* ==========================================
-   DISPLAY USER
-========================================== */
-
-function displayUser() {
-
-    if (!currentUser) {
-        return;
-    }
-
-
-    const metadata =
-        currentUser.user_metadata || {};
-
-
-    const fullName =
-        metadata.full_name ||
-        metadata.name ||
-        "KMFBinary User";
-
-
-    const phone =
-        metadata.phone ||
-        metadata.phone_number ||
-        "";
-
-
-    const country =
-        metadata.country ||
-        "Kenya";
-
-
-    const email =
-        currentUser.email ||
-        "";
-
-
-    document.getElementById(
-        "profileName"
-    ).textContent =
-        fullName;
-
-
-    document.getElementById(
-        "profileEmail"
-    ).textContent =
-        email;
-
-
-    document.getElementById(
-        "accountId"
-    ).textContent =
-        currentUser.id;
-
-
-    document.getElementById(
-        "displayFullName"
-    ).textContent =
-        fullName;
-
-
-    document.getElementById(
-        "displayEmail"
-    ).textContent =
-        email;
-
-
-    document.getElementById(
-        "displayPhone"
-    ).textContent =
-        phone ||
-        "Not added";
-
-
-    document.getElementById(
-        "displayCountry"
-    ).textContent =
-        country;
-
-
-    const firstLetter =
-        fullName
-            .trim()
-            .charAt(0)
-            .toUpperCase();
-
-
-    document.getElementById(
-        "avatar"
-    ).textContent =
-        firstLetter ||
-        "K";
-
-
-    const phoneAction =
-        document.getElementById(
-            "phoneAction"
-        );
-
-
-    const phoneVerification =
-        document.getElementById(
-            "phoneVerification"
-        );
-
-
-    if (phone) {
-
-        phoneAction.textContent =
-            "Edit";
-
-        phoneVerification.textContent =
-            "Added";
-
-        phoneVerification.className =
-            "verified";
-
-    }
-
-    else {
-
-        phoneAction.textContent =
-            "Add";
-
-        phoneVerification.textContent =
-            "Pending";
-
-        phoneVerification.className =
-            "pending";
-
-    }
-
-}
-
-
-/* ==========================================
-   LOAD WALLET
-========================================== */
 
 async function loadWallet() {
-
     try {
-
-        const {
-            data: {
-                session
-            }
-        } =
-            await supabaseClient.auth.getSession();
-
-
-        if (!session) {
-
-            window.location.href =
-                "login.html";
-
-            return;
-
-        }
-
-
-        const response =
-            await fetch(
-                API_BASE_URL +
-                "/api/wallet",
-                {
-                    method: "GET",
-
-                    headers: {
-
-                        "Content-Type":
-                            "application/json",
-
-                        "Authorization":
-                            "Bearer " +
-                            session.access_token
-
-                    }
-                }
-            );
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Wallet request failed"
-            );
-
-        }
-
-
-        walletData =
-            await response.json();
-
-
-        const wallet =
-            walletData.wallet ||
-            walletData;
-
+        const data = await apiRequest("/api/wallet");
+        const wallet = data.wallet || data;
 
         const liveBalance =
-            Number(
-                wallet.balance || 0
-            );
-
+            wallet.balance ?? wallet.real_balance ?? wallet.realBalance ?? 0;
 
         const demoBalance =
-            Number(
-                wallet.demo_balance || 0
-            );
+            wallet.demo_balance ?? wallet.demoBalance ?? 10000;
 
-
-        document.getElementById(
-            "liveBalance"
-        ).textContent =
-            formatMoney(
-                liveBalance
-            );
-
-
-        document.getElementById(
-            "demoBalance"
-        ).textContent =
-            formatMoney(
-                demoBalance
-            );
-
-
-        document.getElementById(
-            "financeLiveBalance"
-        ).textContent =
-            formatMoney(
-                liveBalance
-            );
-
-
-        document.getElementById(
-            "financeDemoBalance"
-        ).textContent =
-            formatMoney(
-                demoBalance
-            );
-
+        $("realBalance").textContent = formatMoney(liveBalance);
+        $("demoBalance").textContent = formatMoney(demoBalance);
+    } catch (error) {
+        showApiFailure("Wallet", error);
     }
-
-    catch (error) {
-
-        console.error(
-            "Wallet loading error:",
-            error
-        );
-
-    }
-
 }
 
+async function loadKycStatus() {
+    try {
+        const data = await apiRequest("/api/kyc/status");
+        const kyc = data.kyc || data.verification || data;
 
-/* ==========================================
-   MONEY
-========================================== */
-
-function formatMoney(amount) {
-
-    return new Intl.NumberFormat(
-        "en-US",
-        {
-            style: "currency",
-            currency: "USD",
-            minimumFractionDigits: 2
-        }
-    ).format(
-        Number(amount) || 0
-    );
-
+        setKycStatus(
+            kyc.status || "not_submitted",
+            kyc.rejection_reason || kyc.rejectionReason || ""
+        );
+        clearMessage("kycMessage");
+    } catch (error) {
+        console.error("Verification status error:", error);
+        showMessage(
+            "kycMessage",
+            "Could not retrieve verification status from the backend. " +
+                (error.message || ""),
+            "error"
+        );
+    }
 }
 
+$("profileForm").addEventListener("submit", async event => {
+    event.preventDefault();
 
-/* ==========================================
-   EDIT PROFILE
-========================================== */
-
-function openEditModal() {
-
-    if (!currentUser) {
-        return;
-    }
-
-
-    const metadata =
-        currentUser.user_metadata || {};
-
-
-    document.getElementById(
-        "editFullName"
-    ).value =
-        metadata.full_name ||
-        metadata.name ||
-        "";
-
-
-    document.getElementById(
-        "editPhone"
-    ).value =
-        metadata.phone ||
-        metadata.phone_number ||
-        "";
-
-
-    document.getElementById(
-        "editCountry"
-    ).value =
-        metadata.country ||
-        "Kenya";
-
-
-    document.getElementById(
-        "editMessage"
-    ).textContent =
-        "";
-
-
-    document
-        .getElementById(
-            "editModal"
-        )
-        .classList.add(
-            "show"
-        );
-
-}
-
-
-function closeEditModal() {
-
-    document
-        .getElementById(
-            "editModal"
-        )
-        .classList.remove(
-            "show"
-        );
-
-}
-
-
-/* ==========================================
-   SAVE PROFILE
-========================================== */
-
-async function saveProfile() {
-
-    if (!currentUser) {
-        return;
-    }
-
-
-    const fullName =
-        document.getElementById(
-            "editFullName"
-        ).value.trim();
-
-
-    const phone =
-        document.getElementById(
-            "editPhone"
-        ).value.trim();
-
-
-    const country =
-        document.getElementById(
-            "editCountry"
-        ).value.trim();
-
-
-    const message =
-        document.getElementById(
-            "editMessage"
-        );
-
-
-    const button =
-        document.getElementById(
-            "saveProfileButton"
-        );
-
-
-    if (!fullName) {
-
-        message.textContent =
-            "Please enter your full name.";
-
-        message.className =
-            "message error";
-
-        return;
-
-    }
-
-
-    button.disabled =
-        true;
-
-    button.textContent =
-        "Saving...";
-
+    const button = $("saveProfileButton");
+    button.disabled = true;
+    button.textContent = "Saving...";
 
     try {
+        const payload = {
+            full_name: $("profileFullName").value.trim(),
+            username: $("profileUsername").value.trim(),
+            phone: $("profilePhone").value.trim(),
+            country: $("profileCountry").value.trim()
+        };
 
-        const {
-            data,
-            error
-        } =
-            await supabaseClient.auth.updateUser({
+      const saveResult = await apiRequest("/api/profile", {
+    method: "PATCH",
+    body: JSON.stringify(payload)
+});
 
-                data: {
+console.log("PROFILE SAVE RESPONSE:", saveResult);
 
-                    full_name:
-                        fullName,
+console.log(
+    "PHONE SENT:",
+    payload.phone
+);
 
-                    phone:
-                        phone,
-
-                    country:
-                        country
-
-                }
-
-            });
-
-
-        if (error) {
-            throw error;
-        }
-
-
-        currentUser =
-            data.user;
-
-
-        displayUser();
-
-
-        message.textContent =
-            "Profile saved successfully.";
-
-        message.className =
-            "message success";
-
-
-        setTimeout(
-            () => {
-
-                closeEditModal();
-
-            },
-            900
-        );
-
+        showMessage("profileMessage", "Profile details saved.", "success");
+    } catch (error) {
+        showApiFailure("Profile", error);
+    } finally {
+        button.disabled = false;
+        button.textContent = "Save profile";
     }
+});
 
-    catch (error) {
+$("refreshButton").addEventListener("click", async () => {
+    clearMessage("profileMessage");
+    await loadProfile();
+    await loadWallet();
+});
 
-        console.error(
-            "Profile save error:",
-            error
-        );
+$("refreshKycButton").addEventListener("click", loadKycStatus);
 
-
-        message.textContent =
-            error.message ||
-            "Unable to save profile.";
-
-        message.className =
-            "message error";
-
-    }
-
-    finally {
-
-        button.disabled =
-            false;
-
-        button.textContent =
-            "Save Changes";
-
-    }
-
-}
-
-
-/* ==========================================
-   PASSWORD RESET
-========================================== */
-
-async function resetPassword() {
-
-    if (
-        !currentUser ||
-        !currentUser.email
-    ) {
-
-        alert(
-            "Unable to determine your email."
-        );
-
-        return;
-
-    }
-
-
-    const {
-        error
-    } =
-        await supabaseClient.auth.resetPasswordForEmail(
-            currentUser.email,
-            {
-                redirectTo:
-                    window.location.origin +
-                    "/reset-password.html"
-            }
-        );
-
-
-    if (error) {
-
-        alert(
-            error.message
-        );
-
-        return;
-
-    }
-
-
-    alert(
-        "Password reset instructions have been sent to your email."
+$("accountMode").addEventListener("change", event => {
+    setAccountMode(event.target.value);
+    showMessage(
+        "modeMessage",
+        event.target.value === "real"
+            ? "Live account selected. No funds were transferred."
+            : "Demo account selected. No funds were transferred.",
+        "info"
     );
+});
 
-}
-
-
-/* ==========================================
-   LOGOUT
-========================================== */
-
-async function logout() {
-
-    clearCustomerCarePolling();
-
+$("passwordResetButton").addEventListener("click", async () => {
+    const button = $("passwordResetButton");
+    button.disabled = true;
+    button.textContent = "Sending...";
 
     try {
+        const email = currentSession?.user?.email;
+        if (!email) throw new Error("Your account email could not be found.");
 
-        await supabaseClient.auth.signOut();
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+            redirectTo: window.location.origin + "/reset-password.html"
+        });
 
-    }
+        if (error) throw error;
 
-    catch (error) {
-
-        console.error(
-            "Logout error:",
-            error
+        showMessage(
+            "securityMessage",
+            "If password-reset email delivery is configured, check your inbox for the reset link.",
+            "success"
         );
-
+    } catch (error) {
+        console.error("Password reset error:", error);
+        showMessage(
+            "securityMessage",
+            error.message || "Unable to request a password reset.",
+            "error"
+        );
+    } finally {
+        button.disabled = false;
+        button.textContent = "Send password-reset email";
     }
+});
 
+/* Mobile navigation */
+$("mobileMenu").addEventListener("click", () => {
+    $("sidebar").classList.toggle("open");
+});
 
-    localStorage.removeItem(
-        "kmf_account_mode"
-    );
+document.addEventListener("click", event => {
+    if (window.innerWidth > 950) return;
 
-    localStorage.removeItem(
-        "kmf_selected_account"
-    );
+    const sidebar = $("sidebar");
+    if (!sidebar.contains(event.target) &&
+        event.target !== $("mobileMenu")) {
+        sidebar.classList.remove("open");
+    }
+});
 
-
-    window.location.href =
-        "login.html";
-
+/* Customer Care */
+function openSupport() {
+    $("supportModal").classList.add("open");
+    loadSupportConversation();
 }
 
+function closeSupport() {
+    $("supportModal").classList.remove("open");
+}
 
-/* ==========================================
-   CHAT KEYBOARD
-========================================== */
+$("openSupportButton").addEventListener("click", openSupport);
+$("closeSupportButton").addEventListener("click", closeSupport);
 
-document
-    .getElementById(
-        "customerCareInput"
-    )
-    .addEventListener(
-        "keydown",
-        function(event) {
+$("supportModal").addEventListener("click", event => {
+    if (event.target === $("supportModal")) closeSupport();
+});
 
-            if (
-                event.key === "Enter" &&
-                !event.shiftKey
-            ) {
+function renderSupportMessages(messages) {
+    const container = $("supportMessages");
 
-                event.preventDefault();
-
-                sendCustomerCareMessage();
-
-            }
-
-        }
+    const signature = JSON.stringify(
+        (messages || []).map(message => ({
+            id: message.id,
+            message: message.message,
+            created_at: message.created_at,
+            sender_id: message.sender_id || message.user_id
+        }))
     );
 
+    if (signature === supportMessagesSignature) return;
+    supportMessagesSignature = signature;
 
-/* ==========================================
-   CLOSE CHAT WHEN CLICKING BACKGROUND
-========================================== */
+    if (!messages || !messages.length) {
+        container.innerHTML =
+            '<div class="loading">No messages yet. Send a message to contact support.</div>';
+        return;
+    }
 
-document
-    .getElementById(
-        "customerCareModal"
-    )
-    .addEventListener(
-        "click",
-        function(event) {
+    container.innerHTML = messages.map(message => {
+        const mine =
+            String(message.sender_id || message.user_id || "") ===
+            String(currentSession?.user?.id || "");
 
-            if (
-                event.target === this
-            ) {
+        const timestamp = message.created_at
+            ? new Date(message.created_at).toLocaleString()
+            : "";
 
-                closeCustomerCare();
+        return `
+            <div class="chat-message ${mine ? "mine" : ""}">
+                ${escapeHtml(message.message || "")}
+                <div class="chat-time">${escapeHtml(timestamp)}</div>
+            </div>
+        `;
+    }).join("");
 
-            }
+    container.scrollTop = container.scrollHeight;
+}
 
-        }
-    );
-
-
-/* ==========================================
-   EVENT LISTENERS
-========================================== */
-
-document
-    .getElementById(
-        "logoutButton"
-    )
-    .addEventListener(
-        "click",
-        logout
-    );
-
-
-document
-    .getElementById(
-        "logoutNav"
-    )
-    .addEventListener(
-        "click",
-        function(event) {
-
-            event.preventDefault();
-
-            logout();
-
-        }
-    );
-
-
-/* ==========================================
-   INITIALIZE
-========================================== */
-
-async function initializePage() {
+async function loadSupportConversation() {
+    if (!currentSession || supportPollingBusy) return;
+    supportPollingBusy = true;
 
     try {
+        if (!supportConversationId) {
+            const data = await apiRequest("/api/support/conversation");
+            const conversation = data.conversation || data;
+            supportConversationId = conversation.id || conversation.conversation_id;
 
-        const {
-            data: {
-                session
+            if (!supportConversationId) {
+                throw new Error("The backend did not return a conversation ID.");
             }
-        } =
-            await supabaseClient.auth.getSession();
-
-
-        if (!session) {
-
-            window.location.href =
-                "login.html";
-
-            return;
-
         }
 
-
-        await loadUser();
-
-        await loadWallet();
-
-        updateAccountDisplay();
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Profile initialization error:",
-            error
+        const data = await apiRequest(
+            "/api/support/messages?conversation_id=" +
+            encodeURIComponent(supportConversationId)
         );
 
-    }
+        const messages = Array.isArray(data.messages)
+            ? data.messages
+            : [];
 
+        renderSupportMessages(messages);
+        $("supportStatus").textContent = "Connected to Customer Care";
+    } catch (error) {
+        console.error("Customer Care loading error:", error);
+        $("supportStatus").textContent = "Unable to connect";
+        $("supportMessages").innerHTML =
+            '<div class="message show error">' +
+            escapeHtml(error.message || "Could not load support messages.") +
+            '</div>';
+    } finally {
+        supportPollingBusy = false;
+    }
 }
 
+$("supportForm").addEventListener("submit", async event => {
+    event.preventDefault();
 
-initializePage();
+    const input = $("supportMessageInput");
+    const button = $("sendSupportButton");
+    const message = input.value.trim();
 
+    if (!message) return;
+
+    button.disabled = true;
+
+    try {
+        if (!supportConversationId) {
+            await loadSupportConversation();
+        }
+
+        if (!supportConversationId) {
+            throw new Error("Customer Care conversation is unavailable.");
+        }
+
+        await apiRequest("/api/support/messages", {
+            method: "POST",
+            body: JSON.stringify({
+                conversation_id: supportConversationId,
+                message
+            })
+        });
+
+        input.value = "";
+        supportMessagesSignature = "";
+        await loadSupportConversation();
+    } catch (error) {
+        console.error("Customer Care send error:", error);
+        $("supportStatus").textContent =
+            error.message || "Message could not be sent.";
+    } finally {
+        button.disabled = false;
+        input.focus();
+    }
+});
+
+function startSupportPolling() {
+    clearInterval(supportPollingTimer);
+    supportPollingTimer = setInterval(() => {
+        if ($("supportModal").classList.contains("open")) {
+            loadSupportConversation();
+        }
+    }, 5000);
+}
+
+/* Logout */
+$("logoutButton").addEventListener("click", async () => {
+    const button = $("logoutButton");
+    button.disabled = true;
+    button.textContent = "Signing out...";
+
+    try {
+        clearInterval(supportPollingTimer);
+
+        const { error } = await supabaseClient.auth.signOut();
+        if (error) throw error;
+
+        localStorage.removeItem("kmf_account_mode");
+        localStorage.removeItem("kmf_selected_account");
+
+        window.location.replace("login.html");
+    } catch (error) {
+        console.error("Logout error:", error);
+        showMessage(
+            "pageNotice",
+            "Could not complete logout: " + (error.message || ""),
+            "error"
+        );
+
+        button.disabled = false;
+        button.textContent = "↩ Logout";
+    }
+});
+
+/* Keep authentication state changes from sending the user to dashboard. */
+supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === "SIGNED_OUT" && currentSession) {
+        currentSession = null;
+        window.location.replace("login.html");
+    } else if (session) {
+        currentSession = session;
+    }
+});
+
+startSupportPolling();
+initializeProfile();
 </script>
-
 </body>
 </html>

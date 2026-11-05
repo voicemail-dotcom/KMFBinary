@@ -1,215 +1,89 @@
+
 "use strict";
 
-const supabase =
-    require("./supabase");
-
-const buySellMarket =
-    require("./buy-sell-market");
-
+const db = require("./db");
+const buySellMarket = require("./buy-sell-market");
 
 /*
 ==========================================================
-KMF BUY / SELL SETTLEMENT
+KMF BUY / SELL SETTLEMENT — NEON
 ==========================================================
 
-Features:
-
+Preserves:
 - BUY / SELL P&L
 - Maximum loss = 100% of stake
-- Take Profit = 1.5x / 2x / 3x profit
-- Duration:
-    5 seconds
-    10 seconds
-    30 seconds
-    1 minute
-    2 minutes
-    5 minutes
-    10 minutes
-    15 minutes
-    30 minutes
-    1 hour
-- TP closes trade immediately
-- Max loss closes trade immediately
-- Expiry closes trade using current P/L
-- Manual Cash Out closes trade immediately
-- Stake is deducted when trade opens
-- Settlement returns stake + profit
-- Losing trades return only the remaining amount
-- Maximum loss returns 0
-- Separate wallet transaction references
-- Prevents double settlement
-==========================================================
-*/
+- Take Profit multipliers
+- Supported trade durations
+- Automatic expiry settlement
+- Manual cash-out
+- Demo / Live wallets
+- KES / USD conversion
+- Conditional trade closure
+- Atomic trade + wallet + transaction updates
 
-
-/*
-==========================================================
-SUPPORTED BUY / SELL DURATIONS
+Database: Neon PostgreSQL
 ==========================================================
 */
 
 const VALID_BUY_SELL_DURATIONS = [
-    1,
-    2,
-    3,
-    4,
-    5,
-    10,
-    15,
-    30,
-    45,
-    60,
-    120,
-    300,
-    600,
-    900,
-    1800,
-    2700,
-    3600
+    1, 2, 3, 4, 5, 10, 15, 30, 45,
+    60, 120, 300, 600, 900, 1800, 2700, 3600
 ];
-
 
 /*
 ==========================================================
 GET KES / USD EXCHANGE RATE
 ==========================================================
-
-IMPORTANT:
-
-The opening Buy/Sell endpoint uses
-KMF_KES_PER_USD.
-
-Settlement MUST use the same rate.
-
-This prevents the stake from being converted using
-one rate when opening and another rate when settling.
-==========================================================
 */
 
 function getKesPerUsd() {
+    const rate = Number(process.env.KMF_KES_PER_USD || 135);
 
-    const rate =
-        Number(
-            process.env.KMF_KES_PER_USD ||
-            135
-        );
-
-
-    if (
-        !Number.isFinite(rate) ||
-        rate <= 0
-    ) {
-
+    if (!Number.isFinite(rate) || rate <= 0) {
         return 135;
-
     }
 
-
     return rate;
-
 }
-
 
 /*
 ==========================================================
 BUY / SELL P&L
 ==========================================================
-
-For every 1 price point:
-
-KSh100 stake = KSh10 P/L
-
-Therefore:
-
-P/L =
-price movement × stake × 0.10
-
-Maximum loss:
--stake
-
-==========================================================
 */
 
 function calculatePnlKes({
-
     side,
-
     entryPrice,
-
     currentPrice,
-
     stakeKes
-
 }) {
-
-    const entry =
-        Number(entryPrice);
-
-    const current =
-        Number(currentPrice);
-
-    const stake =
-        Number(stakeKes);
-
+    const entry = Number(entryPrice);
+    const current = Number(currentPrice);
+    const stake = Number(stakeKes);
 
     if (
         !Number.isFinite(entry) ||
         !Number.isFinite(current) ||
         !Number.isFinite(stake)
     ) {
-
         return 0;
-
     }
-
 
     let movement;
 
-
-    if (
-        side === "buy"
-    ) {
-
-        movement =
-            current -
-            entry;
-
+    if (side === "buy") {
+        movement = current - entry;
+    } else {
+        movement = entry - current;
     }
 
-    else {
+    let pnl = movement * stake * 0.10;
 
-        movement =
-            entry -
-            current;
+    pnl = Math.max(-stake, pnl);
 
-    }
-
-
-    let pnl =
-        movement *
-        stake *
-        0.10;
-
-
-    /*
-    ------------------------------------------
-    MAXIMUM LOSS
-    ------------------------------------------
-    */
-
-    pnl =
-        Math.max(
-            -stake,
-            pnl
-        );
-
-
-    return Number(
-        pnl.toFixed(2)
-    );
-
+    return Number(pnl.toFixed(2));
 }
-
 
 /*
 ==========================================================
@@ -217,42 +91,20 @@ GET TAKE PROFIT MULTIPLIER
 ==========================================================
 */
 
-function getTakeProfitMultiplier(
-    trade
-) {
-
-    const value =
-        Number(
-            trade.take_profit_multiplier
-        );
-
+function getTakeProfitMultiplier(trade) {
+    const value = Number(trade.take_profit_multiplier);
 
     if (
         [
-            1.5,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10
-        ].includes(
-            value
-        )
+            1.5, 2, 3, 4, 5,
+            6, 7, 8, 9, 10
+        ].includes(value)
     ) {
-
         return value;
-
     }
 
-
     return 1.5;
-
 }
-
 
 /*
 ==========================================================
@@ -260,50 +112,68 @@ VALIDATE DURATION
 ==========================================================
 */
 
-function isValidDuration(
-    durationSeconds
-) {
-
+function isValidDuration(durationSeconds) {
     return VALID_BUY_SELL_DURATIONS.includes(
         Number(durationSeconds)
     );
-
 }
 
+/*
+==========================================================
+UPDATE OPEN TRADE PRICE AND P&L
+==========================================================
+*/
+
+async function updateOpenTradePrice(tradeId, currentPrice, pnlKes) {
+    try {
+        await db.query(
+            `UPDATE buy_sell_trades
+             SET current_price = $1,
+                 pnl_kes = $2
+             WHERE id = $3
+               AND status = 'open'`,
+            [
+                currentPrice,
+                pnlKes,
+                tradeId
+            ]
+        );
+    } catch (error) {
+        console.error(
+            "BUY/SELL PRICE UPDATE ERROR:",
+            error
+        );
+    }
+}
 
 /*
 ==========================================================
 SETTLE ONE TRADE
 ==========================================================
 
-options:
-
 forceClose:
-    Used by manual Cash Out.
+    Used for manual cash-out.
 
-When forceClose is true:
-- TP does not have to be reached.
-- Expiry does not have to be reached.
-- Trade closes immediately using current P/L.
+Trade closure, wallet credit, and transaction logging
+are committed together in one Neon transaction.
 
+If the wallet update or transaction insert fails,
+the trade closure is rolled back too.
 ==========================================================
 */
 
-async function settleTrade(
-    trade,
-    options = {}
-) {
+async function settleTrade(trade, options = {}) {
+    let client;
 
     try {
+        if (!trade || !trade.id || !trade.user_id) {
+            return null;
+        }
 
-        const forceClose =
-            options.forceClose === true;
-
+        const forceClose = options.forceClose === true;
 
         const manualCloseReason =
-            options.closeReason ||
-            "Cash Out";
-
+            options.closeReason || "Cash Out";
 
         /*
         ------------------------------------------
@@ -311,70 +181,53 @@ async function settleTrade(
         ------------------------------------------
         */
 
-        const currentPrice =
-            Number(
-                buySellMarket.getPrice(
-                    trade.symbol
-                )
-            );
+        const currentPrice = Number(
+            buySellMarket.getPrice(trade.symbol)
+        );
 
-
-        if (
-            !Number.isFinite(
-                currentPrice
-            )
-        ) {
-
+        if (!Number.isFinite(currentPrice)) {
             return null;
-
         }
-
 
         /*
         ------------------------------------------
-        CURRENT P/L
+        VALIDATE STAKE
         ------------------------------------------
         */
 
-        const pnlKes =
-            calculatePnlKes({
+        const stakeKes = Number(trade.stake_kes);
+        const stakeUsd = Number(trade.stake_usd);
 
-                side:
-                    trade.side,
-
-                entryPrice:
-                    trade.entry_price,
-
-                currentPrice,
-
-                stakeKes:
-                    trade.stake_kes
-
-            });
-
-
-        const stakeKes =
-            Number(
-                trade.stake_kes
-            );
-
-
-        if (
-            !Number.isFinite(
-                stakeKes
-            ) ||
-            stakeKes <= 0
-        ) {
-
+        if (!Number.isFinite(stakeKes) || stakeKes <= 0) {
             console.error(
                 "BUY/SELL INVALID STAKE:",
                 trade.id
             );
 
             return null;
-
         }
 
+        if (!Number.isFinite(stakeUsd) || stakeUsd <= 0) {
+            console.error(
+                "BUY/SELL INVALID USD STAKE:",
+                trade.id
+            );
+
+            return null;
+        }
+
+        /*
+        ------------------------------------------
+        CURRENT P&L
+        ------------------------------------------
+        */
+
+        const pnlKes = calculatePnlKes({
+            side: trade.side,
+            entryPrice: trade.entry_price,
+            currentPrice,
+            stakeKes
+        });
 
         /*
         ------------------------------------------
@@ -382,20 +235,11 @@ async function settleTrade(
         ------------------------------------------
         */
 
-        const tpMultiplier =
-            getTakeProfitMultiplier(
-                trade
-            );
+        const tpMultiplier = getTakeProfitMultiplier(trade);
 
-
-        const tpTargetKes =
-            Number(
-                (
-                    stakeKes *
-                    tpMultiplier
-                ).toFixed(2)
-            );
-
+        const tpTargetKes = Number(
+            (stakeKes * tpMultiplier).toFixed(2)
+        );
 
         /*
         ------------------------------------------
@@ -403,19 +247,13 @@ async function settleTrade(
         ------------------------------------------
         */
 
-        const expiresAt =
-            new Date(
-                trade.expires_at
-            ).getTime();
-
+        const expiresAt = new Date(
+            trade.expires_at
+        ).getTime();
 
         const expired =
-            Number.isFinite(
-                expiresAt
-            ) &&
-            Date.now() >=
-            expiresAt;
-
+            Number.isFinite(expiresAt) &&
+            Date.now() >= expiresAt;
 
         /*
         ------------------------------------------
@@ -423,10 +261,7 @@ async function settleTrade(
         ------------------------------------------
         */
 
-        const maxLoss =
-            pnlKes <=
-            -stakeKes;
-
+        const maxLoss = pnlKes <= -stakeKes;
 
         /*
         ------------------------------------------
@@ -434,15 +269,12 @@ async function settleTrade(
         ------------------------------------------
         */
 
-        const takeProfitReached =
-            pnlKes >=
-            tpTargetKes;
-
+        const takeProfitReached = pnlKes >= tpTargetKes;
 
         /*
-        ==================================================
-        LIVE TRADE
-        ==================================================
+        ------------------------------------------
+        TRADE STILL OPEN
+        ------------------------------------------
         */
 
         if (
@@ -451,303 +283,108 @@ async function settleTrade(
             !maxLoss &&
             !takeProfitReached
         ) {
-
-            await supabase
-                .from("buy_sell_trades")
-                .update({
-
-                    current_price:
-                        currentPrice,
-
-                    pnl_kes:
-                        pnlKes
-
-                })
-                .eq(
-                    "id",
-                    trade.id
-                )
-                .eq(
-                    "status",
-                    "open"
-                );
-
+            await updateOpenTradePrice(
+                trade.id,
+                currentPrice,
+                pnlKes
+            );
 
             return null;
-
         }
-
 
         /*
         ==================================================
-        FINAL RESULT
+        DETERMINE FINAL RESULT
         ==================================================
         */
 
         let finalPnl;
-
         let status;
-
         let closeReason;
 
-
         /*
-        ------------------------------------------
         MANUAL CASH OUT
-        ------------------------------------------
         */
 
-        if (
-            forceClose
-        ) {
+        if (forceClose) {
+            finalPnl = Math.max(-stakeKes, pnlKes);
 
-            finalPnl =
-                Math.max(
-                    -stakeKes,
-                    pnlKes
-                );
-
-
-            if (
-                finalPnl > 0
-            ) {
-
-                status =
-                    "won";
-
+            if (finalPnl > 0) {
+                status = "won";
+            } else if (finalPnl < 0) {
+                status = "loss";
+            } else {
+                status = "expired";
             }
 
-            else if (
-                finalPnl < 0
-            ) {
-
-                status =
-                    "loss";
-
-            }
-
-            else {
-
-                status =
-                    "expired";
-
-            }
-
-
-            closeReason =
-                manualCloseReason;
-
+            closeReason = manualCloseReason;
         }
 
-
         /*
-        ------------------------------------------
-        MAX LOSS
-        ------------------------------------------
+        MAXIMUM LOSS
         */
 
-        else if (
-            maxLoss
-        ) {
-
-            finalPnl =
-                -stakeKes;
-
-            status =
-                "loss";
-
-            closeReason =
-                "Maximum loss reached";
-
+        else if (maxLoss) {
+            finalPnl = -stakeKes;
+            status = "loss";
+            closeReason = "Maximum loss reached";
         }
 
-
         /*
-        ------------------------------------------
         TAKE PROFIT
-        ------------------------------------------
         */
 
-        else if (
-            takeProfitReached
-        ) {
-
-            finalPnl =
-                tpTargetKes;
-
-            status =
-                "won";
-
-            closeReason =
-                `Take Profit ${tpMultiplier}x reached`;
-
+        else if (takeProfitReached) {
+            finalPnl = tpTargetKes;
+            status = "won";
+            closeReason = `Take Profit ${tpMultiplier}x reached`;
         }
 
-
         /*
-        ------------------------------------------
         DURATION EXPIRY
-        ------------------------------------------
         */
 
         else {
+            finalPnl = pnlKes;
 
-            finalPnl =
-                pnlKes;
-
-
-            if (
-                finalPnl > 0
-            ) {
-
-                status =
-                    "won";
-
+            if (finalPnl > 0) {
+                status = "won";
+            } else if (finalPnl < 0) {
+                status = "loss";
+            } else {
+                status = "expired";
             }
 
-            else if (
-                finalPnl < 0
-            ) {
-
-                status =
-                    "loss";
-
-            }
-
-            else {
-
-                status =
-                    "expired";
-
-            }
-
-
-            closeReason =
-                "Duration expired";
-
+            closeReason = "Duration expired";
         }
 
+        finalPnl = Number(finalPnl.toFixed(2));
 
         /*
         ==================================================
-        CLAIM TRADE
-        ==================================================
-
-        The status check prevents
-        double settlement.
-
-        Only one worker/request can
-        change OPEN → closed status.
+        CALCULATE WALLET CREDIT
         ==================================================
         */
 
-        const {
+        const kesPerUsd = getKesPerUsd();
 
-            data: closedTrade,
-
-            error: closeError
-
-        } = await supabase
-            .from("buy_sell_trades")
-            .update({
-
-                current_price:
-                    currentPrice,
-
-                pnl_kes:
-                    finalPnl,
-
-                result_kes:
-                    finalPnl,
-
-                exit_price:
-                    currentPrice,
-
-                status,
-
-                closed_at:
-                    new Date().toISOString(),
-
-                close_reason:
-                    closeReason
-
-            })
-            .eq(
-                "id",
-                trade.id
-            )
-            .eq(
-                "status",
-                "open"
-            )
-            .select()
-            .maybeSingle();
-
-
-        if (closeError) {
-
-            console.error(
-                "BUY/SELL CLOSE ERROR:",
-                closeError
-            );
-
-            return null;
-
-        }
-
+        const pnlUsd = Number(
+            (finalPnl / kesPerUsd).toFixed(6)
+        );
 
         /*
-        Another worker/request
-        already closed it.
+        The stake was deducted when the trade opened.
+        Settlement returns the remaining stake plus/minus P&L.
         */
 
-        if (!closedTrade) {
-
-            return null;
-
-        }
-
+        const walletCredit = Math.max(
+            0,
+            Number((stakeUsd + pnlUsd).toFixed(6))
+        );
 
         /*
         ==================================================
-        GET WALLET
-        ==================================================
-        */
-
-        const {
-
-            data: wallet,
-
-            error: walletError
-
-        } = await supabase
-            .from("wallets")
-            .select("*")
-            .eq(
-                "user_id",
-                trade.user_id
-            )
-            .maybeSingle();
-
-
-        if (
-            walletError ||
-            !wallet
-        ) {
-
-            console.error(
-                "BUY/SELL WALLET ERROR:",
-                walletError
-            );
-
-            return closedTrade;
-
-        }
-
-
-        /*
-        ==================================================
-        SELECT ACCOUNT BALANCE
+        VALIDATE ACCOUNT MODE
         ==================================================
         */
 
@@ -756,284 +393,188 @@ async function settleTrade(
                 ? "balance"
                 : "demo_balance";
 
+        /*
+        ==================================================
+        ATOMIC NEON SETTLEMENT
+        ==================================================
 
-        const currentBalance =
-            Number(
-                wallet[
-                    balanceField
-                ]
-            );
+        1. Claim the open trade.
+        2. Lock the wallet row.
+        3. Credit the correct balance.
+        4. Insert the wallet transaction.
+        5. Commit all changes together.
 
+        Any database failure rolls back the transaction.
+        ==================================================
+        */
 
-        if (
-            !Number.isFinite(
-                currentBalance
-            )
-        ) {
+        client = await db.pool.connect();
 
-            console.error(
-                "BUY/SELL INVALID WALLET BALANCE:",
+        await client.query("BEGIN");
+
+        /*
+        ------------------------------------------
+        CLAIM TRADE
+        ------------------------------------------
+        */
+
+        const closeResult = await client.query(
+            `UPDATE buy_sell_trades
+             SET current_price = $1,
+                 pnl_kes = $2,
+                 result_kes = $2,
+                 exit_price = $1,
+                 status = $3,
+                 closed_at = NOW(),
+                 close_reason = $4
+             WHERE id = $5
+               AND status = 'open'
+             RETURNING *`,
+            [
+                currentPrice,
+                finalPnl,
+                status,
+                closeReason,
                 trade.id
-            );
+            ]
+        );
 
-            return closedTrade;
-
-        }
-
+        const closedTrade =
+            closeResult.rows[0] || null;
 
         /*
-        ==================================================
-        KES → USD
-        ==================================================
-
-        IMPORTANT:
-
-        Use the SAME KMF_KES_PER_USD rate that is used
-        when the trade opens.
-
-        Example:
-
-        KSh100 stake
-        Rate = 135
-
-        Stake USD =
-        100 / 135
-
-        ==================================================
+        Another worker already closed this trade.
         */
 
-        const kesPerUsd =
-            getKesPerUsd();
-
-
-        const stakeUsd =
-            Number(
-                trade.stake_usd
-            );
-
-
-        if (
-            !Number.isFinite(
-                stakeUsd
-            ) ||
-            stakeUsd <= 0
-        ) {
-
-            console.error(
-                "BUY/SELL INVALID USD STAKE:",
-                trade.id
-            );
-
-            return closedTrade;
-
+        if (!closedTrade) {
+            await client.query("ROLLBACK");
+            return null;
         }
 
-
-        const pnlUsd =
-            Number(
-                (
-                    finalPnl /
-                    kesPerUsd
-                ).toFixed(6)
-            );
-
-
         /*
-        ==================================================
-        WALLET CREDIT
-        ==================================================
-
-        The stake was already removed when the trade
-        opened.
-
-        Therefore settlement returns:
-
-        STAKE + PROFIT
-
-        or:
-
-        STAKE - LOSS
-
-        Examples:
-
         ------------------------------------------
-
-        Stake = KSh100
-        Profit = KSh80
-
-        Credit =
-        KSh100 + KSh80
-        = KSh180
-
+        LOCK WALLET
         ------------------------------------------
-
-        Stake = KSh100
-        Loss = KSh40
-
-        Credit =
-        KSh100 - KSh40
-        = KSh60
-
-        ------------------------------------------
-
-        Stake = KSh100
-        Maximum loss = KSh100
-
-        Credit =
-        KSh100 - KSh100
-        = KSh0
-
-        ==================================================
         */
 
-        const walletCredit =
-            Math.max(
-                0,
-                Number(
-                    (
-                        stakeUsd +
-                        pnlUsd
-                    ).toFixed(6)
-                )
+        const walletResult = await client.query(
+            `SELECT *
+             FROM wallets
+             WHERE user_id = $1
+             FOR UPDATE`,
+            [trade.user_id]
+        );
+
+        const wallet = walletResult.rows[0] || null;
+
+        if (!wallet) {
+            throw new Error(
+                `Wallet not found for user ${trade.user_id}`
             );
-
-
-        const newBalance =
-            Number(
-                (
-                    currentBalance +
-                    walletCredit
-                ).toFixed(6)
-            );
-
-
-        /*
-        ==================================================
-        CREDIT WALLET
-        ==================================================
-        */
-
-        const {
-
-            data: updatedWallet,
-
-            error: walletUpdateError
-
-        } = await supabase
-            .from("wallets")
-            .update({
-
-                [balanceField]:
-                    newBalance,
-
-                updated_at:
-                    new Date().toISOString()
-
-            })
-            .eq(
-                "id",
-                wallet.id
-            )
-            .eq(
-                balanceField,
-                currentBalance
-            )
-            .select()
-            .maybeSingle();
-
-
-        if (
-            walletUpdateError ||
-            !updatedWallet
-        ) {
-
-            console.error(
-                "BUY/SELL WALLET CREDIT ERROR:",
-                walletUpdateError
-            );
-
-            return closedTrade;
-
         }
 
+        const currentBalance = Number(
+            wallet[balanceField]
+        );
 
-        /*
-        ==================================================
-        WALLET TRANSACTION
-        ==================================================
-        */
-
-        const transactionAmount =
-            walletCredit;
-
-
-        const transactionDescription =
-            forceClose
-                ? `Buy/Sell ${trade.side.toUpperCase()} Cash Out`
-                : `Buy/Sell ${trade.side.toUpperCase()} settlement`;
-
-
-        const {
-
-            error: transactionError
-
-        } = await supabase
-            .from("wallet_transactions")
-            .insert({
-
-                user_id:
-                    trade.user_id,
-
-                wallet_id:
-                    wallet.id,
-
-                transaction_type:
-                    "buy_sell_settlement",
-
-                type:
-                    "buy_sell_settlement",
-
-                amount:
-                    transactionAmount,
-
-                status:
-                    "completed",
-
-                payment_method:
-                    "wallet",
-
-                reference:
-                    "BS-SETTLE-" +
-                    trade.id,
-
-                reference_id:
-                    trade.id,
-
-                description:
-                    transactionDescription,
-
-                balance_before:
-                    currentBalance,
-
-                balance_after:
-                    newBalance
-
-            });
-
-
-        if (transactionError) {
-
-            console.error(
-                "BUY/SELL TRANSACTION LOG ERROR:",
-                transactionError
+        if (!Number.isFinite(currentBalance)) {
+            throw new Error(
+                `Invalid ${balanceField} for trade ${trade.id}`
             );
-
         }
 
+        /*
+        ------------------------------------------
+        CALCULATE NEW BALANCE
+        ------------------------------------------
+        */
+
+        const newBalance = Number(
+            (currentBalance + walletCredit).toFixed(6)
+        );
+
+        /*
+        ------------------------------------------
+        CREDIT LIVE OR DEMO WALLET
+        ------------------------------------------
+        */
+
+        const walletUpdateResult = await client.query(
+            `UPDATE wallets
+             SET ${balanceField} = $1,
+                 updated_at = NOW()
+             WHERE id = $2
+               AND user_id = $3
+             RETURNING *`,
+            [
+                newBalance,
+                wallet.id,
+                trade.user_id
+            ]
+        );
+
+        if (walletUpdateResult.rowCount !== 1) {
+            throw new Error(
+                `Wallet credit failed for trade ${trade.id}`
+            );
+        }
+
+        /*
+        ------------------------------------------
+        INSERT WALLET TRANSACTION
+        ------------------------------------------
+        */
+
+        const transactionDescription = forceClose
+            ? `Buy/Sell ${String(trade.side).toUpperCase()} Cash Out`
+            : `Buy/Sell ${String(trade.side).toUpperCase()} settlement`;
+
+        await client.query(
+            `INSERT INTO wallet_transactions (
+                user_id,
+                wallet_id,
+                transaction_type,
+                type,
+                amount,
+                status,
+                payment_method,
+                reference,
+                reference_id,
+                description,
+                balance_before,
+                balance_after
+             )
+             VALUES (
+                $1, $2, $3, $4, $5, $6,
+                $7, $8, $9, $10, $11, $12
+             )`,
+            [
+                trade.user_id,
+                wallet.id,
+                "buy_sell_settlement",
+                "buy_sell_settlement",
+                walletCredit,
+                "completed",
+                "wallet",
+                `BS-SETTLE-${trade.id}`,
+                trade.id,
+                transactionDescription,
+                currentBalance,
+                newBalance
+            ]
+        );
+
+        /*
+        ------------------------------------------
+        COMMIT
+        ------------------------------------------
+        */
+
+        await client.query("COMMIT");
 
         /*
         ==================================================
-        LOG
+        LOG SETTLEMENT
         ==================================================
         */
 
@@ -1047,101 +588,41 @@ async function settleTrade(
                 : "BUY/SELL TRADE SETTLED"
         );
 
-        console.log(
-            "TRADE:",
-            trade.id
-        );
-
-        console.log(
-            "SIDE:",
-            trade.side
-        );
-
-        console.log(
-            "ENTRY:",
-            trade.entry_price
-        );
-
-        console.log(
-            "EXIT:",
-            currentPrice
-        );
-
-        console.log(
-            "STAKE KES:",
-            stakeKes
-        );
-
-        console.log(
-            "STAKE USD:",
-            stakeUsd
-        );
-
-        console.log(
-            "KES/USD RATE:",
-            kesPerUsd
-        );
-
-        console.log(
-            "TP:",
-            tpMultiplier + "x"
-        );
-
-        console.log(
-            "TP TARGET KES:",
-            tpTargetKes
-        );
-
-        console.log(
-            "P/L KES:",
-            finalPnl
-        );
-
-        console.log(
-            "P/L USD:",
-            pnlUsd
-        );
-
-        console.log(
-            "CREDIT USD:",
-            walletCredit
-        );
-
-        console.log(
-            "BALANCE BEFORE USD:",
-            currentBalance
-        );
-
-        console.log(
-            "BALANCE AFTER USD:",
-            newBalance
-        );
-
-        console.log(
-            "MODE:",
-            trade.mode
-        );
-
-        console.log(
-            "STATUS:",
-            status
-        );
-
-        console.log(
-            "REASON:",
-            closeReason
-        );
+        console.log("TRADE:", trade.id);
+        console.log("SIDE:", trade.side);
+        console.log("ENTRY:", trade.entry_price);
+        console.log("EXIT:", currentPrice);
+        console.log("STAKE KES:", stakeKes);
+        console.log("STAKE USD:", stakeUsd);
+        console.log("KES/USD RATE:", kesPerUsd);
+        console.log("TP:", `${tpMultiplier}x`);
+        console.log("TP TARGET KES:", tpTargetKes);
+        console.log("P/L KES:", finalPnl);
+        console.log("P/L USD:", pnlUsd);
+        console.log("CREDIT USD:", walletCredit);
+        console.log("BALANCE BEFORE USD:", currentBalance);
+        console.log("BALANCE AFTER USD:", newBalance);
+        console.log("MODE:", trade.mode);
+        console.log("STATUS:", status);
+        console.log("REASON:", closeReason);
 
         console.log(
             "=========================================="
         );
 
-
         return closedTrade;
 
-    }
-
-    catch (error) {
+    } catch (error) {
+        if (client) {
+            try {
+                await client.query("ROLLBACK");
+            } catch (rollbackError) {
+                console.error(
+                    "BUY/SELL ROLLBACK ERROR:",
+                    rollbackError.message
+                );
+            }
+        }
 
         console.error(
             "BUY/SELL SETTLEMENT ERROR:",
@@ -1150,206 +631,96 @@ async function settleTrade(
 
         return null;
 
+    } finally {
+        if (client) {
+            client.release();
+        }
     }
-
 }
-
 
 /*
 ==========================================================
 MANUAL BUY / SELL CASH OUT
 ==========================================================
-
-This is called by the API endpoint.
-
-It:
-
-1. Finds the user's open trade.
-2. Gets the current market price.
-3. Calculates current P/L.
-4. Immediately closes the trade.
-5. Returns stake + current P/L.
-6. Credits the correct Demo/Live wallet.
-7. Prevents double cash-out.
-
-==========================================================
 */
 
-async function cashOutBuySellTrade(
-    tradeId,
-    userId
-) {
-
+async function cashOutBuySellTrade(tradeId, userId) {
     try {
-
-        if (
-            !tradeId ||
-            !userId
-        ) {
-
+        if (!tradeId || !userId) {
             return {
-
                 success: false,
-
                 statusCode: 400,
-
-                message:
-                    "Trade ID and user ID are required"
-
+                message: "Trade ID and user ID are required"
             };
-
         }
 
-
-        const {
-
-            data: trade,
-
-            error
-
-        } = await supabase
-            .from("buy_sell_trades")
-            .select("*")
-            .eq(
-                "id",
-                tradeId
-            )
-            .eq(
-                "user_id",
+        const result = await db.query(
+            `SELECT *
+             FROM buy_sell_trades
+             WHERE id = $1
+               AND user_id = $2
+               AND status = 'open'
+             LIMIT 1`,
+            [
+                tradeId,
                 userId
-            )
-            .eq(
-                "status",
-                "open"
-            )
-            .maybeSingle();
+            ]
+        );
 
-
-        if (error) {
-
-            console.error(
-                "BUY/SELL CASH OUT LOOKUP ERROR:",
-                error
-            );
-
-            return {
-
-                success: false,
-
-                statusCode: 500,
-
-                message:
-                    "Unable to load Buy/Sell position"
-
-            };
-
-        }
-
+        const trade = result.rows[0] || null;
 
         if (!trade) {
-
             return {
-
                 success: false,
-
                 statusCode: 409,
-
-                message:
-                    "Buy/Sell position is no longer open"
-
+                message: "Buy/Sell position is no longer open"
             };
-
         }
 
-
-        /*
-        Validate stored duration
-        for safety.
-        */
-
-        if (
-            !isValidDuration(
-                trade.duration_seconds
-            )
-        ) {
-
+        if (!isValidDuration(trade.duration_seconds)) {
             console.warn(
                 "BUY/SELL CASH OUT UNKNOWN DURATION:",
                 trade.duration_seconds
             );
-
         }
 
-
-        const closedTrade =
-            await settleTrade(
-                trade,
-                {
-
-                    forceClose:
-                        true,
-
-                    closeReason:
-                        "Manual Cash Out"
-
-                }
-            );
-
+        const closedTrade = await settleTrade(
+            trade,
+            {
+                forceClose: true,
+                closeReason: "Manual Cash Out"
+            }
+        );
 
         if (!closedTrade) {
-
             return {
-
                 success: false,
-
                 statusCode: 409,
-
                 message:
                     "Trade was already closed or could not be cashed out"
-
             };
-
         }
 
-
         return {
-
             success: true,
-
             statusCode: 200,
-
-            message:
-                "Buy/Sell position cashed out successfully",
-
-            trade:
-                closedTrade
-
+            message: "Buy/Sell position cashed out successfully",
+            trade: closedTrade
         };
 
-    }
-
-    catch (error) {
-
+    } catch (error) {
         console.error(
             "BUY/SELL CASH OUT ERROR:",
             error
         );
 
         return {
-
             success: false,
-
             statusCode: 500,
-
-            message:
-                "Unable to cash out Buy/Sell position"
-
+            message: "Unable to cash out Buy/Sell position"
         };
-
     }
-
 }
-
 
 /*
 ==========================================================
@@ -1358,76 +729,32 @@ SETTLE ALL OPEN TRADES
 */
 
 async function settleBuySellTrades() {
-
     try {
+        const result = await db.query(
+            `SELECT *
+             FROM buy_sell_trades
+             WHERE status = 'open'
+             ORDER BY expires_at ASC
+             LIMIT 100`
+        );
 
-        const {
+        const trades = result.rows;
 
-            data: trades,
-
-            error
-
-        } = await supabase
-            .from("buy_sell_trades")
-            .select("*")
-            .eq(
-                "status",
-                "open"
-            )
-            .order(
-                "expires_at",
-                {
-                    ascending: true
-                }
-            )
-            .limit(100);
-
-
-        if (error) {
-
-            console.error(
-                "BUY/SELL OPEN TRADES ERROR:",
-                error
-            );
-
+        if (!Array.isArray(trades) || trades.length === 0) {
             return;
-
         }
 
-
-        if (
-            !Array.isArray(trades) ||
-            trades.length === 0
-        ) {
-
-            return;
-
+        for (const trade of trades) {
+            await settleTrade(trade);
         }
 
-
-        for (
-            const trade of trades
-        ) {
-
-            await settleTrade(
-                trade
-            );
-
-        }
-
-    }
-
-    catch (error) {
-
+    } catch (error) {
         console.error(
             "BUY/SELL SETTLEMENT WORKER ERROR:",
             error
         );
-
     }
-
 }
-
 
 /*
 ==========================================================
@@ -1436,13 +763,8 @@ EXPORT
 */
 
 module.exports = {
-
     calculatePnlKes,
-
     settleBuySellTrades,
-
     cashOutBuySellTrade,
-
     VALID_BUY_SELL_DURATIONS
-
 };

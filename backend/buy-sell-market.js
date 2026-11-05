@@ -1,3 +1,4 @@
+
 "use strict";
 
 /*
@@ -9,11 +10,16 @@ Symbol:
 KMF-BS
 
 Features:
-- Fast-moving synthetic price
-- Tick updates every 150ms
+- Controlled, gradual price movement
+- Smaller random price changes
+- Reduced sudden jumps
+- Smooth market drift and reversals
 - 1-minute OHLC candles
-- Natural movement and reversals
 - BUY / SELL compatible
+- Shared price source for P/L and candles
+
+NOTE:
+The settlement and wallet rules remain unchanged.
 ==========================================================
 */
 
@@ -23,7 +29,8 @@ const SYMBOL = "KMF-BS";
 
 const START_PRICE = 4100;
 
-const TICK_INTERVAL_MS = 150;
+// Four updates per second.
+const TICK_INTERVAL_MS = 250;
 
 const CANDLE_DURATION_MS = 60 * 1000;
 
@@ -79,13 +86,9 @@ function randomNormal() {
     }
 
     return Math.sqrt(
-        -2 *
-        Math.log(u)
-    ) *
-    Math.cos(
-        2 *
-        Math.PI *
-        v
+        -2 * Math.log(u)
+    ) * Math.cos(
+        2 * Math.PI * v
     );
 
 }
@@ -105,28 +108,20 @@ function createCandle(
 
     const candleStart =
         Math.floor(
-            timestamp /
-            CANDLE_DURATION_MS
-        ) *
-        CANDLE_DURATION_MS;
-
+            timestamp / CANDLE_DURATION_MS
+        ) * CANDLE_DURATION_MS;
 
     return {
 
-        time:
-            candleStart,
+        time: candleStart,
 
-        open:
-            price,
+        open: price,
 
-        high:
-            price,
+        high: price,
 
-        low:
-            price,
+        low: price,
 
-        close:
-            price
+        close: price
 
     };
 
@@ -139,46 +134,22 @@ INITIAL CANDLE HISTORY
 ==========================================================
 */
 
-function initializeCandles(
-    market
-) {
+function initializeCandles(market) {
 
-    const now =
-        Date.now();
+    const now = Date.now();
 
+    let price = START_PRICE;
 
-    let price =
-        START_PRICE;
-
-
-    for (
-        let i = 119;
-        i >= 0;
-        i--
-    ) {
+    for (let i = 119; i >= 0; i--) {
 
         const time =
-            now -
-            i *
-            CANDLE_DURATION_MS;
+            now - i * CANDLE_DURATION_MS;
 
+        const open = price;
 
-        const open =
-            price;
-
-
-        let high =
-            open;
-
-
-        let low =
-            open;
-
-
+        // Smaller historical price changes.
         const movement =
-            randomNormal() *
-            3;
-
+            randomNormal() * 0.6;
 
         const close =
             Math.max(
@@ -186,35 +157,25 @@ function initializeCandles(
                 open + movement
             );
 
+        const high =
+            Math.max(open, close) +
+            Math.random() * 0.4;
 
-        high =
+        const low =
             Math.max(
-                open,
-                close
-            ) +
-            Math.random() * 2;
+                1,
+                Math.min(open, close) -
+                Math.random() * 0.4
+            );
 
-
-        low =
-            Math.min(
-                open,
-                close
-            ) -
-            Math.random() * 2;
-
-
-        price =
-            close;
-
+        price = close;
 
         market.candles.push({
 
             time:
                 Math.floor(
-                    time /
-                    CANDLE_DURATION_MS
-                ) *
-                CANDLE_DURATION_MS,
+                    time / CANDLE_DURATION_MS
+                ) * CANDLE_DURATION_MS,
 
             open,
 
@@ -228,19 +189,14 @@ function initializeCandles(
 
     }
 
+    market.price = Number(price.toFixed(2));
 
-    market.price =
-        price;
-
-
-    market.previousPrice =
-        price;
-
+    market.previousPrice = market.price;
 
     market.currentCandle =
         createCandle(
             market,
-            price,
+            market.price,
             now
         );
 
@@ -249,13 +205,11 @@ function initializeCandles(
 
 /*
 ==========================================================
-INITIALIZE
+INITIALIZE MARKET
 ==========================================================
 */
 
-initializeCandles(
-    markets[SYMBOL]
-);
+initializeCandles(markets[SYMBOL]);
 
 
 /*
@@ -266,129 +220,120 @@ GENERATE TICK
 
 function generateTick() {
 
-    const market =
-        markets[SYMBOL];
+    const market = markets[SYMBOL];
 
-
-    const now =
-        Date.now();
+    const now = Date.now();
 
 
     /*
     ------------------------------------------
-    SMALL MARKET DRIFT
+    GENTLE MARKET DRIFT
     ------------------------------------------
     */
 
     market.drift +=
-        randomNormal() *
-        0.04;
+        randomNormal() * 0.024;
 
-
-    market.drift *=
-        0.96;
+    market.drift *= 0.94;
 
 
     /*
     ------------------------------------------
-    RANDOM MOVEMENT
+    SMALLER RANDOM MOVEMENT
     ------------------------------------------
     */
 
     let movement =
-        randomNormal() *
-        0.65;
+        randomNormal() * 0.39;
 
 
     /*
     ------------------------------------------
-    OCCASIONAL STRONGER MOVE
+    OCCASIONAL SMALLER MOVEMENT
     ------------------------------------------
     */
 
-    if (
-        Math.random() <
-        0.035
-    ) {
+    if (Math.random() < 0.015) {
 
         movement +=
-            randomNormal() *
-            2.5;
+            randomNormal() * 1.5;
 
     }
 
 
     /*
     ------------------------------------------
-    DRIFT
+    COMBINE MOVEMENT
     ------------------------------------------
     */
 
-    movement +=
-        market.drift;
+    movement += market.drift;
 
 
     /*
     ------------------------------------------
-    PRICE
+    LIMIT EXTREME SINGLE-TICK JUMPS
+    ------------------------------------------
+
+    Prevents one random tick from creating
+    an unusually large price jump.
+
+    This does not cap total movement over
+    the full duration of a trade.
+    ------------------------------------------
+    */
+
+    movement = Math.max(
+        -0.40,
+        Math.min(0.40, movement)
+    );
+
+
+    /*
+    ------------------------------------------
+    UPDATE PRICE
     ------------------------------------------
     */
 
     const newPrice =
         Math.max(
             1,
-            market.price +
-            movement
+            market.price + movement
         );
 
-
-    market.previousPrice =
-        market.price;
-
+    market.previousPrice = market.price;
 
     market.price =
-        Number(
-            newPrice.toFixed(2)
-        );
-
+        Number(newPrice.toFixed(2));
 
     market.tick++;
 
-
-    market.lastTickTime =
-        now;
+    market.lastTickTime = now;
 
 
     /*
     ------------------------------------------
-    CANDLE
+    UPDATE CANDLE
     ------------------------------------------
     */
 
     const candleStart =
         Math.floor(
-            now /
-            CANDLE_DURATION_MS
-        ) *
-        CANDLE_DURATION_MS;
-
+            now / CANDLE_DURATION_MS
+        ) * CANDLE_DURATION_MS;
 
     if (
         !market.currentCandle ||
-        market.currentCandle.time !==
-        candleStart
+        market.currentCandle.time !== candleStart
     ) {
 
-        if (
-            market.currentCandle
-        ) {
+        if (market.currentCandle) {
 
             market.candles.push(
                 market.currentCandle
             );
 
         }
-
 
         market.currentCandle =
             createCandle(
@@ -397,19 +342,15 @@ function generateTick() {
                 now
             );
 
-
         if (
-            market.candles.length >
-            MAX_CANDLES
+            market.candles.length > MAX_CANDLES
         ) {
 
             market.candles.shift();
 
         }
 
-    }
-
-    else {
+    } else {
 
         market.currentCandle.high =
             Math.max(
@@ -417,13 +358,11 @@ function generateTick() {
                 market.price
             );
 
-
         market.currentCandle.low =
             Math.min(
                 market.currentCandle.low,
                 market.price
             );
-
 
         market.currentCandle.close =
             market.price;
@@ -437,35 +376,25 @@ function generateTick() {
     ------------------------------------------
     */
 
-    for (
-        const callback of
-        market.subscribers
-    ) {
+    for (const callback of market.subscribers) {
 
         try {
 
             callback({
 
-                symbol:
-                    market.symbol,
+                symbol: market.symbol,
 
-                price:
-                    market.price,
+                price: market.price,
 
-                previousPrice:
-                    market.previousPrice,
+                previousPrice: market.previousPrice,
 
-                tick:
-                    market.tick,
+                tick: market.tick,
 
-                timestamp:
-                    now
+                timestamp: now
 
             });
 
-        }
-
-        catch (error) {
+        } catch (error) {
 
             console.error(
                 "Buy/Sell subscriber error:",
@@ -475,7 +404,6 @@ function generateTick() {
         }
 
     }
-
 
     return market.price;
 
@@ -500,20 +428,13 @@ GET PRICE
 ==========================================================
 */
 
-function getPrice(
-    symbol = SYMBOL
-) {
+function getPrice(symbol = SYMBOL) {
 
-    const market =
-        markets[symbol];
-
+    const market = markets[symbol];
 
     if (!market) {
-
         return null;
-
     }
-
 
     return market.price;
 
@@ -526,9 +447,7 @@ GET MARKET
 ==========================================================
 */
 
-function getMarket(
-    symbol = SYMBOL
-) {
+function getMarket(symbol = SYMBOL) {
 
     return markets[symbol] || null;
 
@@ -541,30 +460,19 @@ GET CANDLES
 ==========================================================
 */
 
-function getCandles(
-    symbol = SYMBOL
-) {
+function getCandles(symbol = SYMBOL) {
 
-    const market =
-        markets[symbol];
-
+    const market = markets[symbol];
 
     if (!market) {
-
         return [];
-
     }
 
+    const candles = [
+        ...market.candles
+    ];
 
-    const candles =
-        [
-            ...market.candles
-        ];
-
-
-    if (
-        market.currentCandle
-    ) {
+    if (market.currentCandle) {
 
         candles.push(
             market.currentCandle
@@ -572,10 +480,7 @@ function getCandles(
 
     }
 
-
-    return candles.slice(
-        -MAX_CANDLES
-    );
+    return candles.slice(-MAX_CANDLES);
 
 }
 
@@ -586,36 +491,24 @@ SUBSCRIBE
 ==========================================================
 */
 
-function subscribe(
-    symbol,
-    callback
-) {
+function subscribe(symbol, callback) {
 
-    const market =
-        markets[symbol];
-
+    const market = markets[symbol];
 
     if (
         !market ||
-        typeof callback !==
-        "function"
+        typeof callback !== "function"
     ) {
 
         return () => {};
 
     }
 
-
-    market.subscribers.add(
-        callback
-    );
-
+    market.subscribers.add(callback);
 
     return () => {
 
-        market.subscribers.delete(
-            callback
-        );
+        market.subscribers.delete(callback);
 
     };
 
